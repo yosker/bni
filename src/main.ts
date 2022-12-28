@@ -13,10 +13,12 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('API PRASYDE')
     .setDescription('The Prasyde API description')
     .setVersion('1.0')
     .addTag('Users')
+    .addTag('Auth')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);

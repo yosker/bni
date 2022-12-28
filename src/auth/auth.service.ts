@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { HttpException, Injectable } from '@nestjs/common';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { RegisterAuthDto } from './dto/register-auth.dto';
+import { hash, compare } from 'bcrypt';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User } from 'src/users/interfaces/users.interface';
+import { Users } from 'src/users/schemas/users.schema';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @InjectModel(Users.name) private readonly usersModel: Model<User>,
+    private jwtService: JwtService,
+  ) {}
+  async register(registerAuthDto: RegisterAuthDto) {
+    const { password } = registerAuthDto;
+    const plainToHash = await hash(password, 10);
+    registerAuthDto = { ...registerAuthDto, password: plainToHash };
+    return await this.usersModel.create(registerAuthDto);
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login(loginAuthDto: LoginAuthDto) {
+    const { email, password } = loginAuthDto;
+    const findUser = await this.usersModel.findOne({ email });
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    if (!findUser) throw new HttpException('USER_NOT_FOUND.', 404);
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    const checkPassword = await compare(password, findUser.password);
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    if (!checkPassword) throw new HttpException('PASSWORD_INCORRECT', 403);
+
+    const payload = { id: findUser._id, name: findUser.name };
+    const token = this.jwtService.sign(payload);
+    const data = {
+      user: findUser,
+      token,
+    };
+
+    return data;
   }
 }

@@ -7,8 +7,6 @@ export type UsersDocument = Users & Document;
 export class Users {
   genre: string;
 
-  id: number;
-
   @Prop({ type: 'string', length: 20, unique: true })
   username: string;
 
