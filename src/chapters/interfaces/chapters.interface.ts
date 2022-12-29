@@ -11,11 +11,10 @@ export interface Chapter extends Document {
     createdAt: {
         type: Date
     },
-    status: { type: number, default:1, required: false},
+    status: { type: string, default: "Active", required: false},
 
     //PROPIEDADES PARA DAR DE ALTA UN USUARIO
-
-    userName: { type: string},
+    name: { type: string},
     lastName: { type: string},
     email: { type: string},
 }

@@ -23,8 +23,8 @@ export class Users {
   @Prop({ default: new Date() })
   updatedAt: Date;
 
-  @Prop({ type: 'string' })
-  idChapter: string;
+  @Prop({ type: 'object' })
+  idChapter: Object;
 
   @Prop({ type: 'string' })
   roleName: string;

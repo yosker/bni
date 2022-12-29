@@ -31,13 +31,13 @@ export class CreateChapterDTO {
     @Prop({default: now()})
     createdAt: Date;
 
-    @Prop({default:1, required: false})
-    status?: number;
+    @Prop({default: "Active", required: false})
+    status?: string;
 
     //PROPIEDADES PARA DAR DE ALTA UN USUARIO
     @IsNotEmpty()
     @IsString()
-    userName: string;
+    name: string;
 
     @IsNotEmpty()
     @IsString()

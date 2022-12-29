@@ -5,9 +5,11 @@ import { Chapter } from './interfaces/chapters.interface'
 import { CreateChapterDTO } from './dto/chapters.dto'
 import { ServicesResponse } from '../responses/response'
 import { User } from 'src/users/interfaces/users.interface';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { Users } from 'src/users/schemas/users.schema';
+import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
+import { hash } from 'bcrypt';
 
+const ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class ChaptersService {
 
@@ -32,25 +34,22 @@ export class ChaptersService {
         let message = '';
         let result = {};
 
-        const chapter = new this.chapterModel(createChapterDTO);
+        const chapter: Chapter = new this.chapterModel(createChapterDTO);
         try {
             const newChapter = await chapter.save();
 
-            const createUserDto: CreateUserDto = {
-                idChapter: newChapter._id,
-                roleName: 'Presidente',
-                name: createChapterDTO.userName,
-                lastName: createChapterDTO.lastName,
-                phoneNumber: ' ',
+            let createUserDto: RegisterAuthDto = {
+                idChapter: ObjectId(newChapter._id),
+                name: createChapterDTO.name,
                 email: createChapterDTO.email,
-                password: "123456",
-                imageURL: ' ',
-                companyName: ' ',
-                profession: ' ',
-                status: 1,
-                createdAt: new Date()
+                password: "123456"
             }
-            const user = await this.usersModel.create(createUserDto);
+
+            const { password } = createUserDto;
+            const plainToHash = await hash(password, 10);
+            createUserDto = { ...createUserDto, password: plainToHash };
+
+            await this.usersModel.create(createUserDto);
             status = 200;
             message = "OK";
         }
