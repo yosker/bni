@@ -8,6 +8,7 @@ import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { hash } from 'bcrypt';
+import { SharedService } from 'src/shared/shared.service';
 
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
@@ -15,7 +16,8 @@ export class ChaptersService {
 
     constructor(
         @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
-        @InjectModel(Users.name) private readonly usersModel: Model<User>,) { }
+        @InjectModel(Users.name) private readonly usersModel: Model<User>,
+        private readonly sharedService: SharedService) { }
 
     async getChapters(): Promise<Chapter[]> {
         const chapters = await this.chapterModel.find();
@@ -42,7 +44,7 @@ export class ChaptersService {
                 idChapter: ObjectId(newChapter._id),
                 name: createChapterDTO.name,
                 email: createChapterDTO.email,
-                password: "123456"
+                password: await this.sharedService.passwordGenerator(6)
             }
 
             const { password } = createUserDto;

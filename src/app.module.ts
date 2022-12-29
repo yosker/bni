@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { ChaptersModule } from './chapters/chapters.module';
+import { SharedService } from './shared/shared.service';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -15,8 +17,9 @@ import { ChaptersModule } from './chapters/chapters.module';
     UsersModule,
     AuthModule,
     ChaptersModule,
+    SharedModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [SharedService],
 })
 export class AppModule {}
