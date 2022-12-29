@@ -1,13 +1,16 @@
-import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+import { Prop } from '@nestjs/mongoose';
+import { IsNotEmpty, IsString, IsEmail, IsNumber } from 'class-validator';
+import {now } from "mongoose";
 
 export class CreateUserDto {
-  @IsNotEmpty()
-  @IsString()
-  username: string;
 
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  @IsString()
+  idChapter: string;
+
+  @IsNotEmpty()
+  @IsString()
+  roleName: string;
 
   @IsNotEmpty()
   @IsString()
@@ -15,18 +18,36 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
+  lastName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  phoneNumber: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
   password: string;
 
   @IsString()
-  status: string;
+  imageURL: string;
 
+  @IsNotEmpty()
   @IsString()
-  birthday: string;
+  companyName: string;
 
+  @IsNotEmpty()
   @IsString()
-  rolename: string;
+  profession: string;
 
-  createdAt: string;
+  @Prop({default: now()})
+  createdAt: Date;
 
-  updatedAt: string;
+  @IsNotEmpty()
+  @IsNumber()
+  status: number;
+
 }

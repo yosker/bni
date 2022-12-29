@@ -1,0 +1,22 @@
+import { Schema } from 'mongoose'
+
+export const ChapterSchema = new Schema({
+
+    country: { type: String, required: true },
+    region: { type: String, required: true },
+    chapterName: { type: String, required: true,length: 80, unique: true  },
+    sessionDate: { type: String, required: true },
+    sessionSchedule: { type: String, required: true },
+    sessionType: { type: String, required: true },
+    createdAt: {
+        type: Date,
+        default: new Date().toISOString()
+    },
+    status: { type: Number, default: 1, required: false },
+
+    //PROPIEDADES PARA DAR DE ALTA UN USUARIO
+
+    // userName: { type: String, required: true },
+    // lastName: { type: String, required: true },
+    // email: { type: String, required: true },
+});

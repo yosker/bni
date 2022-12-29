@@ -6,6 +6,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from './schemas/users.schema';
 
+import { ServicesResponse } from '../responses/response'
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -19,9 +21,32 @@ export class UsersService {
     return await this.usersModel.findById(id);
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
+    let response = new ServicesResponse;
+    let status = 0;
+    let message = "";
+    let result = {};
     const newUser = new this.usersModel(createUserDto);
-    return await newUser.save();
+   
+    try {
+      await newUser.save();
+      status = 200;
+      message = "OK";
+    }
+    catch (err) {
+      if (err.code === 11000) {
+        status = 401;
+        message = "DUPLICATED";
+      } else {
+        status = 500;
+        message = "INTERNAL_SERVER_ERROR";
+      }
+    }
+    
+    response.status = status;
+    response.message = message;
+    response.result = result;
+    return response;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
