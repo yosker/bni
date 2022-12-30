@@ -8,13 +8,13 @@ import { SharedService } from 'src/shared/shared.service';
 import { ServicesResponse } from 'src/responses/response';
 
 @Module({
-  imports:[ 
+  imports: [
     MongooseModule.forFeature([
-      {name: 'Chapter', schema: ChapterSchema},
-      {name: 'Users', schema: UsersSchema}
+      { name: 'Chapter', schema: ChapterSchema },
+      { name: 'Users', schema: UsersSchema },
     ]),
   ],
   controllers: [ChaptersController],
-  providers: [ChaptersService, SharedService, ServicesResponse]
+  providers: [ChaptersService, SharedService, ServicesResponse],
 })
 export class ChaptersModule {}

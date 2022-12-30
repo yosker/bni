@@ -14,7 +14,7 @@ import { ServicesResponse } from 'src/responses/response';
         schema: UsersSchema,
       },
     ]),
-    AuthModule
+    AuthModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, ServicesResponse],
