@@ -49,7 +49,7 @@ export class ChaptersService {
 
             const { password } = createUserDto;
             const plainToHash = await hash(password, 10);
-            createUserDto = { ...createUserDto, password: plainToHash };
+            createUserDto = { ...createUserDto, password: plainToHash};
 
             await this.usersModel.create(createUserDto);
             status = 200;

@@ -5,8 +5,7 @@ import {now } from "mongoose";
 export class CreateUserDto {
 
   @IsNotEmpty()
-  @IsString()
-  idChapter: string;
+  idChapter: Object;
 
   @IsNotEmpty()
   @IsString()

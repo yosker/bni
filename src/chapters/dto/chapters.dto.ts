@@ -1,8 +1,11 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { Prop } from '@nestjs/mongoose';
 import { IsNotEmpty, IsString, IsNumber, IsEmail } from 'class-validator';
-import {now } from "mongoose";
+import { extend } from 'joi';
+import { now } from "mongoose";
+import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 
-export class CreateChapterDTO {
+export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
 
     @IsNotEmpty()
     @IsString()
@@ -15,7 +18,7 @@ export class CreateChapterDTO {
     @IsNotEmpty()
     @IsString()
     chapterName: string;
-    
+
     @IsNotEmpty()
     @IsString()
     sessionDate: string;
@@ -23,28 +26,15 @@ export class CreateChapterDTO {
     @IsNotEmpty()
     @IsString()
     sessionSchedule: string;
-  
+
     @IsNotEmpty()
     @IsString()
     sessionType: string;
- 
-    @Prop({default: now()})
+
+    @Prop({ default: now() })
     createdAt: Date;
 
-    @Prop({default: "Active", required: false})
+    @Prop({ default: "Active", required: false })
     status?: string;
-
-    //PROPIEDADES PARA DAR DE ALTA UN USUARIO
-    @IsNotEmpty()
-    @IsString()
-    name: string;
-
-    @IsNotEmpty()
-    @IsString()
-    lastName: string;
-
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
 }
 

@@ -8,6 +8,8 @@ import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { JwtService } from '@nestjs/jwt';
 
+const ObjectId = require('mongodb').ObjectId;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,9 +17,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   async register(registerAuthDto: RegisterAuthDto) {
-    const { password } = registerAuthDto;
+    const { password, idChapter } = registerAuthDto;
     const plainToHash = await hash(password, 10);
-    registerAuthDto = { ...registerAuthDto, password: plainToHash };
+    registerAuthDto = { ...registerAuthDto, password: plainToHash, idChapter: ObjectId(idChapter) };
     return await this.usersModel.create(registerAuthDto);
   }
 
