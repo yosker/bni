@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from './schemas/users.schema';
 
-import { ServicesResponse } from '../responses/response'
+import { ServicesResponse } from '../responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class UsersService {
   constructor(
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private servicesResponse: ServicesResponse,
-  ) { }
+  ) {}
   async findAll(): Promise<Users[]> {
     return await this.usersModel.find();
   }
@@ -24,15 +24,14 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
-    let { status, message, result } = this.servicesResponse;
+    const { status, message, result } = this.servicesResponse;
 
     const newUser = new this.usersModel(createUserDto);
 
     try {
       await newUser.save();
       return { status, message, result };
-    }
-    catch (err) {
+    } catch (err) {
       if (err.code === 11000) {
         throw new HttpErrorByCode[409]('DUPLICATED_REGISTER');
       } else {
