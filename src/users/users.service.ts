@@ -7,12 +7,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from './schemas/users.schema';
 
 import { ServicesResponse } from '../responses/response'
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
-  ) {}
+    private servicesResponse: ServicesResponse,
+  ) { }
   async findAll(): Promise<Users[]> {
     return await this.usersModel.find();
   }
@@ -22,31 +24,21 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
-    let response = new ServicesResponse;
-    let status = 0;
-    let message = "";
-    let result = {};
+    let { status, message, result } = this.servicesResponse;
+
     const newUser = new this.usersModel(createUserDto);
-   
+
     try {
       await newUser.save();
-      status = 200;
-      message = "OK";
+      return { status, message, result };
     }
     catch (err) {
       if (err.code === 11000) {
-        status = 401;
-        message = "DUPLICATED";
+        throw new HttpErrorByCode[409]('DUPLICATED_REGISTER');
       } else {
-        status = 500;
-        message = "INTERNAL_SERVER_ERROR";
+        throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
       }
     }
-    
-    response.status = status;
-    response.message = message;
-    response.result = result;
-    return response;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
