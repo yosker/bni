@@ -6,6 +6,7 @@ import { ChapterSchema } from './schemas/chapters.schema';
 import { UsersSchema } from 'src/users/schemas/users.schema';
 import { SharedService } from 'src/shared/shared.service';
 import { ServicesResponse } from 'src/responses/response';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ServicesResponse } from 'src/responses/response';
       { name: 'Chapter', schema: ChapterSchema },
       { name: 'Users', schema: UsersSchema },
     ]),
+    AuthModule,
   ],
   controllers: [ChaptersController],
   providers: [ChaptersService, SharedService, ServicesResponse],

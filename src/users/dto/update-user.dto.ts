@@ -20,7 +20,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   birthday: string;
 
-  rolename: string;
+  role: string;
 
   updatedAt: string;
 }

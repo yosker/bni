@@ -18,7 +18,7 @@ import { SharedModule } from './shared/shared.module';
     AuthModule,
     ChaptersModule,
     SharedModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [],
   providers: [SharedService],

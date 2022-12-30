@@ -18,16 +18,16 @@ export class Users {
   status: string;
 
   @Prop({ default: new Date() })
-  createdAt: Date
+  createdAt: Date;
 
   @Prop({ default: new Date() })
   updatedAt: Date;
 
   @Prop({ type: 'object' })
-  idChapter: Object;
+  idChapter: object;
 
   @Prop({ type: 'string' })
-  roleName: string;
+  role: string;
 
   @Prop({ type: 'string' })
   lastName: string;
@@ -45,4 +45,4 @@ export class Users {
   profession: string;
 }
 
-export const UsersSchema = SchemaFactory.createForClass(Users); 
+export const UsersSchema = SchemaFactory.createForClass(Users);

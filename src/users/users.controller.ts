@@ -15,6 +15,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Role } from '../auth/decorators/Role.decorator';
+import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -23,6 +26,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('/create')
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   async create(@Res() res, @Body() createUserDto: CreateUserDto) {
     const response = await this.usersService.create(createUserDto);
     return res.status(HttpStatus.OK).json({
