@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpStatus, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  HttpStatus,
+  Res,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,15 +20,14 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post('/create')
   async create(@Res() res, @Body() createUserDto: CreateUserDto) {
-
     const response = await this.usersService.create(createUserDto);
     return res.status(HttpStatus.OK).json({
-      response: response
-    })
+      response: response,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -40,5 +50,4 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
-  
 }

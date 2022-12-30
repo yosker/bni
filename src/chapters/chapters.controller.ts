@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Res,
-  HttpStatus,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { CreateChapterDTO } from './dto/chapters.dto';
 import { ChaptersService } from './chapters.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -18,14 +11,10 @@ import { AuthGuard } from '@nestjs/passport';
 export class ChaptersController {
   constructor(private chapterService: ChaptersService) {}
 
-  @Post('/createChapter')
+  @Post('/create')
   @TokenJwt('test')
   // @UseGuards(AuthGuard(), JwtGuard)
-  async createPost(@Res() res, @Body() chapterDTO: CreateChapterDTO) {
-    const response = await this.chapterService.createChapter(chapterDTO);
-
-    return res.status(HttpStatus.OK).json({
-      response: response,
-    });
+  async createPost(@Body() chapterDTO: CreateChapterDTO) {
+    return await this.chapterService.createChapter(chapterDTO);
   }
 }
