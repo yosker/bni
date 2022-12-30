@@ -17,7 +17,9 @@ export class ChaptersService {
     constructor(
         @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
         @InjectModel(Users.name) private readonly usersModel: Model<User>,
-        private readonly sharedService: SharedService) { }
+        private readonly sharedService: SharedService,
+        private servicesResponse: ServicesResponse
+    ) { }
 
     async getChapters(): Promise<Chapter[]> {
         const chapters = await this.chapterModel.find();
@@ -30,11 +32,7 @@ export class ChaptersService {
     }
 
     async createChapter(createChapterDTO: CreateChapterDTO): Promise<ServicesResponse> {
-
-        let response = new ServicesResponse;
-        let status = 0;
-        let message = '';
-        let result = {};
+        let { status, message, result } = this.servicesResponse;
 
         const chapter: Chapter = new this.chapterModel(createChapterDTO);
         try {
@@ -49,25 +47,21 @@ export class ChaptersService {
 
             const { password } = createUserDto;
             const plainToHash = await hash(password, 10);
-            createUserDto = { ...createUserDto, password: plainToHash};
+            createUserDto = { ...createUserDto, password: plainToHash };
 
             await this.usersModel.create(createUserDto);
-            status = 200;
-            message = "OK";
         }
         catch (err) {
             if (err.code === 11000) {
                 status = 401;
-                message = "Duplicated";
+                message = "DUPLICATED_REGISTER";
             } else {
                 status = 500;
                 message = err.message;
             }
         }
-        response.status = status;
-        response.message = message;
-        response.result = result;
-        return response;
+        
+        return { status, message, result };
     }
 
     async updateChapter(chapterId: string, createChapterDTO: CreateChapterDTO): Promise<Chapter> {

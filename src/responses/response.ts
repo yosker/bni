@@ -1,8 +1,8 @@
 
 export class ServicesResponse{
 
-    status: number;
-    message: string;
-    result: Object;
+    status: number = 200;
+    message: string = 'SUCCESS';
+    result: Object = {};
     
 }
