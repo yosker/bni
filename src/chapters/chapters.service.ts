@@ -46,7 +46,7 @@ export class ChaptersService {
         name: createChapterDTO.name,
         email: createChapterDTO.email,
         password: await this.sharedService.passwordGenerator(6),
-        role: 'Admin',
+        role: 'Operative',
       };
 
       const { password } = createUserDto;
