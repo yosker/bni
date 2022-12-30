@@ -19,9 +19,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /**
+   * @description Se obtiene la información del token recibido
+   * @param payload
+   * @returns
+   */
   async validate(payload: any) {
     const { id, name } = payload;
-    const user = await this.usersModel.findById(id);
+    const user = this.usersModel.findById(id);
     if (!user) {
       throw new UnauthorizedException();
     }

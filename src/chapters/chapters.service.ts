@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -21,20 +22,20 @@ export class ChaptersService {
     private servicesResponse: ServicesResponse,
   ) {}
 
-  async getChapters(): Promise<Chapter[]> {
-    const chapters = await this.chapterModel.find();
+  async getChapters() {
+    const chapters = this.chapterModel.find();
     return chapters;
   }
 
-  async getChapter(chapterId: string): Promise<Chapter> {
-    const chapter = await this.chapterModel.findById(chapterId);
+  async getChapter(chapterId: string) {
+    const chapter = this.chapterModel.findById(chapterId);
     return chapter;
   }
 
   async createChapter(
     createChapterDTO: CreateChapterDTO,
   ): Promise<ServicesResponse> {
-    let { status, message, result } = this.servicesResponse;
+    const { status, message, result } = this.servicesResponse;
 
     const chapter: Chapter = new this.chapterModel(createChapterDTO);
     try {
@@ -48,6 +49,7 @@ export class ChaptersService {
       };
 
       const { password } = createUserDto;
+      console.log(password);
       const plainToHash = await hash(password, 10);
       createUserDto = { ...createUserDto, password: plainToHash };
 
@@ -63,11 +65,8 @@ export class ChaptersService {
     }
   }
 
-  async updateChapter(
-    chapterId: string,
-    createChapterDTO: CreateChapterDTO,
-  ): Promise<Chapter> {
-    const chapterUpdated = await this.chapterModel.findByIdAndUpdate(
+  async updateChapter(chapterId: string, createChapterDTO: CreateChapterDTO) {
+    const chapterUpdated = this.chapterModel.findByIdAndUpdate(
       chapterId,
       createChapterDTO,
       { new: true },
@@ -75,8 +74,8 @@ export class ChaptersService {
     return chapterUpdated;
   }
 
-  async deleteChapter(chapterId: string): Promise<Chapter> {
-    const deletedChapter = await this.chapterModel.findByIdAndDelete(chapterId);
+  async deleteChapter(chapterId: string) {
+    const deletedChapter = this.chapterModel.findByIdAndDelete(chapterId);
     return deletedChapter;
   }
 }

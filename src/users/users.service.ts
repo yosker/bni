@@ -15,12 +15,12 @@ export class UsersService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private servicesResponse: ServicesResponse,
   ) {}
-  async findAll(): Promise<Users[]> {
-    return await this.usersModel.find();
+  async findAll() {
+    return this.usersModel.find();
   }
 
-  async findOne(id: string): Promise<User> {
-    return await this.usersModel.findById(id);
+  async findOne(id: string) {
+    return this.usersModel.findById(id);
   }
 
   async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
@@ -44,7 +44,7 @@ export class UsersService {
     return this.usersModel.findByIdAndUpdate(id, updateUserDto, { new: true });
   }
 
-  async remove(id: string): Promise<User> {
-    return await this.usersModel.findByIdAndDelete(id);
+  async remove(id: string) {
+    return this.usersModel.findByIdAndDelete(id);
   }
 }
