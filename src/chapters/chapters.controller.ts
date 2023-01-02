@@ -1,10 +1,7 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { CreateChapterDTO } from './dto/chapters.dto';
 import { ChaptersService } from './chapters.service';
 import { ApiTags } from '@nestjs/swagger';
-import { Role } from '../auth/decorators/Role.decorator';
-import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
-import { AuthGuard } from '@nestjs/passport';
 import { ServicesResponse } from 'src/responses/response';
 
 @ApiTags('Chapters')
@@ -13,8 +10,6 @@ export class ChaptersController {
   constructor(private chapterService: ChaptersService) {}
 
   @Post('/create')
-  // @Role('Admin')
-  // @UseGuards(AuthGuard(), JwtGuard)
   async create(
     @Body() chapterDTO: CreateChapterDTO,
   ): Promise<ServicesResponse> {

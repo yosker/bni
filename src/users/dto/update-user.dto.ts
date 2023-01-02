@@ -1,6 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsNotEmpty, IsString, IsEmail, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, IsDate } from 'class-validator';
+import { Prop } from '@nestjs/mongoose';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsNotEmpty()
@@ -15,12 +16,14 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString()
   password: string;
 
-  @IsNumber()
-  status: number;
+  @IsString()
+  status: string;
 
   birthday: string;
 
   role: string;
 
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  @IsDate()
+  updatedAt: Date;
 }

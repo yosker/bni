@@ -12,4 +12,6 @@ export interface User extends Document {
   profession: string;
   createdAt: Date;
   status: string;
+  completedApplication: boolean;
+  completedInterview: boolean;
 }

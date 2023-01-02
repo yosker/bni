@@ -17,6 +17,11 @@ import { EmailProperties } from 'src/shared/EmailProperties'
     AuthModule,
   ],
   controllers: [ChaptersController],
-  providers: [ChaptersService, SharedService, ServicesResponse, EmailProperties],
+  providers: [
+    ChaptersService,
+    SharedService,
+    ServicesResponse,
+    EmailProperties,
+  ],
 })
 export class ChaptersModule {}

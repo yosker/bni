@@ -16,17 +16,42 @@ export class AuthService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private jwtService: JwtService,
   ) {}
+
+  /**
+   * @description Registro de nuevo usuario
+   * @param registerAuthDto
+   * @returns User
+   */
   async register(registerAuthDto: RegisterAuthDto) {
     const { password, idChapter } = registerAuthDto;
     const plainToHash = await hash(password, 10);
+
     registerAuthDto = {
       ...registerAuthDto,
       password: plainToHash,
       idChapter: ObjectId(idChapter),
     };
-    return await this.usersModel.create(registerAuthDto);
+    const findUser = await this.usersModel.create(registerAuthDto);
+    const payload = {
+      id: findUser._id,
+      name: registerAuthDto.name,
+      role: registerAuthDto.role,
+      email: registerAuthDto.email,
+    };
+    const token = this.jwtService.sign(payload);
+    const data = {
+      user: findUser,
+      token,
+    };
+
+    return data;
   }
 
+  /**
+   * @description Login de usuario
+   * @param loginAuthDto
+   * @returns user-token
+   */
   async login(loginAuthDto: LoginAuthDto) {
     const { email, password } = loginAuthDto;
     const findUser = await this.usersModel.findOne({ email });

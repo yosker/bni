@@ -1,8 +1,11 @@
 import { Prop } from '@nestjs/mongoose';
-import { IsNotEmpty, IsString, IsEmail, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, IsBoolean } from 'class-validator';
 export class CreateUserDto {
   @IsNotEmpty()
   idChapter: object;
+
+  @Prop({ default: null, type: Object })
+  idInvitedBy?: object;
 
   @IsNotEmpty()
   @IsString()
@@ -29,7 +32,7 @@ export class CreateUserDto {
   password: string;
 
   @IsString()
-  imageURL: string;
+  imageURL = '';
 
   @IsNotEmpty()
   @IsString()
@@ -39,10 +42,17 @@ export class CreateUserDto {
   @IsString()
   profession: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @IsString()
+  status = '';
 
   @IsNotEmpty()
-  @IsNumber()
-  status: number;
+  @IsBoolean()
+  completedApplication = false;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  completedInterview = false;
+
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }

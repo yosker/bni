@@ -43,6 +43,12 @@ export class Users {
 
   @Prop({ type: 'string' })
   profession: string;
+
+  @Prop({ type: 'boolean' })
+  completedApplication: boolean;
+
+  @Prop({ type: 'boolean' })
+  completedInterview: boolean;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);
