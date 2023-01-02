@@ -7,7 +7,8 @@ import configuration from './config/configuration';
 import { ChaptersModule } from './chapters/chapters.module';
 import { SharedService } from './shared/shared.service';
 import { SharedModule } from './shared/shared.module';
-
+import { ServicesResponse } from 'src/responses/response';
+import { AttendanceModule } from './attendance/attendance.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,8 +20,9 @@ import { SharedModule } from './shared/shared.module';
     ChaptersModule,
     SharedModule,
     AuthModule,
+    AttendanceModule,
   ],
   controllers: [],
-  providers: [SharedService],
+  providers: [SharedService, ServicesResponse],
 })
 export class AppModule {}

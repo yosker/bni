@@ -11,6 +11,7 @@ import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { EmailProperties } from 'src/shared/EmailProperties';
 
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
@@ -20,7 +21,8 @@ export class ChaptersService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
-  ) {}
+    private emailProperties: EmailProperties,
+  ) { }
 
   async getChapters() {
     const chapters = this.chapterModel.find();
@@ -32,10 +34,10 @@ export class ChaptersService {
     return chapter;
   }
 
-  async createChapter(
+  async create(
     createChapterDTO: CreateChapterDTO,
   ): Promise<ServicesResponse> {
-    const { status, message, result } = this.servicesResponse;
+    const { statusCode, message, result } = this.servicesResponse;
 
     const chapter: Chapter = new this.chapterModel(createChapterDTO);
     try {
@@ -46,20 +48,28 @@ export class ChaptersService {
         name: createChapterDTO.name,
         email: createChapterDTO.email,
         password: await this.sharedService.passwordGenerator(6),
-        role: 'Operative',
+        role: 'President',
       };
-
       const { password } = createUserDto;
-      console.log(password);
+
+      //OBJETO PARA EL CORREO 
+      this.emailProperties.email = createChapterDTO.email;
+      this.emailProperties.password = password;
+      this.emailProperties.name = createChapterDTO.name;
+      this.emailProperties.template = process.env.CHAPTERS_WELCOME;
+      this.emailProperties.subject = process.env.SUBJECT_CHAPTER_WELCOME;
+
       const plainToHash = await hash(password, 10);
       createUserDto = { ...createUserDto, password: plainToHash };
+      const newUser = await this.usersModel.create(createUserDto);
 
-      await this.usersModel.create(createUserDto);
+      if (newChapter != null && newUser != null)
+        await this.sharedService.sendEmail(this.emailProperties);
 
-      return { status, message, result };
+      return { statusCode, message, result };
     } catch (err) {
       if (err.code === 11000) {
-        throw new HttpErrorByCode[409]('DUPLICATED_REGISTER');
+        throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
       } else {
         throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
       }

@@ -1,13 +1,21 @@
 import { Injectable } from '@nestjs/common';
-
+import { MailerService } from '@nestjs-modules/mailer';
+import { ServicesResponse } from 'src/responses/response';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { EmailProperties } from './EmailProperties';
 @Injectable()
 export class SharedService {
+  constructor(
+    private servicesResponse: ServicesResponse,
+    private mailerService: MailerService,
+  ) { }
+
   /**
    * @description Genera un password aleatorio
    * @param longitude tamaño de password
    * @returns password generado
    */
-  async passwordGenerator(longitude: Number) {
+  async passwordGenerator(longitude: number) {
     let result = '';
     const abc = 'a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(
       ' ',
@@ -34,4 +42,24 @@ export class SharedService {
     }
     return result;
   }
+  
+  async sendEmail(mailProperties: EmailProperties): Promise<ServicesResponse> {
+
+    const { statusCode, message, result } = this.servicesResponse;
+    try {
+      mailProperties = { ...mailProperties, urlPlatform: process.env.URL_PLATFORM };
+      await this.mailerService.sendMail({
+        to: mailProperties.email,
+        from: process.env.SENDER_EMAIL,
+        subject: mailProperties.subject,
+        template: mailProperties.template,
+        context: {
+          objMail: mailProperties
+        }
+      });
+      return { statusCode, message, result };
+    } catch (err) {
+      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+    }
+  };
 }

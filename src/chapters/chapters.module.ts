@@ -7,7 +7,7 @@ import { UsersSchema } from 'src/users/schemas/users.schema';
 import { SharedService } from 'src/shared/shared.service';
 import { ServicesResponse } from 'src/responses/response';
 import { AuthModule } from 'src/auth/auth.module';
-
+import { EmailProperties } from 'src/shared/EmailProperties'
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -17,6 +17,6 @@ import { AuthModule } from 'src/auth/auth.module';
     AuthModule,
   ],
   controllers: [ChaptersController],
-  providers: [ChaptersService, SharedService, ServicesResponse],
+  providers: [ChaptersService, SharedService, ServicesResponse, EmailProperties],
 })
 export class ChaptersModule {}

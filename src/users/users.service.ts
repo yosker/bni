@@ -24,13 +24,13 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
-    const { status, message, result } = this.servicesResponse;
+    const { statusCode, message, result } = this.servicesResponse;
 
     const newUser = new this.usersModel(createUserDto);
 
     try {
       await newUser.save();
-      return { status, message, result };
+      return { statusCode, message, result };
     } catch (err) {
       if (err.code === 11000) {
         throw new HttpErrorByCode[409]('DUPLICATED_REGISTER');

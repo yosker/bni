@@ -13,11 +13,11 @@ export class ChaptersController {
   constructor(private chapterService: ChaptersService) {}
 
   @Post('/create')
-  @Role('Admin')
-  @UseGuards(AuthGuard(), JwtGuard)
-  async createPost(
+  // @Role('Admin')
+  // @UseGuards(AuthGuard(), JwtGuard)
+  async create(
     @Body() chapterDTO: CreateChapterDTO,
   ): Promise<ServicesResponse> {
-    return await this.chapterService.createChapter(chapterDTO);
+    return await this.chapterService.create(chapterDTO);
   }
 }
