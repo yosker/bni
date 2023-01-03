@@ -62,7 +62,7 @@ export class AttendanceService {
         const pipeline = [
             {
                 $match: {
-                    idChapter: ObjectId('63af9923d919604e65844a3c')
+                    idChapter: ObjectId('63b3a4cbc9c2c1527ad9975a')
                 }
             },
             {
