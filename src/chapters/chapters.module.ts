@@ -7,7 +7,7 @@ import { UsersSchema } from 'src/users/schemas/users.schema';
 import { SharedService } from 'src/shared/shared.service';
 import { ServicesResponse } from 'src/responses/response';
 import { AuthModule } from 'src/auth/auth.module';
-import { EmailProperties } from 'src/shared/EmailProperties'
+import { EmailProperties } from 'src/shared/emailProperties'
 @Module({
   imports: [
     MongooseModule.forFeature([

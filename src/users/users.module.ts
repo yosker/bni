@@ -11,6 +11,7 @@ import { jwtConstants } from 'src/auth/jwt.constants';
 import { RolesModule } from 'src/roles/roles.module';
 import { Roles, RolesSchema } from 'src/roles/schemas/roles.schema';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
+import { SharedService } from 'src/shared/shared.service';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { JwtStrategy } from 'src/auth/jwt.strategy';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, RolesModule, ServicesResponse, JwtStrategy],
+  providers: [UsersService, RolesModule, ServicesResponse, JwtStrategy, SharedService],
   exports: [JwtStrategy, PassportModule],
 })
 export class UsersModule {}

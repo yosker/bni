@@ -14,7 +14,7 @@ export class Users {
   @Prop({ type: 'string' })
   password: string;
 
-  @Prop({ type: 'string' })
+  @Prop({ type: 'string', default: 'Active' })
   status: string;
 
   @Prop({ default: new Date() })
@@ -49,6 +49,9 @@ export class Users {
 
   @Prop({ type: 'boolean' })
   completedInterview: boolean;
+
+  @Prop({  type: String, required: false, default: '-' })
+  invitedBy?: string;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

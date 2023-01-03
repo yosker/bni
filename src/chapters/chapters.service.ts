@@ -11,7 +11,7 @@ import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
-import { EmailProperties } from 'src/shared/EmailProperties';
+import { EmailProperties } from 'src/shared/emailProperties';
 
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
@@ -48,7 +48,7 @@ export class ChaptersService {
         name: createChapterDTO.name,
         email: createChapterDTO.email,
         password: await this.sharedService.passwordGenerator(6),
-        role: 'President',
+        role: 'Presidente',
       };
       const { password } = createUserDto;
 

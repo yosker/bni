@@ -6,9 +6,7 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
-  HttpStatus,
-  Res,
+  UseGuards
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,19 +18,21 @@ import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiBearerAuth()
-@Role('Admin')
-@UseGuards(AuthGuard(), JwtGuard)
+// @Role('Admin')
+// @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('/create')
-  async create(@Res() res, @Body() createUserDto: CreateUserDto) {
-    const response = await this.usersService.create(createUserDto);
-    return res.status(HttpStatus.OK).json({
-      response: response,
-    });
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.create(createUserDto);
+  }
+
+  @Post('/createVistor')
+  async createVisotors(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.createVisitor(createUserDto);
   }
 
   @Get()

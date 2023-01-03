@@ -9,10 +9,9 @@ export class CreateUserDto {
   idChapter: object;
 
   @ApiProperty({
-    example: 'Id dell Usuario que Invitó.',
+    example: 'Id del Usuario que Invitó.',
   })
-  @Prop({ default: null, type: Object })
-  idInvitedBy?: object;
+  invitedBy?: string;
 
   @ApiProperty({
     example: 'Nombre del Rol.',
@@ -49,8 +48,8 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Password.',
   })
-  @IsNotEmpty()
-  @IsString()
+  // @IsNotEmpty()
+  //  @IsString()
   password: string;
 
   @ApiProperty({
@@ -77,7 +76,7 @@ export class CreateUserDto {
     example: 'Estatus del registro.',
   })
   @IsString()
-  status = '';
+  status = 'Active';
 
   @ApiProperty({
     example: 'Solicitud Completada.',

@@ -5,21 +5,24 @@ import { User } from './interfaces/users.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from './schemas/users.schema';
-
 import { ServicesResponse } from '../responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from 'src/roles/interfaces/roles.interface';
 import { Roles } from 'src/roles/schemas/roles.schema';
+import { hash } from 'bcrypt';
+import { SharedService } from 'src/shared/shared.service';
 
+const ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     @InjectModel(Roles.name) private readonly rolesModel: Model<Role>,
+    private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) {}
+  ) { }
   async findAll() {
     return this.usersModel.find();
   }
@@ -29,7 +32,49 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
-    const { statusCode, message } = this.servicesResponse;
+    const { statusCode, message, result } = this.servicesResponse;
+    const findRole = await this.rolesModel.findOne({
+      name: createUserDto.role,
+    });
+
+    if (!findRole)
+      throw new HttpErrorByCode[404]('ROLE_NOT_FOUND', this.servicesResponse);
+
+    try {
+      const pass = await this.sharedService.passwordGenerator(6);
+      const plainToHash = await hash(pass, 10);
+      createUserDto = { ...createUserDto, password: plainToHash, idChapter: ObjectId(createUserDto.idChapter) , invitedBy:'-'};
+
+      const newUser = await this.usersModel.create(createUserDto);
+      if (newUser != null)
+        console.log('Envio  de correo');
+
+      // const payload = {
+      //   id: newUser._id,
+      //   name: createUserDto.name,
+      //   role: createUserDto.role,
+      //   email: createUserDto.email,
+      // };
+
+      // const token = this.jwtService.sign(payload);
+      // const data = {
+      //   user: newUser,
+      //   token,
+      // };
+
+      return { statusCode, message, result };
+    } catch (err) {
+      if (err.code === 11000) {
+        throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
+      } else {
+        throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      }
+    }
+  }
+
+
+  async createVisitor(createUserDto: CreateUserDto): Promise<ServicesResponse> {
+    const { statusCode, message, result } = this.servicesResponse;
     const findRole = await this.rolesModel.findOne({
       name: createUserDto.role,
     });
@@ -37,25 +82,11 @@ export class UsersService {
     if (!findRole)
       throw new HttpErrorByCode[404]('NOT_FOUND_ROLE', this.servicesResponse);
 
-    const _newUser = new this.usersModel(createUserDto);
-
     try {
-      const newUser = await _newUser.save();
+      const _newUser = new this.usersModel(createUserDto);
+      await _newUser.save();
 
-      const payload = {
-        id: newUser._id,
-        name: createUserDto.name,
-        role: createUserDto.role,
-        email: createUserDto.email,
-      };
-
-      const token = this.jwtService.sign(payload);
-      const data = {
-        user: newUser,
-        token,
-      };
-
-      return { statusCode, message, result: data };
+      return { statusCode, message, result };
     } catch (err) {
       if (err.code === 11000) {
         throw new HttpErrorByCode[409]('DUPLICATED_REGISTER');
@@ -65,8 +96,27 @@ export class UsersService {
     }
   }
 
-  async update(id: string, _updateUserDto: UpdateUserDto): Promise<User> {
-    return this.usersModel.findByIdAndUpdate(id, _updateUserDto, { new: true });
+
+  async update(id: string, _updateUserDto: UpdateUserDto): Promise<ServicesResponse> {
+    const { statusCode, message, result } = this.servicesResponse;
+    const findRole = await this.rolesModel.findOne({
+      name: _updateUserDto.role,
+    });
+
+    if (!findRole)
+      throw new HttpErrorByCode[404]('ROLE_NOT_FOUND', this.servicesResponse);
+    try {
+      _updateUserDto = { ..._updateUserDto, idChapter: ObjectId(_updateUserDto.idChapter) };
+      await this.usersModel.findByIdAndUpdate(id, _updateUserDto);
+
+      return { statusCode, message, result };
+    } catch (err) {
+      if (err.code === 11000) {
+        throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
+      } else {
+        throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      }
+    }
   }
 
   async remove(id: string) {

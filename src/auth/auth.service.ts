@@ -63,6 +63,7 @@ export class AuthService {
     if (!checkPassword) throw new HttpException('PASSWORD_INCORRECT', 403);
 
     const payload = {
+      idChapter: findUser.idChapter,
       id: findUser._id,
       name: findUser.name,
       role: findUser.role,

@@ -15,7 +15,7 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
 
   @IsNotEmpty()
   @IsString()
-  chapterName: string;
+  name: string;
 
   @IsNotEmpty()
   @IsString()

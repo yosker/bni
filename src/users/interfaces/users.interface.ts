@@ -14,4 +14,5 @@ export interface User extends Document {
   status: string;
   completedApplication: boolean;
   completedInterview: boolean;
+  invitedBy?:{ Type:string, default:''}
 }
