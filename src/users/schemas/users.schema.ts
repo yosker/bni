@@ -50,8 +50,8 @@ export class Users {
   @Prop({ type: 'boolean' })
   completedInterview: boolean;
 
-  @Prop({  type: String, required: false, default: '-' })
-  invitedBy?: string;
+  @Prop({ type: String, required: false, default: '-' })
+  invitedBy: string;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);
