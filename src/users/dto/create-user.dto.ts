@@ -15,7 +15,7 @@ export class CreateUserDto {
   idInvitedBy?: object;
 
   @ApiProperty({
-    example: 'Nombre del Rol.',
+    example: 'Nombre del Rol Asignado al Usuario.',
   })
   @IsNotEmpty()
   @IsString()
@@ -74,10 +74,10 @@ export class CreateUserDto {
   profession: string;
 
   @ApiProperty({
-    example: 'Estatus del registro.',
+    example: 'Estatus del Registro.',
   })
-  @IsString()
-  status = '';
+  @Prop({ default: 'Active', required: false })
+  status: string;
 
   @ApiProperty({
     example: 'Solicitud Completada.',
