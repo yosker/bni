@@ -4,12 +4,13 @@ import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Users, UsersSchema } from './schemas/users.schema';
 import { ServicesResponse } from 'src/responses/response';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from 'src/auth/auth.module';
 import { jwtConstants } from 'src/auth/jwt.constants';
 import { RolesModule } from 'src/roles/roles.module';
 import { Roles, RolesSchema } from 'src/roles/schemas/roles.schema';
+import { JwtStrategy } from 'src/auth/jwt.strategy';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { Roles, RolesSchema } from 'src/roles/schemas/roles.schema';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, RolesModule, ServicesResponse, JwtService],
-  exports: [PassportModule],
+  providers: [UsersService, RolesModule, ServicesResponse, JwtStrategy],
+  exports: [JwtStrategy, PassportModule],
 })
 export class UsersModule {}
