@@ -22,7 +22,7 @@ export class ChaptersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private emailProperties: EmailProperties,
-  ) { }
+  ) {}
 
   async getChapters() {
     const chapters = this.chapterModel.find();
@@ -34,9 +34,7 @@ export class ChaptersService {
     return chapter;
   }
 
-  async create(
-    createChapterDTO: CreateChapterDTO,
-  ): Promise<ServicesResponse> {
+  async create(createChapterDTO: CreateChapterDTO): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
 
     const chapter: Chapter = new this.chapterModel(createChapterDTO);
@@ -52,13 +50,13 @@ export class ChaptersService {
       };
       const { password } = createUserDto;
 
-      //OBJETO PARA EL CORREO 
+      //OBJETO PARA EL CORREO
       this.emailProperties.email = createChapterDTO.email;
       this.emailProperties.password = password;
       this.emailProperties.name = createChapterDTO.name;
       this.emailProperties.template = process.env.CHAPTERS_WELCOME;
       this.emailProperties.subject = process.env.SUBJECT_CHAPTER_WELCOME;
-
+      console.log(password);
       const plainToHash = await hash(password, 10);
       createUserDto = { ...createUserDto, password: plainToHash };
       const newUser = await this.usersModel.create(createUserDto);

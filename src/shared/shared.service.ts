@@ -8,7 +8,7 @@ export class SharedService {
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
-  ) { }
+  ) {}
 
   /**
    * @description Genera un password aleatorio
@@ -22,10 +22,6 @@ export class SharedService {
     ); // Espacios para convertir cara letra a un elemento de un array
 
     for (let i = 0; i < longitude; i++) {
-      const abc = 'a b c d e f g h i j k l m n o p q r s t u v w x y z'.split(
-        ' ',
-      ); // Espacios para convertir cara letra a un elemento de un array
-
       if (abc[i]) {
         // Condicional para prevenir errores en caso de que longitud sea mayor a 26
         const random = Math.floor(Math.random() * 4); // Generaremos el número
@@ -42,24 +38,26 @@ export class SharedService {
     }
     return result;
   }
-  
-  async sendEmail(emailProperties: EmailProperties): Promise<ServicesResponse> {
 
+  async sendEmail(emailProperties: EmailProperties): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
     try {
-      emailProperties = { ...emailProperties, urlPlatform: process.env.URL_PLATFORM };
+      emailProperties = {
+        ...emailProperties,
+        urlPlatform: process.env.URL_PLATFORM,
+      };
       await this.mailerService.sendMail({
         to: emailProperties.email,
         from: process.env.SENDER_EMAIL,
         subject: emailProperties.subject,
         template: emailProperties.template,
         context: {
-          objMail: emailProperties
-        }
+          objMail: emailProperties,
+        },
       });
       return { statusCode, message, result };
     } catch (err) {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
     }
-  };
+  }
 }

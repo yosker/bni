@@ -22,7 +22,7 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) { }
+  ) {}
   async findAll() {
     return this.usersModel.find();
   }
@@ -33,7 +33,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
-    const findRole = await this.rolesModel.findOne({
+    const findRole = this.rolesModel.findOne({
       name: createUserDto.role,
     });
 
@@ -43,24 +43,15 @@ export class UsersService {
     try {
       const pass = await this.sharedService.passwordGenerator(6);
       const plainToHash = await hash(pass, 10);
-      createUserDto = { ...createUserDto, password: plainToHash, idChapter: ObjectId(createUserDto.idChapter) , invitedBy:'-'};
+      createUserDto = {
+        ...createUserDto,
+        password: plainToHash,
+        idChapter: ObjectId(createUserDto.idChapter),
+        invitedBy: '-',
+      };
 
       const newUser = await this.usersModel.create(createUserDto);
-      if (newUser != null)
-        console.log('Envio  de correo');
-
-      // const payload = {
-      //   id: newUser._id,
-      //   name: createUserDto.name,
-      //   role: createUserDto.role,
-      //   email: createUserDto.email,
-      // };
-
-      // const token = this.jwtService.sign(payload);
-      // const data = {
-      //   user: newUser,
-      //   token,
-      // };
+      if (newUser != null) console.log('Envio  de correo');
 
       return { statusCode, message, result };
     } catch (err) {
@@ -72,10 +63,9 @@ export class UsersService {
     }
   }
 
-
   async createVisitor(createUserDto: CreateUserDto): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
-    const findRole = await this.rolesModel.findOne({
+    const findRole = this.rolesModel.findOne({
       name: createUserDto.role,
     });
 
@@ -96,18 +86,23 @@ export class UsersService {
     }
   }
 
-
-  async update(id: string, _updateUserDto: UpdateUserDto): Promise<ServicesResponse> {
+  async update(
+    id: string,
+    _updateUserDto: UpdateUserDto,
+  ): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
-    const findRole = await this.rolesModel.findOne({
+    const findRole = this.rolesModel.findOne({
       name: _updateUserDto.role,
     });
 
     if (!findRole)
       throw new HttpErrorByCode[404]('ROLE_NOT_FOUND', this.servicesResponse);
     try {
-      _updateUserDto = { ..._updateUserDto, idChapter: ObjectId(_updateUserDto.idChapter) };
-      await this.usersModel.findByIdAndUpdate(id, _updateUserDto);
+      _updateUserDto = {
+        ..._updateUserDto,
+        idChapter: ObjectId(_updateUserDto.idChapter),
+      };
+      this.usersModel.findByIdAndUpdate(id, _updateUserDto);
 
       return { statusCode, message, result };
     } catch (err) {

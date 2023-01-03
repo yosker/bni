@@ -1,6 +1,12 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsEmail, IsBoolean } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsEmail,
+  IsBoolean,
+  ValidateIf,
+} from 'class-validator';
 export class CreateUserDto {
   @ApiProperty({
     example: 'Id del Capítulo.',
@@ -11,6 +17,9 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Id del Usuario que Invitó.',
   })
+  @ValidateIf((o) => '' in o)
+  @IsString()
+  @Prop({ default: '-', required: false })
   invitedBy?: string;
 
   @ApiProperty({
@@ -27,6 +36,9 @@ export class CreateUserDto {
   @IsString()
   name: string;
 
+  @ApiProperty({
+    example: 'Apellido del Usuario.',
+  })
   @IsNotEmpty()
   @IsString()
   lastName: string;
@@ -48,8 +60,8 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Password.',
   })
-  // @IsNotEmpty()
-  //  @IsString()
+  @ValidateIf((o) => '' in o)
+  @IsString()
   password: string;
 
   @ApiProperty({
@@ -75,13 +87,8 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Estatus del Registro.',
   })
-<<<<<<< HEAD
-  @IsString()
-  status = 'Active';
-=======
   @Prop({ default: 'Active', required: false })
   status: string;
->>>>>>> 94a099156c587316d79aeef531e4281c7a61a45b
 
   @ApiProperty({
     example: 'Solicitud Completada.',
