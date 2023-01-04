@@ -1,30 +1,29 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { InterviewsService } from './interviews.service';
+import { InterviewsController } from './interviews.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Users, UsersSchema } from './schemas/users.schema';
-import { ServicesResponse } from 'src/responses/response';
+import { Interviews, InterviewsSchema } from './schemas/interviews.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from 'src/auth/auth.module';
 import { jwtConstants } from 'src/auth/jwt.constants';
-import { RolesModule } from 'src/roles/roles.module';
-import { Roles, RolesSchema } from 'src/roles/schemas/roles.schema';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
+import { ServicesResponse } from 'src/responses/response';
 import { SharedService } from 'src/shared/shared.service';
+import { Users, UsersSchema } from 'src/users/schemas/users.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: Users.name,
-        schema: UsersSchema,
+        name: Interviews.name,
+        schema: InterviewsSchema,
       },
     ]),
     MongooseModule.forFeature([
       {
-        name: Roles.name,
-        schema: RolesSchema,
+        name: Users.name,
+        schema: UsersSchema,
       },
     ]),
     AuthModule,
@@ -36,14 +35,8 @@ import { SharedService } from 'src/shared/shared.service';
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  controllers: [UsersController],
-  providers: [
-    UsersService,
-    RolesModule,
-    ServicesResponse,
-    JwtStrategy,
-    SharedService,
-  ],
+  controllers: [InterviewsController],
+  providers: [InterviewsService, ServicesResponse, JwtStrategy, SharedService],
   exports: [JwtStrategy, PassportModule],
 })
-export class UsersModule {}
+export class InterviewsModule {}

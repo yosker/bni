@@ -10,6 +10,7 @@ import { SharedModule } from './shared/shared.module';
 import { ServicesResponse } from 'src/responses/response';
 import { AttendanceModule } from './attendance/attendance.module';
 import { RolesModule } from './roles/roles.module';
+import { InterviewsModule } from './interviews/interviews.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RolesModule } from './roles/roles.module';
     AuthModule,
     AttendanceModule,
     RolesModule,
+    InterviewsModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],
