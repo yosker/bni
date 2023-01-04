@@ -22,7 +22,7 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) {}
+  ) { }
   async findAll() {
     return this.usersModel.find();
   }
@@ -86,10 +86,7 @@ export class UsersService {
     }
   }
 
-  async update(
-    id: string,
-    _updateUserDto: UpdateUserDto,
-  ): Promise<ServicesResponse> {
+  async update(id: string, _updateUserDto: UpdateUserDto,): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
     const findRole = this.rolesModel.findOne({
       name: _updateUserDto.role,
@@ -102,7 +99,7 @@ export class UsersService {
         ..._updateUserDto,
         idChapter: ObjectId(_updateUserDto.idChapter),
       };
-      this.usersModel.findByIdAndUpdate(id, _updateUserDto);
+      await this.usersModel.findByIdAndUpdate(ObjectId(id), _updateUserDto);
 
       return { statusCode, message, result };
     } catch (err) {

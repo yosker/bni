@@ -8,7 +8,7 @@ export class SharedService {
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
-  ) {}
+  ) { }
 
   /**
    * @description Genera un password aleatorio

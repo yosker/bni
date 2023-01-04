@@ -1,14 +1,17 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+// import { PartialType } from '@nestjs/mapped-types';
+// import { CreateUserDto } from './create-user.dto';
+import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 import { Prop } from '@nestjs/mongoose';
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
-  @ApiProperty({
-    example: 'Id del Capítulo.',
-  })
+export class UpdateUserDto {
+
   @IsNotEmpty()
   idChapter: object;
+  
+  @IsNotEmpty()
+  @IsString()
+  role: string;
 
   @ApiProperty({
     example: 'Nombre del Usuario.',
@@ -24,20 +27,20 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString()
   lastName: string;
 
-  @ApiProperty({
-    example: 'Estatus del Registro.',
-  })
+  @IsNotEmpty()
   @IsString()
-  phoneNumber: string;
+  phoneNumber: string; 
 
-  @ApiProperty({
-    example: 'Nombre del Rol Asignado al Usuario.',
-  })
-  role: string;
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-  @ApiProperty({
-    example: 'Fecha de Actualización del Registro.',
-  })
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @IsNotEmpty()
+  @IsString()
+  companyName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  profession: string
+
 }

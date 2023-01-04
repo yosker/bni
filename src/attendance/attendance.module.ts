@@ -19,6 +19,6 @@ import { Users, UsersSchema } from 'src/users/schemas/users.schema';
     AuthModule,
   ],
   controllers: [AttendanceController],
-  providers: [AttendanceService, ServicesResponse]
+  providers: [AttendanceService, ServicesResponse] 
 })
 export class AttendanceModule {}

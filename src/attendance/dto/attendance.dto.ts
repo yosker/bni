@@ -6,11 +6,17 @@ import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
+    example: 'Id del capitulo.',
+  })
+  @IsNotEmpty()
+  chapterId: object;
+ 
+  @ApiProperty({
     example: 'Id del Usuario.',
   })
   @IsNotEmpty()
   @IsString()
-  idUser: object;
+  userId: object;
 
   @ApiProperty({
     example: 'Tipo de asistencia.',

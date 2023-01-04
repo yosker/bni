@@ -1,7 +1,8 @@
 import { Schema } from 'mongoose'
 
 export const AttendanceSchema = new Schema({
-    idUser: { type: Object, required: true },
+    chapterId:{ type: Object, required: true },
+    userId: { type: Object, required: true },
     attendanceType: { type: String, required: true },
     attendanceDate: { type: String },
     createdAt: {

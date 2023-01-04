@@ -2,8 +2,11 @@ import { Controller, Post, Body, Get, UseGuards  } from '@nestjs/common';
 import { ServicesResponse } from 'src/responses/response';
 import { AttendanceService } from './attendance.service'
 import { AttendanceDTO } from './dto/attendance.dto';
-import { ApiTags } from '@nestjs/swagger';
-
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
+import { AuthGuard } from '@nestjs/passport';
+@ApiBearerAuth()
+@UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Attendance')
 @Controller('attendance')
 export class AttendanceController {
