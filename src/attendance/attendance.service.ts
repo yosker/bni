@@ -22,18 +22,27 @@ export class AttendanceService {
         private readonly servicesResponse: ServicesResponse,
     ) { }
 
-    //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
-    async create(attendanceDTO: AttendanceDTO): Promise<ServicesResponse> {
+  //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
+  async create(attendanceDTO: AttendanceDTO): Promise<ServicesResponse> {
+    let { statusCode, message, result } = this.servicesResponse;
+    try {
+      //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
+      const existUser = await this.usersModel.findById({
+        _id: ObjectId(attendanceDTO.userId),
+      });
+      if (!existUser) {
+        statusCode = 404;
+        message = 'USER_NOT_FOUND';
+        return { statusCode, message, result };
+      }
 
-        let { statusCode, message, result } = this.servicesResponse;
-        try {
-            //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS 
-            const existUser = await this.usersModel.findById({ _id: ObjectId(attendanceDTO.userId) });
-            if (!existUser) {
-                statusCode = 404;
-                message = 'USER_NOT_FOUND';
-                return { statusCode, message, result };
-            };
+      //VALIDAMOS QUE EL USUARIO NO SE REGISTRE DOS VECES EL MISMO DIA EN LA COLECCION DE ASISTENCIA
+      const userSession = await this.attendanceModel.findOne({
+        userId: ObjectId(attendanceDTO.userId),
+        attendanceDate: attendanceDTO.attendanceDate,
+        chapterId: ObjectId(attendanceDTO.chapterId),
+        status: 'Active',
+      });
 
             const currentDate = moment().format("DD/MM/YYYY");
             let authAttendance = false;

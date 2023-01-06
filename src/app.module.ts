@@ -11,6 +11,8 @@ import { ServicesResponse } from 'src/responses/response';
 import { AttendanceModule } from './attendance/attendance.module';
 import { RolesModule } from './roles/roles.module';
 import { ChapterSessionsModule } from './chapter-sessions/chapter-sessions.module';
+import { InterviewsModule } from './interviews/interviews.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,6 +37,7 @@ import { ChapterSessionsModule } from './chapter-sessions/chapter-sessions.modul
     AttendanceModule,
     RolesModule,
     ChapterSessionsModule,
+    InterviewsModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse ],
