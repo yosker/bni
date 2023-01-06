@@ -56,7 +56,7 @@ export class ChaptersService {
       this.emailProperties.name = createChapterDTO.name;
       this.emailProperties.template = process.env.CHAPTERS_WELCOME;
       this.emailProperties.subject = process.env.SUBJECT_CHAPTER_WELCOME;
-      console.log(password);
+   
       const plainToHash = await hash(password, 10);
       createUserDto = { ...createUserDto, password: plainToHash };
       const newUser = await this.usersModel.create(createUserDto);

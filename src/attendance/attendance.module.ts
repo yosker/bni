@@ -6,7 +6,9 @@ import { AttendanceSchema } from './schemas/attendance.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { ServicesResponse } from 'src/responses/response';
 import { Users, UsersSchema } from 'src/users/schemas/users.schema';
-
+import { UsersModule } from 'src/users/users.module';
+import { ChapterSessionsModule } from 'src/chapter-sessions/chapter-sessions.module';
+import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessions.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -15,10 +17,11 @@ import { Users, UsersSchema } from 'src/users/schemas/users.schema';
         name: Users.name,
         schema: UsersSchema,
       },
+      { name: 'ChapterSession', schema: ChapterSessionSchema },
     ]),
     AuthModule,
   ],
   controllers: [AttendanceController],
-  providers: [AttendanceService, ServicesResponse] 
+  providers: [AttendanceService, ServicesResponse, UsersModule, ChapterSessionsModule] 
 })
 export class AttendanceModule {}

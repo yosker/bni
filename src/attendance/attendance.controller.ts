@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards  } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards,  Param  } from '@nestjs/common';
 import { ServicesResponse } from 'src/responses/response';
 import { AttendanceService } from './attendance.service'
 import { AttendanceDTO } from './dto/attendance.dto';
@@ -20,9 +20,14 @@ export class AttendanceController {
       return await this.attendanceService.create(attendanceDTO);
     }
 
-    @Get('/networkers')
-    async get(): Promise<any> {
-      return await this.attendanceService.networkersList();
+    @Get('/visitors/:chapterId')
+    async getVisitors(@Param('chapterId') chapterId: string): Promise<ServicesResponse> {
+      return await this.attendanceService.VisitorsList(chapterId);
+    }
+    
+    @Get('/networkers/:chapterId')
+    async getNetworkers(@Param('chapterId') chapterId: string): Promise<ServicesResponse> {
+      return await this.attendanceService.NetworkersList(chapterId);
     }
     
 }

@@ -10,7 +10,7 @@ import { SharedModule } from './shared/shared.module';
 import { ServicesResponse } from 'src/responses/response';
 import { AttendanceModule } from './attendance/attendance.module';
 import { RolesModule } from './roles/roles.module';
-
+import { ChapterSessionsModule } from './chapter-sessions/chapter-sessions.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,8 +34,9 @@ import { RolesModule } from './roles/roles.module';
     AuthModule,
     AttendanceModule,
     RolesModule,
+    ChapterSessionsModule,
   ],
   controllers: [],
-  providers: [SharedService, ServicesResponse],
+  providers: [SharedService, ServicesResponse ],
 })
 export class AppModule {}

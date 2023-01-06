@@ -8,7 +8,9 @@ import { ServicesResponse } from '../responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
+import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
 
+const moment = require('moment');
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -16,6 +18,7 @@ export class AttendanceService {
     constructor(
         @InjectModel('Attendance') private readonly attendanceModel: Model<Attendance>,
         @InjectModel(Users.name) private readonly usersModel: Model<User>,
+        @InjectModel('ChapterSession') private readonly chapterSessionModel: Model<ChapterSession>,
         private readonly servicesResponse: ServicesResponse,
     ) { }
 
@@ -32,42 +35,105 @@ export class AttendanceService {
                 return { statusCode, message, result };
             };
 
-            //VALIDAMOS QUE EL USUARIO NO SE REGISTRE DOS VECES EL MISMO DIA EN LA COLECCION DE ASISTENCIA
-            const userSession = await this.attendanceModel.findOne({
-                userId: ObjectId(attendanceDTO.userId),
-                attendanceDate: attendanceDTO.attendanceDate,
+            const currentDate = moment().format("DD/MM/YYYY");
+            let authAttendance = false;
+
+            //VALIDAMOS QUE LA SESION EXISTA EXISTA Y QUE ESTE ACTIVA
+            const chapterSession = await this.chapterSessionModel.findOne({
                 chapterId: ObjectId(attendanceDTO.chapterId),
+                sessionDate: currentDate,
                 status: 'Active'
             });
+            if (chapterSession != null) { authAttendance = true; }
 
-            if (userSession) {
-                statusCode = 409;
-                message = 'RECORD_DUPLICATED';
+            if (authAttendance) {
+                //VALIDAMOS QUE EL USUARIO NO SE REGISTRE DOS VECES EL MISMO DIA EN LA COLECCION DE ASISTENCIA
+                const userSession = await this.attendanceModel.findOne({
+                    userId: ObjectId(attendanceDTO.userId),
+                    attendanceDate: currentDate,
+                    chapterId: ObjectId(attendanceDTO.chapterId),
+                    status: 'Active'
+                });
+
+                if (userSession) {
+                    statusCode = 409;
+                    message = 'RECORD_DUPLICATED';
+                    return { statusCode, message, result };
+                };
+
+                attendanceDTO = { ...attendanceDTO, attendanceDate: currentDate, userId: ObjectId(attendanceDTO.userId), chapterId: ObjectId(attendanceDTO.chapterId) };
+                await this.attendanceModel.create(attendanceDTO);
+
+                let pipeline = await this.AttendanceResult(attendanceDTO.chapterId, currentDate, attendanceDTO.userId, 1);
+                const userData = await this.attendanceModel.aggregate(pipeline);
+
+                return { statusCode, message, result: userData[0] };
+            } else {
+                statusCode = 401;
+                message = 'ATTENDANCE_NOT_AUTHORIZED';
                 return { statusCode, message, result };
-            };
+            }
+        } catch (err) {
+            throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+        }
+    };
 
-            attendanceDTO = { ...attendanceDTO, userId: ObjectId(attendanceDTO.userId), chapterId: ObjectId(attendanceDTO.chapterId) };
-            await this.attendanceModel.create(attendanceDTO);
+    //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE SE REGISTRARON EN LA SESION
+    async VisitorsList(chapterId: string) {
 
-            let pipeline = await this.AttendanceResult(attendanceDTO.chapterId, attendanceDTO.attendanceDate, attendanceDTO.userId);
-            const userList = await this.attendanceModel.aggregate(pipeline);
+        let { message } = this.servicesResponse;
+        try {
+            const currentDate = moment().format("YYYY-MM-DD");
+            const visitorList = await this.usersModel.find({
+                idChapter: ObjectId(chapterId),
+                role: "Visitante",
+                status: "Active",
+                createdAt: { $gte: moment(`${currentDate}T00:00:00`), $lt: moment(`${currentDate}T23:59:59`) }
+            }, {
+                name: 1,
+                lastName: 1,
+                companyName: 1,
+                profession: 1,
+                invitedBy: 1,
+                completedApplication: 1,
+                completedInterview: 1
+            });
 
-            return { statusCode, message, result: userList[0] };
+            return { statusCode: 200, message, result: visitorList };
+
+        } catch (err) {
+            throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+        }
+    };
+
+    //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE REGISTRARON ASISNTENCIA
+    async NetworkersList(chapterId: string) {
+
+        let { message } = this.servicesResponse;
+        try {
+            const currentDate = moment().format("DD/MM/YYYY");
+            let pipeline = await this.AttendanceResult(ObjectId(chapterId), currentDate, ObjectId(0), 0);
+            const userData = await this.attendanceModel.aggregate(pipeline);
+
+            return { statusCode: 200, message, result: userData };
+
         } catch (err) {
             throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
         }
     };
 
     //PIPELINE PARA REGRESAR LOS DATOS DEL USUARIO (NETWORKER) CUANDO SE REGISTRA 
-    async AttendanceResult(chapterId: object, attendaceDate: string, userId: object) {
+    async AttendanceResult(chapterId: object, attendaceDate: string, userId: object, queryType: number) {
+
+        let filter = {
+            ["chapterId"]: ObjectId(chapterId),
+            ["attendanceDate"]: attendaceDate,
+        };
+        if (queryType == 1) { filter["userId"] = ObjectId(userId); }
 
         const result = [
             {
-                $match: {
-                    chapterId: ObjectId(chapterId),
-                    attendanceDate: attendaceDate,
-                    userId: ObjectId(userId)
-                }
+                $match: filter
             },
             {
                 $lookup: {
@@ -85,6 +151,7 @@ export class AttendanceService {
                     name: '$userData.name',
                     imageUrl: '$userData.imageURL',
                     attendanceDate: '$attendanceDate',
+                    createdAt: '$createdAt',
                     attendanceHour: { $concat: [{ "$toString": { $hour: '$createdAt' } }, ':', { "$toString": { $minute: '$createdAt' } }] },
                     companyName: '$userData.companyName',
                     profession: '$userData.profession'
@@ -94,42 +161,4 @@ export class AttendanceService {
         return result;
     };
 
-    async networkersList() {
-
-        const pipeline = [
-            {
-                $match: {
-                    idChapter: ObjectId('63b3a4cbc9c2c1527ad9975a')
-                }
-            },
-            {
-                $lookup: {
-                    from: 'attendances',
-                    localField: 'idUser',
-                    foreignField: 'id',
-                    as: 'userData'
-                }
-            },
-            {
-                $unwind: "$userData"
-            },
-            {
-                $project: {
-                    name: '$name',
-                    email: '$email',
-                    attendanceDate: '$userData.attendanceDate',
-                    hour: { $hour: '$userData.createdAt' },
-                    date: '$userData.createdAt',
-                    date2: { $hour: { date: "$userData.createdAt", timezone: "GMT" } },
-                    attendanceHour: { $concat: [{ "$toString": { $hour: '$userData.createdAt' } }, ':', { "$toString": { $minute: '$userData.createdAt' } }] },
-                }
-            }
-        ];
-
-        const userList = await this.usersModel.aggregate(pipeline);
-
-        console.log('userList....', userList);
-
-        return userList;
-    }
 }

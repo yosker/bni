@@ -28,16 +28,15 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
     example: 'Fecha de asistencia.',
   })
-  @IsNotEmpty()
-  @IsString()
+
+  @Prop({ default: '', required: false })
   attendanceDate: string;
 
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })
-  @Prop({ default: now() })
-  createdAt: Date;
-
+  @Prop({ default: now(), required: false })
+  createdAt?: Date;
  
   @ApiProperty({
     example: 'Estatus del Registro.',
