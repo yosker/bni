@@ -3,6 +3,12 @@ import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateInterviewDto {
   @ApiProperty({
+    example: 'Usuario que aplica la entrevista.',
+  })
+  @IsNotEmpty()
+  userId: object;
+
+  @ApiProperty({
     example: 'Fecha de Entrevista.',
   })
   @IsNotEmpty()

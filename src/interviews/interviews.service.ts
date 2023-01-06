@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { User } from 'src/users/interfaces/users.interface';
+import { Users } from 'src/users/schemas/users.schema';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 import { UpdateInterviewDto } from './dto/update-interview.dto';
 import { Interview } from './interfaces/interviews.interface';
 import { Interviews } from './schemas/interviews.schema';
+
+const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class InterviewsService {
   constructor(
     @InjectModel(Interviews.name)
     private readonly interviewModel: Model<Interview>,
+    @InjectModel(Users.name) private readonly usersModel: Model<User>,
   ) {}
 
   /**
@@ -19,22 +24,23 @@ export class InterviewsService {
    * @returns Objeto Guardado
    */
   async save(createInterviewDto: CreateInterviewDto) {
-    return await this.interviewModel.create(createInterviewDto);
+    await this.interviewModel.create(createInterviewDto).then(() => {
+      this.usersModel.findByIdAndUpdate(ObjectId(createInterviewDto.userId), {
+        completedInterview: true,
+      });
+    });
   }
 
   findAll() {
     return `This action returns all interviews`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} interview`;
+  async findOne(id: string) {
+    return await this.interviewModel.findById(id);
   }
 
-  update(id: number, updateInterviewDto: UpdateInterviewDto) {
-    return updateInterviewDto;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} interview`;
+  async update(id: number, _updateInterviewDto: UpdateInterviewDto) {
+    await this.usersModel.findByIdAndUpdate(ObjectId(id), _updateInterviewDto);
+    return _updateInterviewDto;
   }
 }
