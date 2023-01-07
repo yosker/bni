@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { InterviewsService } from './interviews.service';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 import { UpdateInterviewDto } from './dto/update-interview.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Interviews')
 @Controller('interviews')
 export class InterviewsController {
   constructor(private readonly interviewsService: InterviewsService) {}
@@ -22,11 +24,22 @@ export class InterviewsController {
     return this.interviewsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
+  @Patch('questionsReferences/:id')
+  updateQuestionsReferences(
     @Param('id') id: string,
     @Body() updateInterviewDto: UpdateInterviewDto,
   ) {
-    return this.interviewsService.update(+id, updateInterviewDto);
+    return this.interviewsService.updateQuestionsReferences(
+      id,
+      updateInterviewDto,
+    );
+  }
+
+  @Patch('interviewUser/:id')
+  updateInterviewUser(
+    @Param('id') id: string,
+    @Body() updateInterviewDto: UpdateInterviewDto,
+  ) {
+    return this.interviewsService.updateUserInterview(id, updateInterviewDto);
   }
 }

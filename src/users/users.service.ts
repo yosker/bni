@@ -54,8 +54,8 @@ export class UsersService {
       if (newUser != null) console.log('Envio  de correo');
 
       return { statusCode, message, result };
-    } catch (err) {
-      if (err.code === 11000) {
+    } catch (error) {
+      if (error.code === 11000) {
         throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
       } else {
         throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
@@ -77,8 +77,8 @@ export class UsersService {
       await _newUser.save();
 
       return { statusCode, message, result };
-    } catch (err) {
-      if (err.code === 11000) {
+    } catch (error) {
+      if (error.code === 11000) {
         throw new HttpErrorByCode[409]('DUPLICATED_REGISTER');
       } else {
         throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
@@ -105,8 +105,8 @@ export class UsersService {
       await this.usersModel.findByIdAndUpdate(ObjectId(id), _updateUserDto);
 
       return { statusCode, message, result };
-    } catch (err) {
-      if (err.code === 11000) {
+    } catch (error) {
+      if (error.code === 11000) {
         throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
       } else {
         throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');

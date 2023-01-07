@@ -1,26 +1,33 @@
+import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { References } from '../interfaces/references.interface';
 
 export class CreateInterviewDto {
   @ApiProperty({
-    example: 'Usuario que aplica la entrevista.',
+    example: 'Usuario Invitado que Aplica la Entrevista.',
   })
   @IsNotEmpty()
   userId: object;
 
   @ApiProperty({
+    example: 'Identificador del Capitulo.',
+  })
+  @IsNotEmpty()
+  chapterId: object;
+
+  @ApiProperty({
+    example: 'Referencias del Usuario Invitado (solo 2 obligatorios).',
+  })
+  @IsNotEmpty()
+  references: References;
+
+  @ApiProperty({
     example: 'Fecha de Entrevista.',
   })
   @IsNotEmpty()
-  @IsDate()
-  dateOfInterview: Date;
-
-  @ApiProperty({
-    example: 'Hora dde Entrevista.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  timeEnd: string;
+  @Prop({ default: new Date() })
+  dateOfInterview: Date = new Date();
 
   @ApiProperty({
     example: 'Nombre del Candidato.',
