@@ -13,6 +13,7 @@ import { Roles } from 'src/roles/schemas/roles.schema';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 
+const QRCode = require("qrcode");
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class UsersService {
@@ -113,6 +114,34 @@ export class UsersService {
       }
     }
   }
+
+  //ENDPOIT QUE REGRESA LA INFO GENERAL DEL USUARIO JUNTO CON UN QR PARA LA ASISTENCIA
+  async findNetworkerData (id: string, chapterId: string): Promise<ServicesResponse>{
+
+    const { message } = this.servicesResponse;
+    try{
+
+      const findUser = await  this.usersModel.findOne({
+        _id: ObjectId(id),
+        idChapter: ObjectId(chapterId),
+        status:'Active'
+      });
+      const qrCreated = await QRCode.toDataURL(id.toString());
+     
+      const dataUser = {
+        name: findUser.name +' '+ findUser.lastName, 
+        companyName: findUser.companyName,
+        profession: findUser.profession,
+        imageURL: findUser.imageURL,
+        qr: qrCreated
+      }; 
+      return {statusCode: 200, message, result: dataUser};
+
+    }catch(err){
+      throw new HttpErrorByCode[500](err.message);
+    }
+  }
+
 
   async remove(id: string) {
     return this.usersModel.findByIdAndDelete(id);

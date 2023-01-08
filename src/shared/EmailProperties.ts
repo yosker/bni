@@ -5,5 +5,6 @@ export class EmailProperties {
     urlPlatform
     template
     subject
+    amount
 }
   

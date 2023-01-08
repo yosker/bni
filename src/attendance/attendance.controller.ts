@@ -29,5 +29,5 @@ export class AttendanceController {
     async getNetworkers(@Param('chapterId') chapterId: string): Promise<ServicesResponse> {
       return await this.attendanceService.NetworkersList(chapterId);
     }
-    
+
 }

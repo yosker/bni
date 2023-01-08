@@ -12,6 +12,7 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { RolesModule } from './roles/roles.module';
 import { ChapterSessionsModule } from './chapter-sessions/chapter-sessions.module';
 import { InterviewsModule } from './interviews/interviews.module';
+import { TreasuryModule } from './treasury/treasury.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { InterviewsModule } from './interviews/interviews.module';
     RolesModule,
     ChapterSessionsModule,
     InterviewsModule,
+    TreasuryModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse ],

@@ -23,7 +23,7 @@ import { AuthGuard } from '@nestjs/passport';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('/create')
   async create(@Body() createUserDto: CreateUserDto) {
@@ -54,5 +54,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Get('/getInformation/:id/:chapterId')
+  findNetworkerData(@Param('id') id: string, @Param('chapterId') chapterId: string) {
+    return this.usersService.findNetworkerData(id, chapterId);
   }
 }

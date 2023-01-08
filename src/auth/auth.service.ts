@@ -7,15 +7,19 @@ import { Model } from 'mongoose';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { JwtService } from '@nestjs/jwt';
+import { ServicesResponse } from '../responses/response';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class AuthService {
+
   constructor(
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private jwtService: JwtService,
-  ) {}
+    private readonly servicesResponse: ServicesResponse,
+  ) { }
 
   /**
    * @description Registro de nuevo usuario
@@ -54,28 +58,33 @@ export class AuthService {
    */
   async login(loginAuthDto: LoginAuthDto) {
     const { email, password } = loginAuthDto;
-    const findUser = await this.usersModel.findOne({ email });
+    let { message } = this.servicesResponse;
 
-    if (!findUser) throw new HttpException('USER_NOT_FOUND.', 404);
+    try {
 
-    const checkPassword = await compare(password, findUser.password);
+      const findUser = await this.usersModel.findOne({ email }, { _id: 1, idChapter: 1, name: 1, lastName: 1, imageURL: 1, role: 1, password: 1 });
+      if (!findUser) throw new HttpException('USER_NOT_FOUND.', 404);
 
-    if (!checkPassword) throw new HttpException('PASSWORD_INCORRECT', 403);
+      const checkPassword = await compare(password, findUser.password);
+      if (!checkPassword) throw new HttpException('PASSWORD_INCORRECT', 403);
 
-    const payload = {
-      idChapter: findUser.idChapter,
-      id: findUser._id,
-      name: findUser.name,
-      role: findUser.role,
-      email: email,
-    };
+      const payload = {
+        idChapter: findUser.idChapter,
+        id: findUser._id,
+        name: findUser.name,
+        role: findUser.role,
+        email: email,
+      };
 
-    const token = this.jwtService.sign(payload);
-    const data = {
-      user: findUser,
-      token,
-    };
+      const token = this.jwtService.sign(payload);
+      const data = {
+        user: findUser,
+        token,
+      };
+      return { statusCode: 200, message, result: data };
 
-    return data;
+    } catch (err) {
+      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+    }
   }
 }
