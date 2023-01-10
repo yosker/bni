@@ -23,6 +23,7 @@ async function bootstrap() {
     .addTag('Chapters')
     .addTag('Attendance')
     .addTag('Roles')
+    .addTag('Interviews')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);

@@ -1,8 +1,11 @@
 import { Document } from 'mongoose';
+import { References } from './references.interface';
 
 export interface Interview extends Document {
+  userId: object;
+  chapterId: object;
+  references: Array<References>;
   dateOfInterview: Date;
-  timeEnd: string;
   candidate: string;
   company: string;
   specialty: string;

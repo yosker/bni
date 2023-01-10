@@ -1,15 +1,22 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { References } from '../interfaces/references.interface';
 
 export type InterviewsDocument = Interviews & Document;
 
 @Schema()
 export class Interviews {
+  @Prop({ type: 'object' })
+  userId: object;
+
+  @Prop({ type: 'object' })
+  chapterId: object;
+
+  @Prop({ type: 'object' })
+  references: References;
+
   @Prop({ type: 'Date' })
   dateOfInterview: Date;
-
-  @Prop({ type: 'string' })
-  timeEnd: string;
 
   @Prop({ type: 'string' })
   candidate: string;
