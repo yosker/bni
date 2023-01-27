@@ -36,12 +36,9 @@ export class InterviewsService {
       userId,
     };
     await this.interviewModel.create(createInterviewDto).then(async () => {
-      await this.usersModel.findByIdAndUpdate(
-        ObjectId(createInterviewDto.userId),
-        {
-          completedInterview: true,
-        },
-      );
+      this.usersModel.findByIdAndUpdate(ObjectId(createInterviewDto.userId), {
+        completedInterview: true,
+      });
     });
   }
 

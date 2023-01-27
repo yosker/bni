@@ -16,14 +16,15 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Role } from '../auth/decorators/Role.decorator';
 import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginationDto, projectionDto } from 'nestjs-search';
 
-@ApiBearerAuth()
-@Role('Admin')
-@UseGuards(AuthGuard(), JwtGuard)
+// @ApiBearerAuth()
+// @Role('Admin')
+// @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post('/create')
   async create(@Body() createUserDto: CreateUserDto) {
@@ -36,9 +37,9 @@ export class UsersController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.usersService.findAll();
+  // @UseGuards(JwtAuthGuard)
+  findAll(@Body() params: PaginationDto) {
+    return this.usersService.findAll(params);
   }
 
   @Get(':id')
@@ -57,7 +58,10 @@ export class UsersController {
   }
 
   @Get('/getInformation/:id/:chapterId')
-  findNetworkerData(@Param('id') id: string, @Param('chapterId') chapterId: string) {
+  findNetworkerData(
+    @Param('id') id: string,
+    @Param('chapterId') chapterId: string,
+  ) {
     return this.usersService.findNetworkerData(id, chapterId);
   }
 }

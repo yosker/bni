@@ -12,8 +12,9 @@ import { Role } from 'src/roles/interfaces/roles.interface';
 import { Roles } from 'src/roles/schemas/roles.schema';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
+import { PaginationDto, projectionDto } from 'nestjs-search';
 
-const QRCode = require("qrcode");
+const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class UsersService {
@@ -24,12 +25,53 @@ export class UsersService {
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
   ) {}
-  async findAll() {
-    return this.usersModel.find();
+  async findAll(_params: PaginationDto) {
+    // params.skip,
+    //   params.limit,
+    //   params?.start_key,
+    //   params?.sort?.field,
+    //   params?.sort?.order,
+    //   params?.filter,
+    //   params?.projection;
+    const user = this.usersModel.find(
+      {},
+      {
+        idChapter: 1,
+        role: 1,
+        name: 1,
+        lastName: 1,
+        phoneNumber: 1,
+        email: 1,
+        imageURL: 1,
+        companyName: 1,
+        profession: 1,
+        createdAt: 1,
+        status: 1,
+        completedApplication: 1,
+        completedInterview: 1,
+        invitedBy: 1,
+      },
+    );
+    return user;
   }
 
   async findOne(id: string) {
-    return this.usersModel.findById(id);
+    return this.usersModel.findById(id, {
+      idChapter: 1,
+      role: 1,
+      name: 1,
+      lastName: 1,
+      phoneNumber: 1,
+      email: 1,
+      imageURL: 1,
+      companyName: 1,
+      profession: 1,
+      createdAt: 1,
+      status: 1,
+      completedApplication: 1,
+      completedInterview: 1,
+      invitedBy: 1,
+    });
   }
 
   async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
@@ -103,7 +145,7 @@ export class UsersService {
         ..._updateUserDto,
         idChapter: ObjectId(_updateUserDto.idChapter),
       };
-      await this.usersModel.findByIdAndUpdate(ObjectId(id), _updateUserDto);
+      this.usersModel.findByIdAndUpdate(ObjectId(id), _updateUserDto);
 
       return { statusCode, message, result };
     } catch (error) {
@@ -116,32 +158,31 @@ export class UsersService {
   }
 
   //ENDPOIT QUE REGRESA LA INFO GENERAL DEL USUARIO JUNTO CON UN QR PARA LA ASISTENCIA
-  async findNetworkerData (id: string, chapterId: string): Promise<ServicesResponse>{
-
+  async findNetworkerData(
+    id: string,
+    chapterId: string,
+  ): Promise<ServicesResponse> {
     const { message } = this.servicesResponse;
-    try{
-
-      const findUser = await  this.usersModel.findOne({
+    try {
+      const findUser = await this.usersModel.findOne({
         _id: ObjectId(id),
         idChapter: ObjectId(chapterId),
-        status:'Active'
+        status: 'Active',
       });
       const qrCreated = await QRCode.toDataURL(id.toString());
-     
+
       const dataUser = {
-        name: findUser.name +' '+ findUser.lastName, 
+        name: findUser.name + ' ' + findUser.lastName,
         companyName: findUser.companyName,
         profession: findUser.profession,
         imageURL: findUser.imageURL,
-        qr: qrCreated
-      }; 
-      return {statusCode: 200, message, result: dataUser};
-
-    }catch(err){
+        qr: qrCreated,
+      };
+      return { statusCode: 200, message, result: dataUser };
+    } catch (err) {
       throw new HttpErrorByCode[500](err.message);
     }
   }
-
 
   async remove(id: string) {
     return this.usersModel.findByIdAndDelete(id);

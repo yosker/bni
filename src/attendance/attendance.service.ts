@@ -14,30 +14,31 @@ import moment from 'moment';
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class AttendanceService {
-    constructor(
-        @InjectModel('Attendance') private readonly attendanceModel: Model<Attendance>,
-        @InjectModel(Users.name) private readonly usersModel: Model<User>,
-        @InjectModel('ChapterSession') private readonly chapterSessionModel: Model<ChapterSession>,
-        private readonly servicesResponse: ServicesResponse,
-       
-    ) { }
+  constructor(
+    @InjectModel('Attendance')
+    private readonly attendanceModel: Model<Attendance>,
+    @InjectModel(Users.name) private readonly usersModel: Model<User>,
+    @InjectModel('ChapterSession')
+    private readonly chapterSessionModel: Model<ChapterSession>,
+    private readonly servicesResponse: ServicesResponse,
+  ) {}
 
-    //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
-    async create(attendanceDTO: AttendanceDTO): Promise<ServicesResponse> {
-        let { statusCode, message, result } = this.servicesResponse;
-        try {
-            //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
-            const existUser = await this.usersModel.findOne({
-                _id: ObjectId(attendanceDTO.userId),
-                idChapter: ObjectId(attendanceDTO.chapterId),
-                status:'Active'
-            });
-            
-            if (!existUser) {
-                statusCode = 404;
-                message = 'USER_NOT_FOUND';
-                return { statusCode, message, result };
-            }
+  //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
+  async create(attendanceDTO: AttendanceDTO): Promise<ServicesResponse> {
+    let { statusCode, message, result } = this.servicesResponse;
+    try {
+      //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
+      const existUser = await this.usersModel.findOne({
+        _id: ObjectId(attendanceDTO.userId),
+        idChapter: ObjectId(attendanceDTO.chapterId),
+        status: 'Active',
+      });
+
+      if (!existUser) {
+        statusCode = 404;
+        message = 'USER_NOT_FOUND';
+        return { statusCode, message, result };
+      }
 
       const currentDate = moment().format('DD/MM/YYYY');
       let authAttendance = false;
@@ -96,7 +97,7 @@ export class AttendanceService {
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE SE REGISTRARON EN LA SESION
   async VisitorsList(chapterId: string) {
-    let { message } = this.servicesResponse;
+    const { message } = this.servicesResponse;
     try {
       const currentDate = moment().format('YYYY-MM-DD');
       const visitorList = await this.usersModel.find(
@@ -128,7 +129,7 @@ export class AttendanceService {
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE REGISTRARON ASISNTENCIA
   async NetworkersList(chapterId: string) {
-    let { message } = this.servicesResponse;
+    const { message } = this.servicesResponse;
     try {
       const currentDate = moment().format('DD/MM/YYYY');
       let pipeline = await this.AttendanceResult(
