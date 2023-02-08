@@ -55,9 +55,9 @@ export class SharedService {
           objMail: emailProperties,
         },
       });
-      return { statusCode, message, result };
     } catch (err) {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
     }
+    return { statusCode, message, result };
   }
 }
