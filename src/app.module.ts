@@ -23,9 +23,10 @@ import { TreasuryModule } from './treasury/treasury.module';
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => {
         const host = config.get('database.host');
-        const port = config.get('database.port');
+        const credentials = config.get('database.credentials');
         const name = config.get('database.name');
-        const uri = `mongodb://${host}:${port}/${name}`;
+        const uri = `mongodb+srv://${credentials}@${host}/${name}?retryWrites=true&w=majority`;
+        console.log(uri);
         return { uri };
       },
       inject: [ConfigService],
