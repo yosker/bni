@@ -7,7 +7,6 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ServicesResponse } from 'src/responses/response';
 import { Users, UsersSchema } from 'src/users/schemas/users.schema';
 import { UsersModule } from 'src/users/users.module';
-import { EmailProperties } from 'src/shared/emailProperties';
 import { SharedService } from 'src/shared/shared.service';
 
 @Module({
@@ -22,6 +21,6 @@ import { SharedService } from 'src/shared/shared.service';
     AuthModule,
   ],
   controllers: [TreasuryController],
-  providers: [TreasuryService, UsersModule, ServicesResponse, EmailProperties, SharedService]
+  providers: [TreasuryService, UsersModule, ServicesResponse, SharedService],
 })
-export class TreasuryModule { }
+export class TreasuryModule {}

@@ -21,7 +21,6 @@ export class ChaptersService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
-    private emailProperties: EmailProperties,
   ) {}
 
   async getChapters() {
@@ -51,18 +50,22 @@ export class ChaptersService {
       const { password } = createUserDto;
 
       //OBJETO PARA EL CORREO
-      this.emailProperties.email = createChapterDTO.email;
-      this.emailProperties.password = password;
-      this.emailProperties.name = createChapterDTO.name;
-      this.emailProperties.template = process.env.CHAPTERS_WELCOME;
-      this.emailProperties.subject = process.env.SUBJECT_CHAPTER_WELCOME;
-   
+      const emailProperties: EmailProperties = {
+        email: createChapterDTO.email,
+        password: password,
+        name: createChapterDTO.name,
+        template: process.env.CHAPTERS_WELCOME,
+        subject: process.env.SUBJECT_CHAPTER_WELCOME,
+        urlPlatform: '',
+        amount: '',
+      };
+
       const plainToHash = await hash(password, 10);
       createUserDto = { ...createUserDto, password: plainToHash };
       const newUser = await this.usersModel.create(createUserDto);
 
       if (newChapter != null && newUser != null)
-        await this.sharedService.sendEmail(this.emailProperties);
+        await this.sharedService.sendEmail(emailProperties);
 
       return { statusCode, message, result };
     } catch (err) {
