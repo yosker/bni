@@ -5,6 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -19,6 +20,10 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('Users')
     .addTag('Auth')
+    .addTag('Chapters')
+    .addTag('Attendance')
+    .addTag('Roles')
+    .addTag('Interviews')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);

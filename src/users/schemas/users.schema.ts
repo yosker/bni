@@ -1,34 +1,57 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose'; 
+import { Document } from 'mongoose';
 
-export type UsersDocument = Users & Document; 
+export type UsersDocument = Users & Document;
 
-@Schema() 
+@Schema()
 export class Users {
-  genre: string;
-
-  @Prop({ type: 'string', length: 20, unique: true })
-  username: string;
-
   @Prop({ type: 'string', length: 50, unique: true })
   email: string;
 
-  @Prop({ type: 'string', length: 20, unique: true })
+  @Prop({ type: 'string', length: 20 })
   name: string;
 
   @Prop({ type: 'string' })
   password: string;
 
+  @Prop({ type: 'string', default: 'Active' })
   status: string;
 
-  birthday: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 
-  rolename: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 
-  @Prop({ type: 'string', default: new Date().toISOString() })
-  createdAt: string
+  @Prop({ type: 'object' })
+  idChapter: object;
 
-  updatedAt: string;
+  @Prop({ type: 'string' })
+  role: string;
+
+  @Prop({ type: 'string' })
+  lastName: string;
+
+  @Prop({ type: 'string' })
+  phoneNumber: string;
+
+  @Prop({ type: 'string' })
+  imageURL: string;
+
+  @Prop({ type: 'string' })
+  companyName: string;
+
+  @Prop({ type: 'string' })
+  profession: string;
+
+  @Prop({ type: 'boolean' })
+  completedApplication: boolean;
+
+  @Prop({ type: 'boolean' })
+  completedInterview: boolean;
+
+  @Prop({ type: String, required: false, default: '-' })
+  invitedBy: string;
 }
 
-export const UsersSchema = SchemaFactory.createForClass(Users); 
+export const UsersSchema = SchemaFactory.createForClass(Users);

@@ -4,6 +4,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
+import { ChaptersModule } from './chapters/chapters.module';
+import { SharedService } from './shared/shared.service';
+import { SharedModule } from './shared/shared.module';
+import { ServicesResponse } from 'src/responses/response';
+import { AttendanceModule } from './attendance/attendance.module';
+import { RolesModule } from './roles/roles.module';
+import { ChapterSessionsModule } from './chapter-sessions/chapter-sessions.module';
+import { InterviewsModule } from './interviews/interviews.module';
+import { TreasuryModule } from './treasury/treasury.module';
 
 @Module({
   imports: [
@@ -24,8 +33,16 @@ import configuration from './config/configuration';
     }),
     UsersModule,
     AuthModule,
+    ChaptersModule,
+    SharedModule,
+    AuthModule,
+    AttendanceModule,
+    RolesModule,
+    ChapterSessionsModule,
+    InterviewsModule,
+    TreasuryModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [SharedService, ServicesResponse ],
 })
 export class AppModule {}

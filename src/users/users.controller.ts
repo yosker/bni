@@ -1,25 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Role } from '../auth/decorators/Role.decorator';
+import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { PaginationDto, projectionDto } from 'nestjs-search';
 
-@ApiBearerAuth()
+// @ApiBearerAuth()
+// @Role('Admin')
+// @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Post('/create')
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.create(createUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Post('/createVistor')
+  async createVisotors(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.createVisitor(createUserDto);
+  }
+
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  // @UseGuards(JwtAuthGuard)
+  findAll(@Body() params: PaginationDto) {
+    return this.usersService.findAll(params);
   }
 
   @Get(':id')
@@ -36,5 +56,12 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
-  
+
+  @Get('/getInformation/:id/:chapterId')
+  findNetworkerData(
+    @Param('id') id: string,
+    @Param('chapterId') chapterId: string,
+  ) {
+    return this.usersService.findNetworkerData(id, chapterId);
+  }
 }
