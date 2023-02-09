@@ -1,10 +1,9 @@
-export class EmailProperties {
-    email
-    password 
-    name
-    urlPlatform
-    template
-    subject
-    amount
+export interface EmailProperties {
+  email: string;
+  password: string;
+  name: string;
+  urlPlatform: string;
+  template: any;
+  subject: string;
+  amount: string;
 }
-  
