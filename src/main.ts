@@ -17,7 +17,7 @@ async function bootstrap() {
     .addBearerAuth()
     .setTitle('API PRASYDE')
     .setDescription('The Prasyde API description')
-    .setVersion('1.0')
+    .setVersion('1.1')
     .addTag('Users')
     .addTag('Auth')
     .addTag('Chapters')
