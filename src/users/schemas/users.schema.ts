@@ -5,7 +5,7 @@ export type UsersDocument = Users & Document;
 
 @Schema()
 export class Users {
-  @Prop({ type: 'string', length: 50, unique: true })
+  @Prop({ type: 'string', length: 80, unique: true })
   email: string;
 
   @Prop({ type: 'string', length: 20 })

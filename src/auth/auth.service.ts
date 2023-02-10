@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { hash, compare } from 'bcrypt';
@@ -8,7 +8,7 @@ import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { JwtService } from '@nestjs/jwt';
 import { ServicesResponse } from '../responses/response';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { Response } from 'express';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -19,7 +19,7 @@ export class AuthService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private jwtService: JwtService,
     private readonly servicesResponse: ServicesResponse,
-  ) { }
+  ) {}
 
   /**
    * @description Registro de nuevo usuario
@@ -56,17 +56,31 @@ export class AuthService {
    * @param loginAuthDto
    * @returns user-token
    */
-  async login(loginAuthDto: LoginAuthDto) {
+  async login(loginAuthDto: LoginAuthDto, res: Response): Promise<Response> {
     const { email, password } = loginAuthDto;
-    let { message } = this.servicesResponse;
+    let { message, statusCode } = this.servicesResponse;
 
     try {
-
-      const findUser = await this.usersModel.findOne({ email }, { _id: 1, idChapter: 1, name: 1, lastName: 1, imageURL: 1, role: 1, password: 1 });
-      if (!findUser) throw new HttpException('USER_NOT_FOUND.', 404);
+      const findUser = await this.usersModel.findOne(
+        { email },
+        {
+          _id: 1,
+          idChapter: 1,
+          name: 1,
+          lastName: 1,
+          imageURL: 1,
+          role: 1,
+          password: 1,
+        },
+      );
+      if (!findUser)
+        return res.status(HttpStatus.BAD_REQUEST).json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
 
       const checkPassword = await compare(password, findUser.password);
-      if (!checkPassword) throw new HttpException('PASSWORD_INCORRECT', 403);
+      if (!checkPassword)
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(new HttpException('PASSWORD_INCORRECT.', HttpStatus.BAD_REQUEST));
 
       const payload = {
         idChapter: findUser.idChapter,
@@ -81,10 +95,15 @@ export class AuthService {
         user: findUser,
         token,
       };
-      return { statusCode: 200, message, result: data };
-
+      return res.status(HttpStatus.OK).json({
+        statusCode,
+        message,
+        result: data,
+      });
     } catch (err) {
-      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(new HttpException('INTERNAL_SERVER_ERROR.', HttpStatus.INTERNAL_SERVER_ERROR));
     }
   }
 }

@@ -13,6 +13,7 @@ import { Roles } from 'src/roles/schemas/roles.schema';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { PaginationDto, projectionDto } from 'nestjs-search';
+import { EmailProperties } from 'src/shared/emailProperties';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
@@ -24,7 +25,7 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) {}
+  ) { }
   async findAll(_params: PaginationDto) {
     // params.skip,
     //   params.limit,
@@ -92,12 +93,25 @@ export class UsersService {
         idChapter: ObjectId(createUserDto.idChapter),
         invitedBy: '-',
       };
-
       const newUser = await this.usersModel.create(createUserDto);
-      if (newUser != null) console.log('Envio  de correo');
+      if (newUser != null) {
+        const url = process.env.URL_NET_PLATFORM + '?id=' + newUser._id.toString() + '&chapterId=' + newUser.idChapter.toString();
 
+        //OBJETO PARA EL CORREO
+        const emailProperties: EmailProperties = {
+          email: newUser.email,
+          password: '',
+          name: newUser.name + ' ' + newUser.lastName,
+          template: process.env.NETWORKERS_WELCOME_TEMPLATE,
+          subject: process.env.SUBJECT_CHAPTER_WELCOME,
+          urlPlatform: url,
+          amount: '',
+        };
+        await this.sharedService.sendEmail(emailProperties);
+      }
       return { statusCode, message, result };
     } catch (error) {
+
       if (error.code === 11000) {
         throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
       } else {
