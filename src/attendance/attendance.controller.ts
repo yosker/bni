@@ -5,8 +5,8 @@ import { AttendanceDTO } from './dto/attendance.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
-@ApiBearerAuth()
-@UseGuards(AuthGuard(), JwtGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Attendance')
 @Controller('attendance')
 export class AttendanceController {

@@ -9,7 +9,7 @@ import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
-import moment from 'moment';
+import * as moment from 'moment';
 
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
