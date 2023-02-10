@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ServicesResponse } from 'src/responses/response';
@@ -9,6 +9,7 @@ import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { EmailProperties } from 'src/shared/emailProperties';
 import { SharedService } from 'src/shared/shared.service';
+import { Response } from 'express';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -22,8 +23,8 @@ export class TreasuryService {
   ) {}
 
   //ENDPOINT PARA GUARDAR UNA APORTACIÓN
-  async create(treasuryDTO: TreasuryDTO): Promise<ServicesResponse> {
-    let { statusCode, message, result } = this.servicesResponse;
+  async create(treasuryDTO: TreasuryDTO, res: Response): Promise<Response> {
+    const { result } = this.servicesResponse;
 
     try {
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
@@ -67,18 +68,29 @@ export class TreasuryService {
           await this.sharedService.sendEmail(emailProperties);
         }
       } else {
-        return { statusCode: 200, message: 'PAYMENT_FOUND', result };
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(new HttpException('PAYMENT_FOUND.', HttpStatus.NOT_FOUND));
       }
-      return { statusCode, message, result };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: result,
+      });
     } catch (err) {
-      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
   }
 
   //ENDPOINT QUE REGRESA EL LISTADO DE APORTACIONES POR USUARIO
-  async userPaymentList(id: string): Promise<ServicesResponse> {
-    let { message } = this.servicesResponse;
-
+  async userPaymentList(id: string, res: Response): Promise<Response> {
     try {
       const paymentList = await this.treasuryModel
         .find(
@@ -94,9 +106,20 @@ export class TreasuryService {
           },
         )
         .sort({ createdAt: 1 });
-      return { statusCode: 200, message, result: paymentList };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: paymentList,
+      });
     } catch (err) {
-      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
   }
 }

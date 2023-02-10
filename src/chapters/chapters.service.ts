@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chapter } from './interfaces/chapters.interface';
@@ -12,6 +12,7 @@ import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { EmailProperties } from 'src/shared/emailProperties';
+import { Response } from 'express';
 
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
@@ -33,8 +34,11 @@ export class ChaptersService {
     return chapter;
   }
 
-  async create(createChapterDTO: CreateChapterDTO): Promise<ServicesResponse> {
-    const { statusCode, message, result } = this.servicesResponse;
+  async create(
+    createChapterDTO: CreateChapterDTO,
+    res: Response,
+  ): Promise<Response> {
+    const { result } = this.servicesResponse;
 
     const chapter: Chapter = new this.chapterModel(createChapterDTO);
     try {
@@ -67,27 +71,43 @@ export class ChaptersService {
       if (newChapter != null && newUser != null)
         await this.sharedService.sendEmail(emailProperties);
 
-      return { statusCode, message, result };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: result,
+      });
     } catch (err) {
       if (err.code === 11000) {
-        throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(new HttpException('RECORD_DUPLICATED.', HttpStatus.CONFLICT));
       } else {
-        throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+        throw res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json(
+            new HttpException(
+              'INTERNAL_SERVER_ERROR.',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            ),
+          );
       }
     }
   }
 
-  async updateChapter(chapterId: string, createChapterDTO: CreateChapterDTO) {
+  async updateChapter(
+    chapterId: string,
+    createChapterDTO: CreateChapterDTO,
+    res: Response,
+  ): Promise<Response> {
     const chapterUpdated = this.chapterModel.findByIdAndUpdate(
       chapterId,
       createChapterDTO,
       { new: true },
     );
-    return chapterUpdated;
-  }
-
-  async deleteChapter(chapterId: string) {
-    const deletedChapter = this.chapterModel.findByIdAndDelete(chapterId);
-    return deletedChapter;
+    return res.status(HttpStatus.OK).json({
+      statusCode: this.servicesResponse.statusCode,
+      message: this.servicesResponse.message,
+      result: chapterUpdated,
+    });
   }
 }
