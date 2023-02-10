@@ -1,5 +1,5 @@
 export class ServicesResponse {
-  statusCode = 201;
+  statusCode = 200;
   message = 'SUCCESS';
   result = {};
 }
