@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './interfaces/users.interface';
@@ -12,8 +12,9 @@ import { Role } from 'src/roles/interfaces/roles.interface';
 import { Roles } from 'src/roles/schemas/roles.schema';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
-import { PaginationDto, projectionDto } from 'nestjs-search';
+import { PaginationDto } from 'nestjs-search';
 import { EmailProperties } from 'src/shared/emailProperties';
+import { Response } from 'express';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
@@ -25,8 +26,8 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) { }
-  async findAll(_params: PaginationDto) {
+  ) {}
+  async findAll(_params: PaginationDto, res: Response): Promise<Response> {
     // params.skip,
     //   params.limit,
     //   params?.start_key,
@@ -53,11 +54,15 @@ export class UsersService {
         invitedBy: 1,
       },
     );
-    return user;
+    return res.status(HttpStatus.OK).json({
+      statusCode: this.servicesResponse.statusCode,
+      message: this.servicesResponse.message,
+      result: user,
+    });
   }
 
-  async findOne(id: string) {
-    return this.usersModel.findById(id, {
+  async findOne(id: string, res: Response) {
+    const user = this.usersModel.findById(id, {
       idChapter: 1,
       role: 1,
       name: 1,
@@ -73,16 +78,22 @@ export class UsersService {
       completedInterview: 1,
       invitedBy: 1,
     });
+    return res.status(HttpStatus.OK).json({
+      statusCode: this.servicesResponse.statusCode,
+      message: this.servicesResponse.message,
+      result: user,
+    });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<ServicesResponse> {
-    const { statusCode, message, result } = this.servicesResponse;
+  async create(createUserDto: CreateUserDto, res: Response): Promise<Response> {
     const findRole = this.rolesModel.findOne({
       name: createUserDto.role,
     });
-
+    const { result } = this.servicesResponse;
     if (!findRole)
-      throw new HttpErrorByCode[404]('ROLE_NOT_FOUND', this.servicesResponse);
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(new HttpException('ROLE_NOT_FOUND.', HttpStatus.BAD_REQUEST));
 
     try {
       const pass = await this.sharedService.passwordGenerator(6);
@@ -95,7 +106,12 @@ export class UsersService {
       };
       const newUser = await this.usersModel.create(createUserDto);
       if (newUser != null) {
-        const url = process.env.URL_NET_PLATFORM + '?id=' + newUser._id.toString() + '&chapterId=' + newUser.idChapter.toString();
+        const url =
+          process.env.URL_NET_PLATFORM +
+          '?id=' +
+          newUser._id.toString() +
+          '&chapterId=' +
+          newUser.idChapter.toString();
 
         //OBJETO PARA EL CORREO
         const emailProperties: EmailProperties = {
@@ -109,9 +125,12 @@ export class UsersService {
         };
         await this.sharedService.sendEmail(emailProperties);
       }
-      return { statusCode, message, result };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: result,
+      });
     } catch (error) {
-
       if (error.code === 11000) {
         throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
       } else {
@@ -120,8 +139,10 @@ export class UsersService {
     }
   }
 
-  async createVisitor(createUserDto: CreateUserDto): Promise<ServicesResponse> {
-    const { statusCode, message, result } = this.servicesResponse;
+  async createVisitor(
+    createUserDto: CreateUserDto,
+    res: Response,
+  ): Promise<Response> {
     const findRole = this.rolesModel.findOne({
       name: createUserDto.role,
     });
@@ -133,12 +154,25 @@ export class UsersService {
       const _newUser = new this.usersModel(createUserDto);
       await _newUser.save();
 
-      return { statusCode, message, result };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: _newUser,
+      });
     } catch (error) {
       if (error.code === 11000) {
-        throw new HttpErrorByCode[409]('DUPLICATED_REGISTER');
+        throw res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(new HttpException('DUPLICATED_REGISTER.', HttpStatus.CONFLICT));
       } else {
-        throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+        throw res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json(
+            new HttpException(
+              'INTERNAL_SERVER_ERROR.',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            ),
+          );
       }
     }
   }
@@ -146,8 +180,9 @@ export class UsersService {
   async update(
     id: string,
     _updateUserDto: UpdateUserDto,
-  ): Promise<ServicesResponse> {
-    const { statusCode, message, result } = this.servicesResponse;
+    res: Response,
+  ): Promise<Response> {
+    const { result } = this.servicesResponse;
     const findRole = this.rolesModel.findOne({
       name: _updateUserDto.role,
     });
@@ -161,12 +196,25 @@ export class UsersService {
       };
       this.usersModel.findByIdAndUpdate(ObjectId(id), _updateUserDto);
 
-      return { statusCode, message, result };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: result,
+      });
     } catch (error) {
       if (error.code === 11000) {
-        throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
+        throw res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(new HttpException('DUPLICATED_REGISTER.', HttpStatus.CONFLICT));
       } else {
-        throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+        throw res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json(
+            new HttpException(
+              'INTERNAL_SERVER_ERROR.',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            ),
+          );
       }
     }
   }
@@ -175,8 +223,8 @@ export class UsersService {
   async findNetworkerData(
     id: string,
     chapterId: string,
-  ): Promise<ServicesResponse> {
-    const { message } = this.servicesResponse;
+    res: Response,
+  ): Promise<Response> {
     try {
       const findUser = await this.usersModel.findOne({
         _id: ObjectId(id),
@@ -192,13 +240,20 @@ export class UsersService {
         imageURL: findUser.imageURL,
         qr: qrCreated,
       };
-      return { statusCode: 200, message, result: dataUser };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: dataUser,
+      });
     } catch (err) {
-      throw new HttpErrorByCode[500](err.message);
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
-  }
-
-  async remove(id: string) {
-    return this.usersModel.findByIdAndDelete(id);
   }
 }

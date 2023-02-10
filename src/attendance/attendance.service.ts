@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Attendance } from './interfaces/attendance.interfaces';
@@ -12,6 +12,8 @@ import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.
 import * as moment from 'moment';
 
 const ObjectId = require('mongodb').ObjectId;
+import { Response } from 'express';
+
 @Injectable()
 export class AttendanceService {
   constructor(
@@ -24,8 +26,7 @@ export class AttendanceService {
   ) {}
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
-  async create(attendanceDTO: AttendanceDTO): Promise<ServicesResponse> {
-    let { statusCode, message, result } = this.servicesResponse;
+  async create(attendanceDTO: AttendanceDTO, res: Response): Promise<Response> {
     try {
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const existUser = await this.usersModel.findOne({
@@ -35,9 +36,9 @@ export class AttendanceService {
       });
 
       if (!existUser) {
-        statusCode = 404;
-        message = 'USER_NOT_FOUND';
-        return { statusCode, message, result };
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
       }
 
       const currentDate = moment().format('DD/MM/YYYY');
@@ -63,9 +64,9 @@ export class AttendanceService {
         });
 
         if (userSession) {
-          statusCode = 409;
-          message = 'RECORD_DUPLICATED';
-          return { statusCode, message, result };
+          return res
+            .status(HttpStatus.BAD_REQUEST)
+            .json(new HttpException('USER_NOT_FOUND.', HttpStatus.CONFLICT));
         }
 
         attendanceDTO = {
@@ -76,7 +77,7 @@ export class AttendanceService {
         };
         await this.attendanceModel.create(attendanceDTO);
 
-        let pipeline = await this.AttendanceResult(
+        const pipeline = await this.AttendanceResult(
           attendanceDTO.chapterId,
           currentDate,
           attendanceDTO.userId,
@@ -84,20 +85,35 @@ export class AttendanceService {
         );
         const userData = await this.attendanceModel.aggregate(pipeline);
 
-        return { statusCode, message, result: userData[0] };
+        return res.status(HttpStatus.OK).json({
+          statusCode: this.servicesResponse.statusCode,
+          message: this.servicesResponse.message,
+          result: userData[0],
+        });
       } else {
-        statusCode = 401;
-        message = 'ATTENDANCE_NOT_AUTHORIZED';
-        return { statusCode, message, result };
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(
+            new HttpException(
+              'ATTENDANCE_NOT_AUTHORIZED.',
+              HttpStatus.UNAUTHORIZED,
+            ),
+          );
       }
     } catch (err) {
-      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
   }
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE SE REGISTRARON EN LA SESION
-  async VisitorsList(chapterId: string) {
-    const { message } = this.servicesResponse;
+  async VisitorsList(chapterId: string, res: Response): Promise<Response> {
     try {
       const currentDate = moment().format('YYYY-MM-DD');
       const visitorList = await this.usersModel.find(
@@ -121,18 +137,28 @@ export class AttendanceService {
         },
       );
 
-      return { statusCode: 200, message, result: visitorList };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: visitorList,
+      });
     } catch (err) {
-      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
   }
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE REGISTRARON ASISNTENCIA
-  async NetworkersList(chapterId: string) {
-    const { message } = this.servicesResponse;
+  async NetworkersList(chapterId: string, res: Response): Promise<Response> {
     try {
       const currentDate = moment().format('DD/MM/YYYY');
-      let pipeline = await this.AttendanceResult(
+      const pipeline = await this.AttendanceResult(
         ObjectId(chapterId),
         currentDate,
         ObjectId(0),
@@ -140,9 +166,20 @@ export class AttendanceService {
       );
       const userData = await this.attendanceModel.aggregate(pipeline);
 
-      return { statusCode: 200, message, result: userData };
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: userData,
+      });
     } catch (err) {
-      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
   }
 
@@ -153,47 +190,51 @@ export class AttendanceService {
     userId: object,
     queryType: number,
   ) {
-    let filter = {
-      ['chapterId']: ObjectId(chapterId),
-      ['attendanceDate']: attendaceDate,
-    };
-    if (queryType == 1) {
-      filter['userId'] = ObjectId(userId);
-    }
+    try {
+      const filter = {
+        ['chapterId']: ObjectId(chapterId),
+        ['attendanceDate']: attendaceDate,
+      };
+      if (queryType == 1) {
+        filter['userId'] = ObjectId(userId);
+      }
 
-    const result = [
-      {
-        $match: filter,
-      },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'userData',
+      const result = [
+        {
+          $match: filter,
         },
-      },
-      {
-        $unwind: '$userData',
-      },
-      {
-        $project: {
-          name: '$userData.name',
-          imageUrl: '$userData.imageURL',
-          attendanceDate: '$attendanceDate',
-          createdAt: '$createdAt',
-          attendanceHour: {
-            $concat: [
-              { $toString: { $hour: '$createdAt' } },
-              ':',
-              { $toString: { $minute: '$createdAt' } },
-            ],
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userData',
           },
-          companyName: '$userData.companyName',
-          profession: '$userData.profession',
         },
-      },
-    ];
-    return result;
+        {
+          $unwind: '$userData',
+        },
+        {
+          $project: {
+            name: '$userData.name',
+            imageUrl: '$userData.imageURL',
+            attendanceDate: '$attendanceDate',
+            createdAt: '$createdAt',
+            attendanceHour: {
+              $concat: [
+                { $toString: { $hour: '$createdAt' } },
+                ':',
+                { $toString: { $minute: '$createdAt' } },
+              ],
+            },
+            companyName: '$userData.companyName',
+            profession: '$userData.profession',
+          },
+        },
+      ];
+      return result;
+    } catch (error) {
+      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+    }
   }
 }

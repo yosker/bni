@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Res } from '@nestjs/common';
 import { InterviewsService } from './interviews.service';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 import { UpdateInterviewDto } from './dto/update-interview.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 
 @ApiTags('Interviews')
 @Controller('interviews')
@@ -10,28 +11,30 @@ export class InterviewsController {
   constructor(private readonly interviewsService: InterviewsService) {}
 
   @Post()
-  create(@Body() createInterviewDto: CreateInterviewDto) {
-    return this.interviewsService.save(createInterviewDto);
+  create(@Body() createInterviewDto: CreateInterviewDto, @Res() res: Response) {
+    return this.interviewsService.save(createInterviewDto, res);
   }
 
   @Get()
-  findAll() {
-    return this.interviewsService.findAll();
+  findAll(@Res() res: Response) {
+    return this.interviewsService.findAll(res);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.interviewsService.findOne(id);
+  findOne(@Param('id') id: string, @Res() res: Response) {
+    return this.interviewsService.findOne(id, res);
   }
 
   @Patch('questionsReferences/:id')
   updateQuestionsReferences(
     @Param('id') id: string,
     @Body() updateInterviewDto: UpdateInterviewDto,
+    @Res() res: Response
   ) {
     return this.interviewsService.updateQuestionsReferences(
       id,
       updateInterviewDto,
+      res
     );
   }
 
@@ -39,7 +42,8 @@ export class InterviewsController {
   updateInterviewUser(
     @Param('id') id: string,
     @Body() updateInterviewDto: UpdateInterviewDto,
+    @Res() res: Response
   ) {
-    return this.interviewsService.updateUserInterview(id, updateInterviewDto);
+    return this.interviewsService.updateUserInterview(id, updateInterviewDto, res);
   }
 }

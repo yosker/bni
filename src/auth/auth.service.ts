@@ -14,7 +14,6 @@ const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class AuthService {
-
   constructor(
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private jwtService: JwtService,
@@ -26,29 +25,47 @@ export class AuthService {
    * @param registerAuthDto
    * @returns User
    */
-  async register(registerAuthDto: RegisterAuthDto) {
-    const { password, idChapter } = registerAuthDto;
-    const plainToHash = await hash(password, 10);
+  async register(
+    registerAuthDto: RegisterAuthDto,
+    res: Response,
+  ): Promise<Response> {
+    try {
+      const { password, idChapter } = registerAuthDto;
+      const plainToHash = await hash(password, 10);
 
-    registerAuthDto = {
-      ...registerAuthDto,
-      password: plainToHash,
-      idChapter: ObjectId(idChapter),
-    };
-    const findUser = await this.usersModel.create(registerAuthDto);
-    const payload = {
-      id: findUser._id,
-      name: registerAuthDto.name,
-      role: registerAuthDto.role,
-      email: registerAuthDto.email,
-    };
-    const token = this.jwtService.sign(payload);
-    const data = {
-      user: findUser,
-      token,
-    };
+      registerAuthDto = {
+        ...registerAuthDto,
+        password: plainToHash,
+        idChapter: ObjectId(idChapter),
+      };
+      const findUser = await this.usersModel.create(registerAuthDto);
+      const payload = {
+        id: findUser._id,
+        name: registerAuthDto.name,
+        role: registerAuthDto.role,
+        email: registerAuthDto.email,
+      };
+      const token = this.jwtService.sign(payload);
+      const data = {
+        user: findUser,
+        token,
+      };
 
-    return data;
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: data,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 
   /**
@@ -58,7 +75,6 @@ export class AuthService {
    */
   async login(loginAuthDto: LoginAuthDto, res: Response): Promise<Response> {
     const { email, password } = loginAuthDto;
-    let { message, statusCode } = this.servicesResponse;
 
     try {
       const findUser = await this.usersModel.findOne(
@@ -74,13 +90,17 @@ export class AuthService {
         },
       );
       if (!findUser)
-        return res.status(HttpStatus.BAD_REQUEST).json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(new HttpException('USER_NOT_FOUND.', HttpStatus.NOT_FOUND));
 
       const checkPassword = await compare(password, findUser.password);
       if (!checkPassword)
         return res
           .status(HttpStatus.BAD_REQUEST)
-          .json(new HttpException('PASSWORD_INCORRECT.', HttpStatus.BAD_REQUEST));
+          .json(
+            new HttpException('PASSWORD_INCORRECT.', HttpStatus.BAD_REQUEST),
+          );
 
       const payload = {
         idChapter: findUser.idChapter,
@@ -96,14 +116,19 @@ export class AuthService {
         token,
       };
       return res.status(HttpStatus.OK).json({
-        statusCode,
-        message,
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
         result: data,
       });
     } catch (err) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(new HttpException('INTERNAL_SERVER_ERROR.', HttpStatus.INTERNAL_SERVER_ERROR));
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
   }
 }

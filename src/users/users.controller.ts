@@ -5,10 +5,10 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   HttpCode,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,11 +18,12 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Role } from '../auth/decorators/Role.decorator';
 import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
-import { PaginationDto, projectionDto } from 'nestjs-search';
+import { PaginationDto } from 'nestjs-search';
+import { Response } from 'express';
 
-// @ApiBearerAuth()
-// @Role('Admin')
-// @UseGuards(AuthGuard(), JwtGuard)
+@ApiBearerAuth()
+@Role('Admin')
+@UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
@@ -30,41 +31,44 @@ export class UsersController {
 
   @Post('/create')
   @HttpCode(HttpStatus.OK)
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    return await this.usersService.create(createUserDto, res);
   }
 
   @Post('/createVistor')
-  async createVisotors(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.createVisitor(createUserDto);
+  async createVisotors(
+    @Body() createUserDto: CreateUserDto,
+    @Res() res: Response,
+  ) {
+    return await this.usersService.createVisitor(createUserDto, res);
   }
 
   @Get()
-  // @UseGuards(JwtAuthGuard)
-  findAll(@Body() params: PaginationDto) {
-    return this.usersService.findAll(params);
+  @UseGuards(JwtAuthGuard)
+  findAll(@Body() params: PaginationDto, @Res() res: Response) {
+    return this.usersService.findAll(params, res);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  findOne(@Param('id') id: string, @Res() res: Response) {
+    return this.usersService.findOne(id, res);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Res() res: Response,
+  ) {
+    return this.usersService.update(id, updateUserDto, res);
   }
 
   @Get('/getInformation/:id/:chapterId')
   findNetworkerData(
     @Param('id') id: string,
     @Param('chapterId') chapterId: string,
+    @Res() res: Response,
   ) {
-    return this.usersService.findNetworkerData(id, chapterId);
+    return this.usersService.findNetworkerData(id, chapterId, res);
   }
 }

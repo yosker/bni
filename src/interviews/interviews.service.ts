@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -9,6 +9,7 @@ import { CreateInterviewDto } from './dto/create-interview.dto';
 import { UpdateInterviewDto } from './dto/update-interview.dto';
 import { Interview } from './interfaces/interviews.interface';
 import { Interviews } from './schemas/interviews.schema';
+import { Response } from 'express';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -26,7 +27,10 @@ export class InterviewsService {
    * @param createInterviewDto Objeto de Preguntas
    * @returns Objeto Guardado
    */
-  async save(createInterviewDto: CreateInterviewDto) {
+  async save(
+    createInterviewDto: CreateInterviewDto,
+    res: Response,
+  ): Promise<Response> {
     let { chapterId, userId } = createInterviewDto;
     chapterId = ObjectId(chapterId);
     userId = ObjectId(userId);
@@ -40,14 +44,49 @@ export class InterviewsService {
         completedInterview: true,
       });
     });
+    return res.status(HttpStatus.OK).json({
+      statusCode: this.servicesResponse.statusCode,
+      message: this.servicesResponse.message,
+      result: {},
+    });
   }
 
-  findAll() {
-    return `This action returns all interviews`;
+  async findAll(res: Response): Promise<Response> {
+    try {
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 
-  async findOne(id: string) {
-    return await this.interviewModel.findById(id);
+  async findOne(id: string, res: Response): Promise<Response> {
+    try {
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 
   /**
@@ -59,27 +98,45 @@ export class InterviewsService {
   async updateQuestionsReferences(
     id: string,
     _updateInterviewDto: UpdateInterviewDto,
-  ) {
-    const interview = await this.interviewModel.findById(id).catch(() => {
-      throw new HttpErrorByCode[404](
-        'INTERVIEW_NOT_FOUND',
-        this.servicesResponse,
-      );
-    });
+    res: Response,
+  ): Promise<Response> {
+    try {
+      const interview = await this.interviewModel.findById(id).catch(() => {
+        throw res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(
+            new HttpException('INTERVIEW_NOT_FOUND.', HttpStatus.NOT_FOUND),
+          );
+      });
 
-    let index = 0;
-    for (const reference of interview.references) {
-      if (typeof _updateInterviewDto.references[index] != 'undefined') {
-        const referenceModel = _updateInterviewDto.references[index];
-        if (reference.email == referenceModel.email) {
-          reference.questions = _updateInterviewDto.references[index].questions;
-          index++;
+      let index = 0;
+      for (const reference of interview.references) {
+        if (typeof _updateInterviewDto.references[index] != 'undefined') {
+          const referenceModel = _updateInterviewDto.references[index];
+          if (reference.email == referenceModel.email) {
+            reference.questions =
+              _updateInterviewDto.references[index].questions;
+            index++;
+          }
         }
       }
-    }
 
-    await this.interviewModel.findByIdAndUpdate(ObjectId(id), interview);
-    return _updateInterviewDto;
+      await this.interviewModel.findByIdAndUpdate(ObjectId(id), interview);
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: _updateInterviewDto,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 
   /**
@@ -91,18 +148,35 @@ export class InterviewsService {
   async updateUserInterview(
     id: string,
     _updateInterviewDto: UpdateInterviewDto,
-  ) {
-    await this.interviewModel.findById(id).catch(() => {
-      throw new HttpErrorByCode[404](
-        'INTERVIEW_NOT_FOUND',
-        this.servicesResponse,
-      );
-    });
+    res: Response,
+  ): Promise<Response> {
+    try {
+      await this.interviewModel.findById(id).catch(() => {
+        throw res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(
+            new HttpException('INTERVIEW_NOT_FOUND.', HttpStatus.NOT_FOUND),
+          );
+      });
 
-    await this.interviewModel.findByIdAndUpdate(
-      ObjectId(id),
-      _updateInterviewDto,
-    );
-    return _updateInterviewDto;
+      await this.interviewModel.findByIdAndUpdate(
+        ObjectId(id),
+        _updateInterviewDto,
+      );
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: _updateInterviewDto,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 }

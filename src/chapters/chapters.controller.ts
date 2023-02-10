@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Res } from '@nestjs/common';
 import { CreateChapterDTO } from './dto/chapters.dto';
 import { ChaptersService } from './chapters.service';
 import { ApiTags } from '@nestjs/swagger';
-import { ServicesResponse } from 'src/responses/response';
+import { Response } from 'express';
 
 @ApiTags('Chapters')
 @Controller('chapters')
@@ -12,8 +12,9 @@ export class ChaptersController {
   @Post('/create')
   async create(
     @Body() chapterDTO: CreateChapterDTO,
-  ): Promise<ServicesResponse> {
-    return await this.chapterService.create(chapterDTO);
+    @Res() res: Response
+  ): Promise<Response> {
+    return await this.chapterService.create(chapterDTO, res);
   }
 
   @Get()
