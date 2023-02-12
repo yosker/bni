@@ -23,7 +23,7 @@ export class AttendanceService {
     @InjectModel('ChapterSession')
     private readonly chapterSessionModel: Model<ChapterSession>,
     private readonly servicesResponse: ServicesResponse,
-  ) { }
+  ) {}
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
   async create(attendanceDTO: AttendanceDTO, res: Response): Promise<Response> {
@@ -113,10 +113,15 @@ export class AttendanceService {
   }
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE SE REGISTRARON EN LA SESION
-  async VisitorsList(chapterId: string, sessionDate: string, res: Response): Promise<Response> {
+  async VisitorsList(
+    chapterId: string,
+    sessionDate: string,
+    res: Response,
+  ): Promise<Response> {
     try {
-      const currentDate = sessionDate.split('-'); //moment().format('YYYY-MM-DD'); 
-      const newDate = currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
+      const currentDate = sessionDate.split('-'); //moment().format('YYYY-MM-DD');
+      const newDate =
+        currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
 
       const visitorList = await this.usersModel.find(
         {
@@ -124,7 +129,7 @@ export class AttendanceService {
           role: 'Visitante',
           status: 'Active',
           createdAt: {
-            $gte: moment(`${(newDate)}T00:00:00.000`),
+            $gte: moment(`${newDate}T00:00:00.000`),
             $lt: moment(`${newDate}T23:59:59.999`),
           },
         },
@@ -157,9 +162,13 @@ export class AttendanceService {
   }
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE REGISTRARON ASISNTENCIA
-  async NetworkersList(chapterId: string, sessionDate: string, res: Response): Promise<Response> {
+  async NetworkersList(
+    chapterId: string,
+    sessionDate: string,
+    res: Response,
+  ): Promise<Response> {
     try {
-      const currentDate = sessionDate.replace(/-/gi, "/");// moment().format('DD/MM/YYYY');
+      const currentDate = sessionDate.replace(/-/gi, '/'); // moment().format('DD/MM/YYYY');
       const pipeline = await this.AttendanceResult(
         ObjectId(chapterId),
         currentDate,
@@ -219,8 +228,7 @@ export class AttendanceService {
         {
           $project: {
             name: {
-              $concat:
-                ["$userData.name", " ", "$userData.lastName"]
+              $concat: ['$userData.name', ' ', '$userData.lastName'],
             },
             imageUrl: '$userData.imageURL',
             attendanceDate: '$attendanceDate',
