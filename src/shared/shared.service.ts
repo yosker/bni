@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
-import { EmailProperties } from './emailProperties';
+
 @Injectable()
 export class SharedService {
   constructor(
@@ -39,7 +39,7 @@ export class SharedService {
     return result;
   }
 
-  async sendEmail(emailProperties: EmailProperties): Promise<ServicesResponse> {
+  async sendEmail(emailProperties: any): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
     try {
       emailProperties = {

@@ -4,10 +4,8 @@ import { Model } from 'mongoose';
 import { ServicesResponse } from 'src/responses/response';
 import { Treasury } from 'src/treasury/interfaces/treasury.interfaces';
 import { TreasuryDTO } from 'src/treasury/dto/treasury.dto';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
-import { EmailProperties } from 'src/shared/emailProperties';
 import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
 
@@ -52,7 +50,7 @@ export class TreasuryService {
 
         if (paymentCreated != null) {
           //ENVIO DE CORREO CON CONPROBANTE DE APORTACIÓN
-          const emailProperties: EmailProperties = {
+          const emailProperties = {
             email: findUser.email,
             name: findUser.name + ' ' + findUser.lastName,
             template: process.env.RECEIPT_TEMPLATE,
