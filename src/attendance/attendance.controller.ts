@@ -19,26 +19,28 @@ import { Response } from 'express';
 @ApiTags('Attendance')
 @Controller('attendance')
 export class AttendanceController {
-  constructor(private attendanceService: AttendanceService) {}
+  constructor(private attendanceService: AttendanceService) { }
 
   @Post('/create')
   async create(@Body() attendanceDTO: AttendanceDTO, @Res() res: Response) {
     return await this.attendanceService.create(attendanceDTO, res);
   }
 
-  @Get('/visitors/:chapterId')
+  @Get('/visitors/:chapterId/:sessionDate')
   async getVisitors(
     @Param('chapterId') chapterId: string,
+    @Param('sessionDate') sessionDate: string,
     @Res() res: Response,
   ) {
-    return await this.attendanceService.VisitorsList(chapterId, res);
+    return await this.attendanceService.VisitorsList(chapterId, sessionDate, res);
   }
 
-  @Get('/networkers/:chapterId')
+  @Get('/networkers/:chapterId/:sessionDate')
   async getNetworkers(
     @Param('chapterId') chapterId: string,
+    @Param('sessionDate') sessionDate: string,
     @Res() res: Response,
   ) {
-    return await this.attendanceService.NetworkersList(chapterId, res);
+    return await this.attendanceService.NetworkersList(chapterId, sessionDate, res);
   }
 }

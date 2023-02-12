@@ -17,7 +17,7 @@ import { Response } from 'express';
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('ChapterSession')
-@Controller('chapter-sessions')
+@Controller('chapterSessions')
 export class ChapterSessionsController {
   constructor(private chapterSessionService: ChapterSessionsService) {}
 

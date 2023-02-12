@@ -15,6 +15,7 @@ import { SharedService } from 'src/shared/shared.service';
 import { PaginationDto } from 'nestjs-search';
 import { EmailProperties } from 'src/shared/emailProperties';
 import { Response } from 'express';
+import { object } from 'joi';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
@@ -26,7 +27,7 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) {}
+  ) { }
   async findAll(_params: PaginationDto, res: Response): Promise<Response> {
     // params.skip,
     //   params.limit,
@@ -151,13 +152,16 @@ export class UsersService {
       throw new HttpErrorByCode[404]('NOT_FOUND_ROLE', this.servicesResponse);
 
     try {
-      const _newUser = new this.usersModel(createUserDto);
-      await _newUser.save();
+      createUserDto = {
+        ...createUserDto,
+        idChapter: ObjectId(createUserDto.idChapter)
+      };
+      await this.usersModel.create(createUserDto);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: _newUser,
+        result: {},
       });
     } catch (error) {
       if (error.code === 11000) {

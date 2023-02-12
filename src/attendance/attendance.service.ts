@@ -23,7 +23,7 @@ export class AttendanceService {
     @InjectModel('ChapterSession')
     private readonly chapterSessionModel: Model<ChapterSession>,
     private readonly servicesResponse: ServicesResponse,
-  ) {}
+  ) { }
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
   async create(attendanceDTO: AttendanceDTO, res: Response): Promise<Response> {
@@ -41,7 +41,7 @@ export class AttendanceService {
           .json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
       }
 
-      const currentDate = moment().format('DD/MM/YYYY');
+      const currentDate = moment().format('DD-MM-YYYY');
       let authAttendance = false;
 
       //VALIDAMOS QUE LA SESION EXISTA EXISTA Y QUE ESTE ACTIVA
@@ -66,7 +66,7 @@ export class AttendanceService {
         if (userSession) {
           return res
             .status(HttpStatus.BAD_REQUEST)
-            .json(new HttpException('USER_NOT_FOUND.', HttpStatus.CONFLICT));
+            .json(new HttpException('RECORD_DUPLICATED.', HttpStatus.CONFLICT));
         }
 
         attendanceDTO = {
@@ -113,17 +113,19 @@ export class AttendanceService {
   }
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE SE REGISTRARON EN LA SESION
-  async VisitorsList(chapterId: string, res: Response): Promise<Response> {
+  async VisitorsList(chapterId: string, sessionDate: string, res: Response): Promise<Response> {
     try {
-      const currentDate = moment().format('YYYY-MM-DD');
+      const currentDate = sessionDate.split('-'); //moment().format('YYYY-MM-DD'); 
+      const newDate = currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
+
       const visitorList = await this.usersModel.find(
         {
           idChapter: ObjectId(chapterId),
           role: 'Visitante',
           status: 'Active',
           createdAt: {
-            $gte: moment(`${currentDate}T00:00:00`),
-            $lt: moment(`${currentDate}T23:59:59`),
+            $gte: moment(`${(newDate)}T00:00:00.000`),
+            $lt: moment(`${newDate}T23:59:59.999`),
           },
         },
         {
@@ -155,9 +157,9 @@ export class AttendanceService {
   }
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE REGISTRARON ASISNTENCIA
-  async NetworkersList(chapterId: string, res: Response): Promise<Response> {
+  async NetworkersList(chapterId: string, sessionDate: string, res: Response): Promise<Response> {
     try {
-      const currentDate = moment().format('DD/MM/YYYY');
+      const currentDate = sessionDate.replace(/-/gi, "/");// moment().format('DD/MM/YYYY');
       const pipeline = await this.AttendanceResult(
         ObjectId(chapterId),
         currentDate,
@@ -216,7 +218,10 @@ export class AttendanceService {
         },
         {
           $project: {
-            name: '$userData.name',
+            name: {
+              $concat:
+                ["$userData.name", " ", "$userData.lastName"]
+            },
             imageUrl: '$userData.imageURL',
             attendanceDate: '$attendanceDate',
             createdAt: '$createdAt',
