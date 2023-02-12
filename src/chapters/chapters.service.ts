@@ -10,8 +10,6 @@ import { Users } from 'src/users/schemas/users.schema';
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
-import { EmailProperties } from 'src/shared/emailProperties';
 import { Response } from 'express';
 
 const ObjectId = require('mongodb').ObjectId;
@@ -54,7 +52,7 @@ export class ChaptersService {
       const { password } = createUserDto;
 
       //OBJETO PARA EL CORREO
-      const emailProperties: EmailProperties = {
+      const emailProperties = {
         email: createChapterDTO.email,
         password: password,
         name: createChapterDTO.name,

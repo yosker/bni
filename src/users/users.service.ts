@@ -13,9 +13,7 @@ import { Roles } from 'src/roles/schemas/roles.schema';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { PaginationDto } from 'nestjs-search';
-import { EmailProperties } from 'src/shared/emailProperties';
 import { Response } from 'express';
-import { object } from 'joi';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
@@ -27,7 +25,7 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) { }
+  ) {}
   async findAll(_params: PaginationDto, res: Response): Promise<Response> {
     // params.skip,
     //   params.limit,
@@ -115,7 +113,7 @@ export class UsersService {
           newUser.idChapter.toString();
 
         //OBJETO PARA EL CORREO
-        const emailProperties: EmailProperties = {
+        const emailProperties = {
           email: newUser.email,
           password: '',
           name: newUser.name + ' ' + newUser.lastName,
@@ -154,7 +152,7 @@ export class UsersService {
     try {
       createUserDto = {
         ...createUserDto,
-        idChapter: ObjectId(createUserDto.idChapter)
+        idChapter: ObjectId(createUserDto.idChapter),
       };
       await this.usersModel.create(createUserDto);
 
