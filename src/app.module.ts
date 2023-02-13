@@ -13,6 +13,7 @@ import { RolesModule } from './roles/roles.module';
 import { ChapterSessionsModule } from './chapter-sessions/chapter-sessions.module';
 import { InterviewsModule } from './interviews/interviews.module';
 import { TreasuryModule } from './treasury/treasury.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { TreasuryModule } from './treasury/treasury.module';
     ChapterSessionsModule,
     InterviewsModule,
     TreasuryModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse ],

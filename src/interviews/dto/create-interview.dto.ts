@@ -126,4 +126,10 @@ export class CreateInterviewDto {
   @IsNotEmpty()
   @IsString()
   question11: string;
+
+  @ApiProperty({
+    example: 'Fecha de Creación del Registro.',
+  })
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }
