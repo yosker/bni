@@ -3,7 +3,6 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './interfaces/users.interface';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from './schemas/users.schema';
 import { ServicesResponse } from '../responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
@@ -13,7 +12,6 @@ import { Roles } from 'src/roles/schemas/roles.schema';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
-import { S3 } from 'aws-sdk';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
@@ -25,15 +23,15 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS EXCEPTO VISITANTES
   async findAll(chapterId: string, res: Response): Promise<Response> {
     try {
       const user = await this.usersModel.find({
-        idChapter: ObjectId(chapterId)
-        , role: { $ne: 'Visitante' }
-        , status: "Active"
+        idChapter: ObjectId(chapterId),
+        role: { $ne: 'Visitante' },
+        status: 'Active',
       });
 
       return res.status(HttpStatus.OK).json({
@@ -41,8 +39,7 @@ export class UsersService {
         message: this.servicesResponse.message,
         result: user,
       });
-    }
-    catch (err) {
+    } catch (err) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
@@ -52,13 +49,11 @@ export class UsersService {
           ),
         );
     }
-  };
+  }
 
   //ENDPOINT QUE REGRESA LA INFORAMCION DE UN USUARIO Y LA BUSQUEDA ES POR ID
   async findOne(id: string, res: Response): Promise<Response> {
-
     try {
-
       const user = await this.usersModel.findById({ _id: ObjectId(id) });
 
       return res.status(HttpStatus.OK).json({
@@ -66,8 +61,7 @@ export class UsersService {
         message: this.servicesResponse.message,
         result: user,
       });
-    }
-    catch (err) {
+    } catch (err) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
@@ -77,10 +71,15 @@ export class UsersService {
           ),
         );
     }
-  };
+  }
 
   //ENDPOINT PARA DAR DE ALTA NUEVOS USUARIOS
-  async create(dataBuffer: Buffer, filename: string, req, res: Response): Promise<Response> {
+  async create(
+    dataBuffer: Buffer,
+    filename: string,
+    req,
+    res: Response,
+  ): Promise<Response> {
     const findRole = this.rolesModel.findOne({
       name: req.role,
     });
@@ -95,13 +94,23 @@ export class UsersService {
       const plainToHash = await hash(pass, 10);
       let createUserDto = req;
 
-      const s3Response = filename != "avatar.jpg" ? await (await this.sharedService.uploadFile(dataBuffer, filename, '.jpg', 's3-bucket-users')).result : ''
+      const s3Response =
+        filename != 'avatar.jpg'
+          ? await (
+              await this.sharedService.uploadFile(
+                dataBuffer,
+                filename,
+                '.jpg',
+                's3-bucket-users',
+              )
+            ).result
+          : '';
       createUserDto = {
         ...createUserDto,
         password: plainToHash,
         idChapter: ObjectId(createUserDto.idChapter),
         invitedBy: '-',
-        imageURL: s3Response
+        imageURL: s3Response,
       };
 
       const newUser = await this.usersModel.create(createUserDto);
@@ -141,7 +150,7 @@ export class UsersService {
         throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
       }
     }
-  };
+  }
 
   //ENDPOINT PARA GUARDAR EL REGISTRO DE LOS VISITANTES
   async createVisitor(
@@ -183,11 +192,14 @@ export class UsersService {
           );
       }
     }
-  };
+  }
 
-  //ENDPOINT PARA ACTUALIZAR LA INFORMACIÓN DE LOS USUARIOS 
+  //ENDPOINT PARA ACTUALIZAR LA INFORMACIÓN DE LOS USUARIOS
   async update(
-    dataBuffer: Buffer, filename: string, req, res: Response
+    dataBuffer: Buffer,
+    filename: string,
+    req,
+    res: Response,
   ): Promise<Response> {
     const { result } = this.servicesResponse;
     const findRole = this.rolesModel.findOne({
@@ -197,26 +209,41 @@ export class UsersService {
     if (!findRole)
       throw new HttpErrorByCode[404]('ROLE_NOT_FOUND', this.servicesResponse);
     try {
-
       let _updateUserDto = req;
       let s3Response = '';
 
       if (filename != 'avatar.jpg') {
-        s3Response = await (await this.sharedService.uploadFile(dataBuffer, filename, '.jpg', 's3-bucket-users')).result.toString();
-        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.s3url);
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            filename,
+            '.jpg',
+            's3-bucket-users',
+          )
+        ).result.toString();
+        await this.sharedService.deleteObjectFromS3(
+          's3-bucket-users',
+          req.s3url,
+        );
       } else {
         if (req.deleteAll) {
-          await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.s3url);
+          await this.sharedService.deleteObjectFromS3(
+            's3-bucket-users',
+            req.s3url,
+          );
           s3Response = '';
         } else {
-          s3Response = req.s3url
+          s3Response = req.s3url;
         }
       }
       _updateUserDto = {
         ..._updateUserDto,
-        imageURL: s3Response
+        imageURL: s3Response,
       };
-      await this.usersModel.findByIdAndUpdate(ObjectId(_updateUserDto.id), _updateUserDto);
+      await this.usersModel.findByIdAndUpdate(
+        ObjectId(_updateUserDto.id),
+        _updateUserDto,
+      );
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -234,7 +261,7 @@ export class UsersService {
         throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
       }
     }
-  };
+  }
 
   //ENDPOIT QUE REGRESA LA INFO GENERAL DEL USUARIO JUNTO CON UN QR PARA LA ASISTENCIA
   async findNetworkerData(
@@ -272,16 +299,16 @@ export class UsersService {
           ),
         );
     }
-  };
+  }
 
   //ENDPOINT PARA ELIMINAR (BAJA LOGICA) UN REGISTRO DE LA BASE DE DATOS
-  async delete(
-    id: string, res: Response
-  ): Promise<Response> {
+  async delete(id: string, res: Response): Promise<Response> {
     const { result } = this.servicesResponse;
 
     try {
-      await this.usersModel.findByIdAndUpdate(ObjectId(id),  { status: 'deleted' });
+      await this.usersModel.findByIdAndUpdate(ObjectId(id), {
+        status: 'deleted',
+      });
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -291,6 +318,5 @@ export class UsersService {
     } catch (error) {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
     }
-  };
-
+  }
 }

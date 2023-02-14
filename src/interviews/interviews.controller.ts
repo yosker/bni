@@ -1,10 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { InterviewsService } from './interviews.service';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 import { UpdateInterviewDto } from './dto/update-interview.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Interviews')
 @Controller('interviews')
 export class InterviewsController {
@@ -29,12 +42,12 @@ export class InterviewsController {
   updateQuestionsReferences(
     @Param('id') id: string,
     @Body() updateInterviewDto: UpdateInterviewDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     return this.interviewsService.updateQuestionsReferences(
       id,
       updateInterviewDto,
-      res
+      res,
     );
   }
 
@@ -42,8 +55,12 @@ export class InterviewsController {
   updateInterviewUser(
     @Param('id') id: string,
     @Body() updateInterviewDto: UpdateInterviewDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.interviewsService.updateUserInterview(id, updateInterviewDto, res);
+    return this.interviewsService.updateUserInterview(
+      id,
+      updateInterviewDto,
+      res,
+    );
   }
 }

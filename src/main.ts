@@ -4,7 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-
   const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -12,7 +11,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  let config = new DocumentBuilder()
+  const config = new DocumentBuilder()
     .addBearerAuth()
     .setTitle('API PRASYDE')
     .setDescription('The Prasyde API description')
@@ -28,7 +27,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);
- 
+
   await app.listen(3000);
 }
 bootstrap();
