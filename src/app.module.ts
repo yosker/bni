@@ -15,6 +15,7 @@ import { InterviewsModule } from './interviews/interviews.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { EmailAccountsModule } from './email-accounts/email-accounts.module';
 import { MenuModule } from './menu/menu.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { MenuModule } from './menu/menu.module';
     TreasuryModule,
     EmailAccountsModule,
     MenuModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse ],

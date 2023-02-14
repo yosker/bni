@@ -17,13 +17,14 @@ async function bootstrap() {
     .setTitle('API PRASYDE')
     .setDescription('The Prasyde API description')
     .setVersion('1.0.1')
+    .addTag('Attendance')
     .addTag('Users')
     .addTag('Auth')
     .addTag('Chapters')
-    .addTag('Attendance')
-    .addTag('Roles')
+    .addTag('Comments')
     .addTag('Interviews')
     .addTag('Menu')
+    .addTag('Roles')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);
