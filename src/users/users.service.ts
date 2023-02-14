@@ -12,8 +12,8 @@ import { Role } from 'src/roles/interfaces/roles.interface';
 import { Roles } from 'src/roles/schemas/roles.schema';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
-import { PaginationDto } from 'nestjs-search';
 import { Response } from 'express';
+import { S3 } from 'aws-sdk';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
@@ -25,68 +25,64 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) {}
-  async findAll(_params: PaginationDto, res: Response): Promise<Response> {
-    // params.skip,
-    //   params.limit,
-    //   params?.start_key,
-    //   params?.sort?.field,
-    //   params?.sort?.order,
-    //   params?.filter,
-    //   params?.projection;
-    const user = this.usersModel.find(
-      {},
-      {
-        idChapter: 1,
-        role: 1,
-        name: 1,
-        lastName: 1,
-        phoneNumber: 1,
-        email: 1,
-        imageURL: 1,
-        companyName: 1,
-        profession: 1,
-        createdAt: 1,
-        status: 1,
-        completedApplication: 1,
-        completedInterview: 1,
-        invitedBy: 1,
-      },
-    );
-    return res.status(HttpStatus.OK).json({
-      statusCode: this.servicesResponse.statusCode,
-      message: this.servicesResponse.message,
-      result: user,
-    });
-  }
+  ) { }
 
-  async findOne(id: string, res: Response) {
-    const user = this.usersModel.findById(id, {
-      idChapter: 1,
-      role: 1,
-      name: 1,
-      lastName: 1,
-      phoneNumber: 1,
-      email: 1,
-      imageURL: 1,
-      companyName: 1,
-      profession: 1,
-      createdAt: 1,
-      status: 1,
-      completedApplication: 1,
-      completedInterview: 1,
-      invitedBy: 1,
-    });
-    return res.status(HttpStatus.OK).json({
-      statusCode: this.servicesResponse.statusCode,
-      message: this.servicesResponse.message,
-      result: user,
-    });
-  }
+  //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS EXCEPTO VISITANTES
+  async findAll(chapterId: string, res: Response): Promise<Response> {
+    try {
+      const user = await this.usersModel.find({
+        idChapter: ObjectId(chapterId)
+        , role: { $ne: 'Visitante' }
+        , status: "Active"
+      });
 
-  async create(createUserDto: CreateUserDto, res: Response): Promise<Response> {
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: user,
+      });
+    }
+    catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  };
+
+  //ENDPOINT QUE REGRESA LA INFORAMCION DE UN USUARIO Y LA BUSQUEDA ES POR ID
+  async findOne(id: string, res: Response): Promise<Response> {
+
+    try {
+
+      const user = await this.usersModel.findById({ _id: ObjectId(id) });
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: user,
+      });
+    }
+    catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  };
+
+  //ENDPOINT PARA DAR DE ALTA NUEVOS USUARIOS
+  async create(dataBuffer: Buffer, filename: string, req, res: Response): Promise<Response> {
     const findRole = this.rolesModel.findOne({
-      name: createUserDto.role,
+      name: req.role,
     });
     const { result } = this.servicesResponse;
     if (!findRole)
@@ -97,12 +93,17 @@ export class UsersService {
     try {
       const pass = await this.sharedService.passwordGenerator(6);
       const plainToHash = await hash(pass, 10);
+      let createUserDto = req;
+
+      const s3Response = filename != "avatar.jpg" ? await (await this.sharedService.uploadFile(dataBuffer, filename, '.jpg', 's3-bucket-users')).result : ''
       createUserDto = {
         ...createUserDto,
         password: plainToHash,
         idChapter: ObjectId(createUserDto.idChapter),
         invitedBy: '-',
+        imageURL: s3Response
       };
+
       const newUser = await this.usersModel.create(createUserDto);
       if (newUser != null) {
         const url =
@@ -122,7 +123,7 @@ export class UsersService {
           urlPlatform: url,
           amount: '',
         };
-        await this.sharedService.sendEmail(emailProperties);
+        //await this.sharedService.sendEmail(emailProperties);
       }
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -131,13 +132,18 @@ export class UsersService {
       });
     } catch (error) {
       if (error.code === 11000) {
-        throw new HttpErrorByCode[409]('RECORD_DUPLICATED');
+        return res.status(HttpStatus.OK).json({
+          statusCode: 409,
+          message: 'RECORD_DUPLICATED',
+          result: result,
+        });
       } else {
         throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
       }
     }
-  }
+  };
 
+  //ENDPOINT PARA GUARDAR EL REGISTRO DE LOS VISITANTES
   async createVisitor(
     createUserDto: CreateUserDto,
     res: Response,
@@ -177,26 +183,40 @@ export class UsersService {
           );
       }
     }
-  }
+  };
 
+  //ENDPOINT PARA ACTUALIZAR LA INFORMACIÓN DE LOS USUARIOS 
   async update(
-    id: string,
-    _updateUserDto: UpdateUserDto,
-    res: Response,
+    dataBuffer: Buffer, filename: string, req, res: Response
   ): Promise<Response> {
     const { result } = this.servicesResponse;
     const findRole = this.rolesModel.findOne({
-      name: _updateUserDto.role,
+      name: req.role,
     });
 
     if (!findRole)
       throw new HttpErrorByCode[404]('ROLE_NOT_FOUND', this.servicesResponse);
     try {
+
+      let _updateUserDto = req;
+      let s3Response = '';
+
+      if (filename != 'avatar.jpg') {
+        s3Response = await (await this.sharedService.uploadFile(dataBuffer, filename, '.jpg', 's3-bucket-users')).result.toString();
+        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.s3url);
+      } else {
+        if (req.deleteAll) {
+          await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.s3url);
+          s3Response = '';
+        } else {
+          s3Response = req.s3url
+        }
+      }
       _updateUserDto = {
         ..._updateUserDto,
-        idChapter: ObjectId(_updateUserDto.idChapter),
+        imageURL: s3Response
       };
-      this.usersModel.findByIdAndUpdate(ObjectId(id), _updateUserDto);
+      await this.usersModel.findByIdAndUpdate(ObjectId(_updateUserDto.id), _updateUserDto);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -205,21 +225,16 @@ export class UsersService {
       });
     } catch (error) {
       if (error.code === 11000) {
-        throw res
-          .status(HttpStatus.BAD_REQUEST)
-          .json(new HttpException('DUPLICATED_REGISTER.', HttpStatus.CONFLICT));
+        return res.status(HttpStatus.OK).json({
+          statusCode: 409,
+          message: 'RECORD_DUPLICATED',
+          result: result,
+        });
       } else {
-        throw res
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .json(
-            new HttpException(
-              'INTERNAL_SERVER_ERROR.',
-              HttpStatus.INTERNAL_SERVER_ERROR,
-            ),
-          );
+        throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
       }
     }
-  }
+  };
 
   //ENDPOIT QUE REGRESA LA INFO GENERAL DEL USUARIO JUNTO CON UN QR PARA LA ASISTENCIA
   async findNetworkerData(
@@ -257,5 +272,25 @@ export class UsersService {
           ),
         );
     }
-  }
+  };
+
+  //ENDPOINT PARA ELIMINAR (BAJA LOGICA) UN REGISTRO DE LA BASE DE DATOS
+  async delete(
+    id: string, res: Response
+  ): Promise<Response> {
+    const { result } = this.servicesResponse;
+
+    try {
+      await this.usersModel.findByIdAndUpdate(ObjectId(id),  { status: 'deleted' });
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+    } catch (error) {
+      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+    }
+  };
+
 }

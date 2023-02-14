@@ -40,7 +40,7 @@ export class RolesService {
 
   async findAll(res: Response): Promise<Response> {
     try {
-      const roles = await this.rolesModel.find();
+      const roles = await this.rolesModel.find({});
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,

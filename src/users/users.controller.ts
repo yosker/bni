@@ -6,9 +6,10 @@ import {
   Patch,
   Param,
   UseGuards,
-  HttpCode,
-  HttpStatus,
   Res,
+  UseInterceptors,
+  UploadedFile,
+  Request
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,6 +21,7 @@ import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { PaginationDto } from 'nestjs-search';
 import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiBearerAuth()
 @Role('Admin')
@@ -27,13 +29,30 @@ import { Response } from 'express';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('/create')
-  @HttpCode(HttpStatus.OK)
-  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    return await this.usersService.create(createUserDto, res);
-  }
+  @UseInterceptors(FileInterceptor('file'))
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req, @Res() res: Response): Promise<any> {
+    return await this.usersService.create(
+      file.buffer,
+      file.originalname,
+      req.body, res
+    );
+  };
+
+  @Patch('/updateUser')
+  @UseInterceptors(FileInterceptor('file'))
+  update(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req, @Res() res: Response): Promise<any> {
+    return this.usersService.update(
+      file.buffer,
+      file.originalname,
+      req.body, res);
+  };
 
   @Post('/createVistor')
   async createVisotors(
@@ -43,24 +62,17 @@ export class UsersController {
     return await this.usersService.createVisitor(createUserDto, res);
   }
 
-  @Get()
+  @Get('/networkersList/:chapterId')
   @UseGuards(JwtAuthGuard)
-  findAll(@Body() params: PaginationDto, @Res() res: Response) {
-    return this.usersService.findAll(params, res);
+  findAll(
+    @Param('chapterId') chapterId: string,
+    @Res() res: Response) {
+    return this.usersService.findAll(chapterId, res);
   }
 
-  @Get(':id')
+  @Get('/userById/:id')
   findOne(@Param('id') id: string, @Res() res: Response) {
     return this.usersService.findOne(id, res);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @Res() res: Response,
-  ) {
-    return this.usersService.update(id, updateUserDto, res);
   }
 
   @Get('/getInformation/:id/:chapterId')
@@ -71,4 +83,11 @@ export class UsersController {
   ) {
     return this.usersService.findNetworkerData(id, chapterId, res);
   }
+
+  @Get('/deleteUser/:userId')
+  delete(
+    @Param('userId') userId: string,
+    @Res() res: Response) {
+    return this.usersService.delete(userId, res);
+  };
 }
