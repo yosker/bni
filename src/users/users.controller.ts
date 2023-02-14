@@ -81,9 +81,9 @@ export class UsersController {
   }
 
   @Get('auhtuser')
-  findAuth(@Auth() jWTPayload: JWTPayload) {
-    console.log(jWTPayload);
-    return jWTPayload;
+  findAuth(@Auth() jwtPayload: JWTPayload) {
+    console.log(jwtPayload);
+    return jwtPayload;
   }
 
   @Get('/getInformation/:id/:chapterId')
