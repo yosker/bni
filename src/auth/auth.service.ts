@@ -108,6 +108,7 @@ export class AuthService {
         name: findUser.name,
         role: findUser.role,
         email: email,
+        language: 'esMX',
       };
 
       const token = this.jwtService.sign(payload);
