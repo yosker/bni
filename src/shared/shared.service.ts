@@ -12,7 +12,7 @@ export class SharedService {
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
-  ) { }
+  ) {}
 
   /**
    * @description Genera un password aleatorio
@@ -41,7 +41,7 @@ export class SharedService {
       }
     }
     return result;
-  };
+  }
 
   async sendEmail(emailProperties: any): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
@@ -63,16 +63,20 @@ export class SharedService {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
     }
     return { statusCode, message, result };
-  };
+  }
 
   //FUNCIÓN PARA CARGAR IMAGENES Y ARCHIVOS AL S3 DE AWS
-  async uploadFile(dataBuffer: Buffer, file: string, ext: string, bucketName: string): Promise<ServicesResponse> {
- 
+  async uploadFile(
+    dataBuffer: Buffer,
+    file: string,
+    ext: string,
+    bucketName: string,
+  ): Promise<ServicesResponse> {
     const { statusCode, message } = this.servicesResponse;
     const s3 = new S3({
       region,
       accessKeyId,
-      secretAccessKey
+      secretAccessKey,
     });
 
     const newId = generateSafeId();
@@ -82,28 +86,32 @@ export class SharedService {
       .upload({
         Bucket: bucketName,
         Body: dataBuffer,
-        Key: fileName
+        Key: fileName,
       })
       .promise();
 
     return { statusCode, message, result: uploadResult.Location };
+  }
 
-  };
-
-  async deleteObjectFromS3(bucketName: string, objectName: string): Promise<ServicesResponse> {
-
+  async deleteObjectFromS3(
+    bucketName: string,
+    objectName: string,
+  ): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
     const s3 = new S3({
       region,
       accessKeyId,
-      secretAccessKey
+      secretAccessKey,
     });
 
-    var params = { Bucket: bucketName, Key: objectName.split('/')[3] };
+    const params = { Bucket: bucketName, Key: objectName.split('/')[3] };
 
     if (objectName != '') {
-      s3.deleteObject(params, function (err, data) { });
+      s3.deleteObject(params, function (err, data) {
+        if (err) console.log(err);
+        return data;
+      });
     }
     return { statusCode, message, result };
-  };
+  }
 }
