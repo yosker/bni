@@ -48,15 +48,9 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   sessionType: string;
 
-  @ApiProperty({
-    example: 'Fecha de Creación del Registro.',
-  })
   @Prop({ default: now() })
   createdAt: Date;
 
-  @ApiProperty({
-    example: 'Estatus del Registro.',
-  })
   @Prop({ default: 'Active', required: false })
   status?: string;
 }

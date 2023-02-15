@@ -5,12 +5,8 @@ import { now } from 'mongoose';
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 export class AttendanceDTO extends PartialType(RegisterAuthDto) {
-  @ApiProperty({
-    example: 'Id del capitulo.',
-  })
-  @IsNotEmpty()
   chapterId: object;
- 
+
   @ApiProperty({
     example: 'Id del Usuario.',
   })
@@ -28,19 +24,11 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
     example: 'Fecha de asistencia.',
   })
-
   @Prop({ default: '', required: false })
   attendanceDate: string;
 
-  @ApiProperty({
-    example: 'Fecha de Creación del Registro.',
-  })
   @Prop({ default: now(), required: false })
   createdAt?: Date;
- 
-  @ApiProperty({
-    example: 'Estatus del Registro.',
-  })
 
   @Prop({ default: 'Active', required: false })
   status?: string;

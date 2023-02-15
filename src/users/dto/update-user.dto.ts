@@ -52,7 +52,7 @@ export class UpdateUserDto {
   profession: string;
 
   @ApiProperty({
-    example: 'Aceptado. Si-No',
+    example: 'Aceptado. true/false.',
   })
   @IsBoolean()
   accepted: boolean;

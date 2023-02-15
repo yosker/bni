@@ -6,6 +6,9 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comments } from './schemas/comments.schema';
 import { Response } from 'express';
+import { Users } from 'src/users/schemas/users.schema';
+import { User } from 'aws-sdk/clients/budgets';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -13,15 +16,41 @@ const ObjectId = require('mongodb').ObjectId;
 export class CommentsService {
   constructor(
     @InjectModel(Comments.name) private readonly commentModel: Model<Comment>,
+    @InjectModel(Users.name) private readonly userModel: Model<User>,
     private servicesResponse: ServicesResponse,
   ) {}
-  async create(createCommentDto: CreateCommentDto, res: Response) {
-    await this.commentModel.create(createCommentDto);
-    return res.status(HttpStatus.OK).json({
-      statusCode: this.servicesResponse.statusCode,
-      message: this.servicesResponse.message,
-      result: createCommentDto,
-    });
+  async create(
+    createCommentDto: CreateCommentDto,
+    res: Response,
+    jwtPayload: JWTPayload,
+  ) {
+    try {
+      const comments = await this.commentModel.findOne({
+        interviewId: ObjectId(createCommentDto.interviewId),
+      });
+
+      if (comments.length >= 5) {
+        this.userModel.findByIdAndUpdate(ObjectId(createCommentDto.userId), {
+          accepted: createCommentDto.accepted,
+        });
+      }
+      createCommentDto.createdBy = ObjectId(jwtPayload.id);
+      await this.commentModel.create(createCommentDto);
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: createCommentDto,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 
   async findAll(res: Response) {
@@ -49,7 +78,13 @@ export class CommentsService {
     });
   }
 
-  async update(id: string, updateCommentDto: UpdateCommentDto, res: Response) {
+  async update(
+    id: string,
+    updateCommentDto: UpdateCommentDto,
+    res: Response,
+    jwtPayload: JWTPayload,
+  ) {
+    updateCommentDto.createdBy = ObjectId(jwtPayload.id);
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,

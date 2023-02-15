@@ -85,6 +85,12 @@ export class CreateUserDto {
   profession: string;
 
   @ApiProperty({
+    example: 'Aceptado true/false.',
+  })
+  @Prop({ default: false, required: false })
+  accepted: boolean;
+
+  @ApiProperty({
     example: 'Estatus del Registro.',
   })
   @Prop({ default: 'Active', required: false })

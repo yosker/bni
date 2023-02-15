@@ -1,4 +1,3 @@
-
 import { PartialType } from '@nestjs/mapped-types';
 import { Prop } from '@nestjs/mongoose';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
@@ -7,17 +6,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { now } from 'mongoose';
 
 export class TreasuryDTO extends PartialType(RegisterAuthDto) {
-  @ApiProperty({
-    example: 'Id del capitulo.',
-  })
-  @IsNotEmpty()
   chapterId: object;
- 
-  @ApiProperty({
-    example: 'Id del Usuario.',
-  })
-  @IsNotEmpty()
-  @IsString()
+
   userId: object;
 
   @ApiProperty({
@@ -25,7 +15,7 @@ export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   })
   @IsNotEmpty()
   @IsNumber()
-  payment: Number;
+  payment: number;
 
   @ApiProperty({
     example: 'Mes y año de la aportación',
@@ -40,15 +30,9 @@ export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   paymentDate: string;
 
-  @ApiProperty({
-    example: 'Fecha de Creación del Registro.',
-  })
   @Prop({ default: now(), required: false })
   createdAt?: Date;
- 
-  @ApiProperty({
-    example: 'Estatus del Registro.',
-  })
+
   @Prop({ default: 'Active', required: false })
   status?: string;
 }

@@ -6,22 +6,29 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { ServicesResponse } from 'src/responses/response';
 
 @Module({
-    imports: [
-        MailerModule.forRoot({
-            transport: {
-                host: 'chi56.grupocopydata.com',
-                auth: {
-                    user: 'soporte@prasyde.com',
-                    pass: 'QTOrBXigf94lwJy'
-                }
+  imports: [
+    MailerModule.forRootAsync({
+      useFactory: () => {
+        console.log(process.env.EMAIL_HOST);
+        return {
+          transport: {
+            host: process.env.EMAIL_HOST,
+            secure: process.env.EMAIL_SECURE,
+            port: process.env.EMAIL_PORT,
+            auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS,
             },
-            template: {
-                dir: join(__dirname, 'mails'),
-                adapter: new HandlebarsAdapter()
-            }
-        })
-    ],
-    controllers: [],
-    providers: [SharedService, ServicesResponse],
+          },
+          template: {
+            dir: join(__dirname, 'mails'),
+            adapter: new HandlebarsAdapter(),
+          },
+        };
+      },
+    }),
+  ],
+  controllers: [],
+  providers: [SharedService, ServicesResponse],
 })
-export class SharedModule { }
+export class SharedModule {}

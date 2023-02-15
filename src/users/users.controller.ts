@@ -6,20 +6,21 @@ import {
   Patch,
   Param,
   UseGuards,
-  HttpCode,
-  HttpStatus,
   Res,
+  UseInterceptors,
+  UploadedFile,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Role } from '../auth/decorators/Role.decorator';
 import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
-import { PaginationDto } from 'nestjs-search';
 import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
 @ApiBearerAuth()
 @Role('Admin')
@@ -30,9 +31,33 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('/create')
-  @HttpCode(HttpStatus.OK)
-  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    return await this.usersService.create(createUserDto, res);
+  @UseInterceptors(FileInterceptor('file'))
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+    @Res() res: Response,
+  ): Promise<any> {
+    return await this.usersService.create(
+      file.buffer,
+      file.originalname,
+      req.body,
+      res,
+    );
+  }
+
+  @Patch('/updateUser')
+  @UseInterceptors(FileInterceptor('file'))
+  update(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.usersService.update(
+      file.buffer,
+      file.originalname,
+      req.body,
+      res,
+    );
   }
 
   @Post('/createVistor')
@@ -43,24 +68,26 @@ export class UsersController {
     return await this.usersService.createVisitor(createUserDto, res);
   }
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  findAll(@Body() params: PaginationDto, @Res() res: Response) {
-    return this.usersService.findAll(params, res);
+  @Get('/networkersList/:chapterId/:role')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  findAll(
+    @Param('chapterId') chapterId: string,
+    @Param('role') role: string,
+    @Res() res: Response,
+  ) {
+    return this.usersService.findAll(chapterId, role, res);
   }
 
-  @Get(':id')
+  @Get('/userById/:id')
   findOne(@Param('id') id: string, @Res() res: Response) {
     return this.usersService.findOne(id, res);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @Res() res: Response,
-  ) {
-    return this.usersService.update(id, updateUserDto, res);
+  @Get('auhtuser')
+  findAuth(@Auth() jwtPayload: JWTPayload) {
+    console.log(jwtPayload);
+    return jwtPayload;
   }
 
   @Get('/getInformation/:id/:chapterId')
@@ -70,5 +97,10 @@ export class UsersController {
     @Res() res: Response,
   ) {
     return this.usersService.findNetworkerData(id, chapterId, res);
+  }
+
+  @Get('/deleteUser/:userId')
+  delete(@Param('userId') userId: string, @Res() res: Response) {
+    return this.usersService.delete(userId, res);
   }
 }

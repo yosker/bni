@@ -7,23 +7,29 @@ import {
   Param,
   Res,
 } from '@nestjs/common';
-import { ServicesResponse } from 'src/responses/response';
 import { AttendanceService } from './attendance.service';
 import { AttendanceDTO } from './dto/attendance.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard(), JwtGuard)
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { JWTPayload } from 'src/auth/jwt.payload';
+
+@ApiBearerAuth()
+@UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Attendance')
 @Controller('attendance')
 export class AttendanceController {
-  constructor(private attendanceService: AttendanceService) { }
+  constructor(private attendanceService: AttendanceService) {}
 
   @Post('/create')
-  async create(@Body() attendanceDTO: AttendanceDTO, @Res() res: Response) {
-    return await this.attendanceService.create(attendanceDTO, res);
+  async create(
+    @Body() attendanceDTO: AttendanceDTO,
+    @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
+  ) {
+    return await this.attendanceService.create(attendanceDTO, res, jwtPayload);
   }
 
   @Get('/visitors/:chapterId/:sessionDate')
@@ -32,7 +38,11 @@ export class AttendanceController {
     @Param('sessionDate') sessionDate: string,
     @Res() res: Response,
   ) {
-    return await this.attendanceService.VisitorsList(chapterId, sessionDate, res);
+    return await this.attendanceService.VisitorsList(
+      chapterId,
+      sessionDate,
+      res,
+    );
   }
 
   @Get('/networkers/:chapterId/:sessionDate')
@@ -41,6 +51,10 @@ export class AttendanceController {
     @Param('sessionDate') sessionDate: string,
     @Res() res: Response,
   ) {
-    return await this.attendanceService.NetworkersList(chapterId, sessionDate, res);
+    return await this.attendanceService.NetworkersList(
+      chapterId,
+      sessionDate,
+      res,
+    );
   }
 }

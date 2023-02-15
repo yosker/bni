@@ -16,9 +16,6 @@ export class UpdateRoleDto extends PartialType(CreateRoleDto) {
   })
   description: string;
 
-  @ApiProperty({
-    example: 'Fecha de Creación del Registro.',
-  })
   @Prop({ default: new Date() })
   updatedAt: Date;
 }

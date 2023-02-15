@@ -13,7 +13,10 @@ import { RolesModule } from './roles/roles.module';
 import { ChapterSessionsModule } from './chapter-sessions/chapter-sessions.module';
 import { InterviewsModule } from './interviews/interviews.module';
 import { TreasuryModule } from './treasury/treasury.module';
+import { EmailAccountsModule } from './email-accounts/email-accounts.module';
+import { MenuModule } from './menu/menu.module';
 import { CommentsModule } from './comments/comments.module';
+import { NetinterviewModule } from './netinterview/netinterview.module';
 
 @Module({
   imports: [
@@ -23,10 +26,10 @@ import { CommentsModule } from './comments/comments.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => {
-        const host = config.get('database.host');
-        const credentials = config.get('database.credentials');
-        const name = config.get('database.name');
-        const uri = `mongodb+srv://${credentials}@${host}/${name}?retryWrites=true&w=majority`;
+        // const host = config.get('database.host');
+        // const credentials = config.get('database.credentials');
+        // const name = config.get('database.name');
+        const uri = 'mongodb://localhost:27017/bni'; //`mongodb+srv://${credentials}@${host}/${name}?retryWrites=true&w=majority`;
         console.log(uri);
         return { uri };
       },
@@ -42,9 +45,12 @@ import { CommentsModule } from './comments/comments.module';
     ChapterSessionsModule,
     InterviewsModule,
     TreasuryModule,
+    EmailAccountsModule,
+    MenuModule,
     CommentsModule,
+    NetinterviewModule,
   ],
   controllers: [],
-  providers: [SharedService, ServicesResponse ],
+  providers: [SharedService, ServicesResponse],
 })
 export class AppModule {}
