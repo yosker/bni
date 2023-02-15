@@ -4,16 +4,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { References } from '../interfaces/references.interface';
 
 export class CreateInterviewDto {
-  @ApiProperty({
-    example: 'Usuario Invitado que Aplica la Entrevista.',
-  })
-  @IsNotEmpty()
   userId: object;
 
-  @ApiProperty({
-    example: 'Identificador del Capitulo.',
-  })
-  @IsNotEmpty()
   chapterId: object;
 
   @ApiProperty({
@@ -127,9 +119,6 @@ export class CreateInterviewDto {
   @IsString()
   question11: string;
 
-  @ApiProperty({
-    example: 'Fecha de Creación del Registro.',
-  })
   @Prop({ default: new Date() })
   createdAt: Date;
 }

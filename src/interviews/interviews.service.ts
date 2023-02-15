@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ServicesResponse } from 'src/responses/response';
@@ -10,6 +9,7 @@ import { UpdateInterviewDto } from './dto/update-interview.dto';
 import { Interview } from './interfaces/interviews.interface';
 import { Interviews } from './schemas/interviews.schema';
 import { Response } from 'express';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -30,15 +30,11 @@ export class InterviewsService {
   async save(
     createInterviewDto: CreateInterviewDto,
     res: Response,
+    jwtPayload: JWTPayload,
   ): Promise<Response> {
-    let { chapterId, userId } = createInterviewDto;
-    chapterId = ObjectId(chapterId);
-    userId = ObjectId(userId);
-    createInterviewDto = {
-      ...createInterviewDto,
-      chapterId,
-      userId,
-    };
+    createInterviewDto.chapterId = ObjectId(jwtPayload.idChapter);
+    createInterviewDto.userId = ObjectId(jwtPayload.id);
+
     await this.interviewModel.create(createInterviewDto).then(async () => {
       this.usersModel.findByIdAndUpdate(ObjectId(createInterviewDto.userId), {
         completedInterview: true,

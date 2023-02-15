@@ -8,6 +8,7 @@ import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -21,10 +22,15 @@ export class TreasuryService {
   ) {}
 
   //ENDPOINT PARA GUARDAR UNA APORTACIÓN
-  async create(treasuryDTO: TreasuryDTO, res: Response): Promise<Response> {
+  async create(
+    treasuryDTO: TreasuryDTO,
+    res: Response,
+    jwtPayload: JWTPayload,
+  ): Promise<Response> {
     const { result } = this.servicesResponse;
-
     try {
+      treasuryDTO.userId = ObjectId(jwtPayload.id);
+      treasuryDTO.chapterId = ObjectId(jwtPayload.idChapter);
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const findUser = await this.usersModel.findOne({
         _id: ObjectId(treasuryDTO.userId),

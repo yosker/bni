@@ -1,31 +1,24 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Prop } from '@nestjs/mongoose';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { now } from 'mongoose';
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
-export class AttendanceDTO extends PartialType(RegisterAuthDto) {
+
+export class CreateEmailAccountsDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
 
   @ApiProperty({
-    example: 'Id del Usuario.',
+    example: 'Envío de carta de aceptación.',
   })
   @IsNotEmpty()
-  @IsString()
-  userId: object;
+  acceptedAccount: boolean;
 
   @ApiProperty({
-    example: 'Tipo de asistencia.',
+    example: 'Cuenta del correo electrónico.',
   })
   @IsNotEmpty()
-  @IsString()
-  attendanceType: string;
-
-  @ApiProperty({
-    example: 'Fecha de asistencia.',
-  })
-  @Prop({ default: '', required: false })
-  attendanceDate: string;
+  email: string;
 
   @Prop({ default: now(), required: false })
   createdAt?: Date;

@@ -29,9 +29,6 @@ export class CreateCommentDto {
   @IsBoolean()
   accepted: boolean;
 
-  @ApiProperty({
-    example: 'Fecha de Creación del Registro.',
-  })
   @Prop({ default: new Date() })
   createdAt: Date;
 }

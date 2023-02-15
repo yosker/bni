@@ -1,12 +1,27 @@
-import { Schema } from 'mongoose';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-export const emailAccountsSchema = new Schema({
-    chapterId: { type: Object, required: true },
-    acceptedAccount: { type: Boolean, required: true },
-    email: { type: String, required: true, length: 80, unique: true },
-    createdAt: {
-        type: Date,
-        default: new Date().toISOString(),
-    },
-    status: { type: String, default: 'Active', required: false },
-});
+export type EmailAccountsDocument = EmailAccounts & Document;
+
+@Schema()
+export class EmailAccounts {
+  @Prop({ type: 'object' })
+  chapterId: object;
+
+  @Prop({ type: 'object' })
+  userId: object;
+
+  @Prop({ type: 'string' })
+  email: string;
+
+  @Prop({ type: 'boolean' })
+  acceptedAccount: boolean;
+
+  @Prop({ type: 'string' })
+  status: string;
+
+  @Prop({ default: new Date() })
+  createdAt: Date;
+}
+
+export const EmailAccountsSchema = SchemaFactory.createForClass(EmailAccounts);
