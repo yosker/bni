@@ -4,8 +4,10 @@ import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import { CreateCommentDto } from './create-comment.dto';
 
 export class UpdateCommentDto extends PartialType(CreateCommentDto) {
+  createdBy: object;
+
   @ApiProperty({
-    example: 'Usuario que actualiza comentario.',
+    example: 'Usuario invitado.',
   })
   @IsNotEmpty()
   userId: object;

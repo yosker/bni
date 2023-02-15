@@ -50,6 +50,9 @@ export class Users {
   @Prop({ type: 'boolean' })
   completedInterview: boolean;
 
+  @Prop({ type: 'boolean' })
+  accepted: boolean;
+
   @Prop({ type: String, required: false, default: '-' })
   invitedBy: string;
 }

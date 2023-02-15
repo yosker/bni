@@ -1,13 +1,21 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsEmpty, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCommentDto {
+  createdBy: object;
+
   @ApiProperty({
-    example: 'Usuario que hace comentario.',
+    example: 'Usuario invitado.',
   })
   @IsNotEmpty()
   userId: object;
+
+  @ApiProperty({
+    example: 'Id de entrevista.',
+  })
+  @IsNotEmpty()
+  interviewId: object;
 
   @ApiProperty({
     example: 'Comentario del usuario.',
@@ -16,7 +24,7 @@ export class CreateCommentDto {
   comment: string;
 
   @ApiProperty({
-    example: 'Aceptado Si-No.',
+    example: 'Aceptado true/false.',
   })
   @IsBoolean()
   accepted: boolean;

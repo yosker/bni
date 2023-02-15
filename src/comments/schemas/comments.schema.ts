@@ -6,6 +6,9 @@ export type CommentsDocument = Comments & Document;
 @Schema()
 export class Comments {
   @Prop({ type: 'object' })
+  createdBy: object;
+
+  @Prop({ type: 'object' })
   userId: object;
 
   @Prop({ type: 'string' })
