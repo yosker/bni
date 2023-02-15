@@ -16,23 +16,27 @@ export class NetinterviewDTO {
     @ApiProperty({
         example: 'Fuerza 1.',
     })
-    @IsNotEmpty()
     @IsString()
     strength1: string;
 
   @ApiProperty({
     example: 'Fuerza 2.',
   })
-  @IsNotEmpty()
   @IsString()
   strength2: string;
 
     @ApiProperty({
         example: 'Desarrollo 1.',
     })
-    @IsNotEmpty()
     @IsString()
     growth1: string;
+
+    
+    @ApiProperty({
+        example: 'Desarrollo 2.',
+    })
+    @IsString()
+    growth2: string;
 
   @ApiProperty({
     example: 'Tipo de entrevista.',
