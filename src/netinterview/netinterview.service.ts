@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
 import { NetinterviewDTO } from './dto/netinterview.dto';
 import { Netinterview } from './interfaces/neinterview.interface';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -56,7 +57,7 @@ export class NetinterviewService {
   async findAll(userId: string, res: Response): Promise<Response> {
     try {
 
-      const interview = await this.netinterviewModel.find({ userId: ObjectId(userId), status: "Active" })
+      const interview = await this.netinterviewModel.find({ userId: ObjectId(userId), status: "Active" }).sort({ createdAt: -1 })
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -76,7 +77,7 @@ export class NetinterviewService {
   };
 
   //ENDPOINT QUE REGRESA LA INFORMACIÓN DE UNA ENTREVISTA EN PARTICULAR
-  async findOne(interviewId:string, res: Response): Promise<Response> {
+  async findOne(interviewId: string, res: Response): Promise<Response> {
     try {
       const interview = await this.netinterviewModel.findById({ _id: ObjectId(interviewId) });
 
@@ -97,5 +98,34 @@ export class NetinterviewService {
     }
   }
 
+  //ENDPOINT PARA ACTUALIZAR LA INFORMACIÓN DE LA ENTREVISTA
+  async update(
+    netinterviewDTO: NetinterviewDTO,
+    interviewId: string,
+    JWTPayload: any,
+    res: Response,
+  ): Promise<Response> {
+    const { result } = this.servicesResponse;
 
+    try {
+
+      netinterviewDTO = {
+        ...netinterviewDTO,
+        userId: ObjectId(netinterviewDTO.userId),
+        createdBy: JWTPayload.name,
+      };
+      await this.netinterviewModel.findByIdAndUpdate(
+        ObjectId(interviewId),
+        netinterviewDTO,
+      );
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: result,
+      });
+    } catch (error) {
+      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+    }
+  }
 }

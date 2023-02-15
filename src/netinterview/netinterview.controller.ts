@@ -6,6 +6,7 @@ import {
     Param,
     UseGuards,
     Res,
+    Patch,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -21,7 +22,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 @ApiTags('Net Interview')
 @Controller('netinterview')
 export class NetinterviewController {
-   
+
     constructor(private readonly netinterviewService: NetinterviewService) { }
 
     @Post('/create')
@@ -40,5 +41,15 @@ export class NetinterviewController {
     @Get('/findOneById/:interviewId')
     findOne(@Param('interviewId') interviewId: string, @Res() res: Response) {
         return this.netinterviewService.findOne(interviewId, res);
+    }
+
+    @Patch('/update/:interviewId')
+    update(
+        @Param('interviewId') interviewId: string,
+        @Auth() jwtPayload: JWTPayload,
+        @Body() netinterviewDTO: NetinterviewDTO,
+        @Res() res: Response,
+    ) {
+        return this.netinterviewService.update(netinterviewDTO,interviewId, jwtPayload, res);
     }
 }

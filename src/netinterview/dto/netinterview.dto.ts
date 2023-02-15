@@ -5,21 +5,15 @@ import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class NetinterviewDTO {
-    @ApiProperty({
-        example: 'Id del capitulo.',
-    })
+   
     chapterId: object;
-
+    createdBy: string;
+   
     @ApiProperty({
         example: 'Id del networker.',
     })
     @IsNotEmpty()
     userId: object;
-
-    @ApiProperty({
-        example: 'Nombre del entrevistador.',
-    })
-    createdBy: string;
 
     @ApiProperty({
         example: 'Fuerza 1.',
@@ -38,7 +32,6 @@ export class NetinterviewDTO {
     @ApiProperty({
         example: 'Desarrollo 1.',
     })
-
     @IsNotEmpty()
     @IsString()
     growth1: string;
