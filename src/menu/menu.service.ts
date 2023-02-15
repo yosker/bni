@@ -32,6 +32,10 @@ export class MenuService {
             if (role == 'Presidente') {
                 objMenu = await this.administratorMenu(chapter.name, objUser);
             }
+            if (role == 'Membresias') {
+                objMenu = await this.membershipsMenu(chapter.name, objUser);
+            }
+
             return res.status(HttpStatus.OK).json({
                 statusCode: this.servicesResponse.statusCode,
                 message: this.servicesResponse.message,
@@ -67,7 +71,57 @@ export class MenuService {
                 "subModulos": [
                     {
                         "idSubModulo": 1,
-                        "nombre": "Alta Networkers",
+                        "nombre": "Agregar Networker",
+                        "urlPagina": "usersform.html",
+                        "ordenModulo": 1,
+                        "estilo": ""
+                    },
+                    {
+                        "idSubModulo": 2,
+                        "nombre": "Consultar Networkers",
+                        "urlPagina": "userslist.html",
+                        "ordenModulo": 2,
+                        "estilo": ""
+                    }]
+            },
+            {
+                "nombre": "Visitantes",
+                "estilo": "contact_page",
+                "ordenModulo": 2,
+                "subModulos": [
+                    {
+                        "idSubModulo": 3,
+                        "nombre": "Consultar Visitantes",
+                        "urlPagina": "visitorslist.html",
+                        "ordenModulo": 1,
+                        "estilo": ""
+                    }]
+            }
+        ],
+            notificaciones: []
+        }
+        return menu;
+    };
+
+    async membershipsMenu(chapter: any, objUser: any) {
+
+        const menu = {
+            perfil: {
+                "idUsuario": 0,
+                "nombreUsuario": objUser.name + ' ' + objUser.lastName,
+                "avatar": objUser.imageURL,
+                "rol": objUser.role,
+                "idJerarquia": 0,
+                "nombreCompania": chapter,
+            },
+            modulos: [{
+                "nombre": "Networkers",
+                "estilo": "contact_page",
+                "ordenModulo": 1,
+                "subModulos": [
+                    {
+                        "idSubModulo": 1,
+                        "nombre": "Agregar Networker",
                         "urlPagina": "usersform.html",
                         "ordenModulo": 1,
                         "estilo": ""
@@ -84,4 +138,4 @@ export class MenuService {
         }
         return menu;
     };
-}
+};

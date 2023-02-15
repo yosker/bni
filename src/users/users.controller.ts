@@ -28,7 +28,7 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('/create')
   @UseInterceptors(FileInterceptor('file'))
@@ -68,11 +68,14 @@ export class UsersController {
     return await this.usersService.createVisitor(createUserDto, res);
   }
 
-  @Get('/networkersList/:chapterId')
+  @Get('/networkersList/:chapterId/:role')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  findAll(@Param('chapterId') chapterId: string, @Res() res: Response) {
-    return this.usersService.findAll(chapterId, res);
+  findAll(
+    @Param('chapterId') chapterId: string,
+    @Param('role') role: string, 
+    @Res() res: Response) {
+    return this.usersService.findAll(chapterId, role, res);
   }
 
   @Get('/userById/:id')

@@ -16,6 +16,7 @@ import { TreasuryModule } from './treasury/treasury.module';
 import { EmailAccountsModule } from './email-accounts/email-accounts.module';
 import { MenuModule } from './menu/menu.module';
 import { CommentsModule } from './comments/comments.module';
+import { NetinterviewModule } from './netinterview/netinterview.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { CommentsModule } from './comments/comments.module';
     EmailAccountsModule,
     MenuModule,
     CommentsModule,
+    NetinterviewModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse ],
