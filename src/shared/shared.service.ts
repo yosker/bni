@@ -3,7 +3,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { S3 } from 'aws-sdk';
-const generateSafeId = require('generate-safe-id');
+import generateSafeId from 'generate-safe-id';
 const region = process.env.AWS_REGION;
 const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;

@@ -23,21 +23,26 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
-  async findAll(chapterId: string, role: string, res: Response): Promise<Response> {
+  async findAll(
+    chapterId: string,
+    role: string,
+    res: Response,
+  ): Promise<Response> {
     try {
-      let filter = {
+      const filter = {
         ['idChapter']: ObjectId(chapterId),
         ['status']: 'Active',
       };
-      filter['role'] = (role == 'nets') ? { $ne: 'Visitante' } : { $eq: 'Visitante' };
+      filter['role'] =
+        role == 'nets' ? { $ne: 'Visitante' } : { $eq: 'Visitante' };
 
       const user = await this.usersModel.aggregate([
         {
           $match: filter,
-        }
+        },
       ]);
 
       return res.status(HttpStatus.OK).json({
@@ -103,13 +108,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-            await this.sharedService.uploadFile(
-              dataBuffer,
-              filename,
-              '.jpg',
-              's3-bucket-users',
-            )
-          ).result
+              await this.sharedService.uploadFile(
+                dataBuffer,
+                filename,
+                '.jpg',
+                's3-bucket-users',
+              )
+            ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -138,7 +143,7 @@ export class UsersService {
           urlPlatform: url,
           amount: '',
         };
-        //await this.sharedService.sendEmail(emailProperties);
+        await this.sharedService.sendEmail(emailProperties);
       }
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -319,7 +324,7 @@ export class UsersService {
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: {},
+        result: result,
       });
     } catch (error) {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
