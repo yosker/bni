@@ -13,6 +13,8 @@ import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { TreasuryDTO } from './dto/treasury.dto';
 import { TreasuryService } from './treasury.service';
 import { Response } from 'express';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -25,8 +27,9 @@ export class TreasuryController {
   async create(
     @Body() treasuryDTO: TreasuryDTO,
     @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
   ): Promise<Response> {
-    return await this.treasusyService.create(treasuryDTO, res);
+    return await this.treasusyService.create(treasuryDTO, res, jwtPayload);
   }
 
   @Get('/userPayments/:userId')

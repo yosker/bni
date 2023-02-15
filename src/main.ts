@@ -24,6 +24,7 @@ async function bootstrap() {
     .addTag('Interviews')
     .addTag('Menu')
     .addTag('Roles')
+    .addTag('Email Accounts')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);

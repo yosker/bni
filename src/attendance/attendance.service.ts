@@ -13,6 +13,7 @@ import * as moment from 'moment';
 
 const ObjectId = require('mongodb').ObjectId;
 import { Response } from 'express';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
 @Injectable()
 export class AttendanceService {
@@ -26,7 +27,11 @@ export class AttendanceService {
   ) {}
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
-  async create(attendanceDTO: AttendanceDTO, res: Response): Promise<Response> {
+  async create(
+    attendanceDTO: AttendanceDTO,
+    res: Response,
+    jwtPayload: JWTPayload,
+  ): Promise<Response> {
     try {
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const existUser = await this.usersModel.findOne({
@@ -40,7 +45,7 @@ export class AttendanceService {
           .status(HttpStatus.BAD_REQUEST)
           .json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
       }
-
+      attendanceDTO.chapterId = ObjectId(jwtPayload.idChapter);
       const currentDate = moment().format('DD-MM-YYYY');
       let authAttendance = false;
 

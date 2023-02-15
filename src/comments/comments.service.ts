@@ -14,7 +14,6 @@ const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class CommentsService {
-  //5to si, actualizar usuario y debo crear servicio para guardar correos a enviar
   constructor(
     @InjectModel(Comments.name) private readonly commentModel: Model<Comment>,
     @InjectModel(Users.name) private readonly userModel: Model<User>,
