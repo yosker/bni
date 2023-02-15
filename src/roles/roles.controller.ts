@@ -15,8 +15,10 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @ApiBearerAuth()
+@Role('Admin')
 @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Roles')
 @Controller('roles')
