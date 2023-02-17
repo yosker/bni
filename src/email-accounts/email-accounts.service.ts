@@ -44,7 +44,7 @@ export class EmailAccountsService {
     }
   }
 
-  async findAll(res: Response, jwtPayload: JWTPayload,) {
+  async findAll(res: Response, jwtPayload: JWTPayload) {
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
