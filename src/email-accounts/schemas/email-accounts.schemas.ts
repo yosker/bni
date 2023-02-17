@@ -8,6 +8,9 @@ export class EmailAccounts {
   @Prop({ type: 'object' })
   chapterId: object;
 
+  @Prop({ type: 'string' })
+  name: string;
+
   @Prop({ type: 'object' })
   userId: object;
 
