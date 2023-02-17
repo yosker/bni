@@ -4,6 +4,7 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { now } from 'mongoose';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
@@ -33,6 +34,6 @@ export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   @Prop({ default: now(), required: false })
   createdAt?: Date;
 
-  @Prop({ default: 'Active', required: false })
+  @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;
 }

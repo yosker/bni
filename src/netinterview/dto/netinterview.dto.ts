@@ -1,6 +1,7 @@
 import { Prop } from '@nestjs/mongoose';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class NetinterviewDTO {
    
@@ -96,6 +97,6 @@ export class NetinterviewDTO {
   @ApiProperty({
     example: 'Estatus del Registro.',
   })
-  @Prop({ default: 'Active', required: false })
+  @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;
 }

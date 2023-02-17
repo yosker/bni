@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export type UsersDocument = Users & Document;
 
@@ -14,7 +15,7 @@ export class Users {
   @Prop({ type: 'string' })
   password: string;
 
-  @Prop({ type: 'string', default: 'Active' })
+  @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;
 
   @Prop({ default: new Date() })

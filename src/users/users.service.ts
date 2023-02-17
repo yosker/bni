@@ -35,7 +35,7 @@ export class UsersService {
     try {
       const filter = {
         ['idChapter']: ObjectId(chapterId),
-        ['status']: 'Active',
+        ['status']: EstatusRegister.Active,
       };
       filter['role'] =
         role == 'nets' ? { $ne: 'Visitante' } : { $eq: 'Visitante' };

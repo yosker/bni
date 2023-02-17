@@ -6,5 +6,5 @@ export interface EmailAccount extends Document {
   email: { type: string };
   name: { type: string };
   createdAt: { type: Date };
-  status: { type: string; default: EstatusRegister.Active; required: false };
+  status: { type: string; default: EstatusRegister.Active };
 }
