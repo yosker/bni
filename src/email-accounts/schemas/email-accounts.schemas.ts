@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export type EmailAccountsDocument = EmailAccounts & Document;
 
@@ -20,7 +21,7 @@ export class EmailAccounts {
   @Prop({ type: 'boolean' })
   acceptedAccount: boolean;
 
-  @Prop({ type: 'string' })
+  @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;
 
   @Prop({ default: new Date() })
