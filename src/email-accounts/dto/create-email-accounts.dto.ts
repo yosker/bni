@@ -9,7 +9,7 @@ export class CreateEmailAccountsDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
 
   @ApiProperty({
-    example: 'Nombre de la Cuenta de correo.',
+    example: 'Nombre de la cuenta de correo.',
   })
   @IsNotEmpty()
   name: string;
