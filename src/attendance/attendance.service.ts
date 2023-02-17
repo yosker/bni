@@ -174,7 +174,7 @@ export class AttendanceService {
     res: Response,
   ): Promise<Response> {
     try {
-      const currentDate = sessionDate.replace(/-/gi, '/'); // moment().format('DD/MM/YYYY');
+      const currentDate = sessionDate.replace(/-/gi, '/');
       const pipeline = await this.AttendanceResult(
         ObjectId(chapterId),
         currentDate,
