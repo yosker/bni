@@ -13,7 +13,7 @@ import { ServicesResponse } from 'src/responses/response';
         return {
           transport: {
             host: process.env.EMAIL_HOST,
-            secure: process.env.EMAIL_SECURE,
+            // secure: process.env.EMAIL_SECURE,
             port: process.env.EMAIL_PORT,
             auth: {
               user: process.env.EMAIL_USER,

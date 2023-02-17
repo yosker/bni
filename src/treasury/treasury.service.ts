@@ -9,6 +9,7 @@ import { Users } from 'src/users/schemas/users.schema';
 import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -35,7 +36,7 @@ export class TreasuryService {
       const findUser = await this.usersModel.findOne({
         _id: ObjectId(treasuryDTO.userId),
         idChapter: ObjectId(treasuryDTO.chapterId),
-        status: 'Active',
+        status: EstatusRegister.Active,
       });
       if (!findUser) throw new HttpException('USER_NOT_FOUND.', 404);
 
@@ -43,7 +44,7 @@ export class TreasuryService {
       const findPayment = await this.treasuryModel.findOne({
         userId: ObjectId(treasuryDTO.userId),
         monthYear: treasuryDTO.monthYear,
-        status: 'Active',
+        status: EstatusRegister.Active,
       });
 
       if (findPayment == null) {
@@ -100,7 +101,7 @@ export class TreasuryService {
         .find(
           {
             userId: ObjectId(id),
-            status: 'Active',
+            status: EstatusRegister.Active,
           },
           {
             _id: 0,

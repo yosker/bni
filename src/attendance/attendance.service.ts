@@ -14,6 +14,7 @@ import * as moment from 'moment';
 const ObjectId = require('mongodb').ObjectId;
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 @Injectable()
 export class AttendanceService {
@@ -37,7 +38,7 @@ export class AttendanceService {
       const existUser = await this.usersModel.findOne({
         _id: ObjectId(attendanceDTO.userId),
         idChapter: ObjectId(attendanceDTO.chapterId),
-        status: 'Active',
+        status: EstatusRegister.Active,
       });
 
       if (!existUser) {
@@ -53,7 +54,7 @@ export class AttendanceService {
       const chapterSession = await this.chapterSessionModel.findOne({
         chapterId: ObjectId(attendanceDTO.chapterId),
         sessionDate: currentDate,
-        status: 'Active',
+        status: EstatusRegister.Active,
       });
       if (chapterSession != null) {
         authAttendance = true;
@@ -65,7 +66,7 @@ export class AttendanceService {
           userId: ObjectId(attendanceDTO.userId),
           attendanceDate: currentDate,
           chapterId: ObjectId(attendanceDTO.chapterId),
-          status: 'Active',
+          status: EstatusRegister.Active,
         });
 
         if (userSession) {
@@ -132,7 +133,7 @@ export class AttendanceService {
         {
           idChapter: ObjectId(chapterId),
           role: 'Visitante',
-          status: 'Active',
+          status: EstatusRegister.Active,
           createdAt: {
             $gte: moment(`${newDate}T00:00:00.000`),
             $lt: moment(`${newDate}T23:59:59.999`),

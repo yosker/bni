@@ -35,8 +35,8 @@ export class EmailAccountsController {
   }
 
   @Get()
-  findAll(@Res() res: Response) {
-    return this.emailAccountsService.findAll(res);
+  findAll(@Res() res: Response, @Auth() jwtPayload: JWTPayload) {
+    return this.emailAccountsService.findAll(res, jwtPayload);
   }
 
   @Get(':id')

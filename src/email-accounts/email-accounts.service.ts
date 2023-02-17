@@ -8,6 +8,7 @@ import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EmailAccount } from './interfaces/email-accounts.interfaces';
 import { EmailAccounts } from './schemas/email-accounts.schemas';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -43,11 +44,14 @@ export class EmailAccountsService {
     }
   }
 
-  async findAll(res: Response) {
+  async findAll(res: Response, jwtPayload: JWTPayload,) {
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
-      result: await this.emailModel.find(),
+      result: await this.emailModel.find({
+        chapterId: ObjectId(jwtPayload.idChapter),
+        status: EstatusRegister.Active,
+      }),
     });
   }
 

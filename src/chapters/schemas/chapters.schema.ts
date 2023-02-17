@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export const ChapterSchema = new Schema({
   country: { type: String, required: true },
@@ -11,5 +12,5 @@ export const ChapterSchema = new Schema({
     type: Date,
     default: new Date().toISOString(),
   },
-  status: { type: String, default: 'Active', required: false },
+  status: { type: String, default: EstatusRegister.Active, required: false },
 });

@@ -6,6 +6,7 @@ import { ChapterSession } from './interfaces/chapterSessions.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
 import * as moment from 'moment';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -27,7 +28,7 @@ export class ChapterSessionsService {
       const findSession = await this.chapterSessionModel.findOne({
         chapterId: ObjectId(chapterSessionDTO.chapterId),
         sessionDate: chapterSessionDTO.sessionDate,
-        status: 'Active',
+        status: EstatusRegister.Active,
       });
       chapterSessionDTO = {
         ...chapterSessionDTO,
@@ -62,21 +63,22 @@ export class ChapterSessionsService {
   //ENDPOINT QUE REGRESA UNA LISTA DE FECHAS DE SESION POR CAPITULO
   async sessionList(chapterId: string, res: Response): Promise<Response> {
     try {
-     
       const currentDate = moment().format('DD-MM-YYYY');
-      const chapterSessionList = await this.chapterSessionModel.find(
-        {
-          chapterId: ObjectId(chapterId),
-          status: 'Active',
-          sessionDate: {
-              $lte: currentDate
+      const chapterSessionList = await this.chapterSessionModel
+        .find(
+          {
+            chapterId: ObjectId(chapterId),
+            status: EstatusRegister.Active,
+            sessionDate: {
+              $lte: currentDate,
+            },
           },
-        },
-        {
-          _id: 0,
-          sessionDate: 1,
-        },
-      ).sort( { sessionDate: -1 });
+          {
+            _id: 0,
+            sessionDate: 1,
+          },
+        )
+        .sort({ sessionDate: -1 });
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
