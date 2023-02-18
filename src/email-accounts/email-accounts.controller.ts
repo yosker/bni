@@ -59,11 +59,8 @@ export class EmailAccountsController {
     );
   }
 
-  @Patch('/:id')
-  delete(
-    @Param('id') id: string,
-    @Res() res: Response,
-  ) {
+  @Patch(':id')
+  delete(@Param('id') id: string, @Res() res: Response) {
     return this.emailAccountsService.delete(id, res);
   }
 }
