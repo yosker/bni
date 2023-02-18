@@ -44,7 +44,7 @@ export class EmailAccountsController {
     return this.emailAccountsService.findOne(id, res);
   }
 
-  @Patch(':id')
+  @Patch('edit/:id')
   update(
     @Param('id') id: string,
     @Body() updateCommentDto: UpdateEmailAccountsDTO,
@@ -59,7 +59,7 @@ export class EmailAccountsController {
     );
   }
 
-  @Patch(':id')
+  @Patch('/:id')
   delete(
     @Param('id') id: string,
     @Res() res: Response,
