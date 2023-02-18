@@ -92,4 +92,19 @@ export class EmailAccountsService {
       ),
     });
   }
+
+  async delete(id: string, res: Response) {
+    return res.status(HttpStatus.OK).json({
+      statusCode: this.servicesResponse.statusCode,
+      message: this.servicesResponse.message,
+      result: await this.emailModel.updateOne(
+        {
+          _id: ObjectId(id),
+        },
+        {
+          status: EstatusRegister.Deleted,
+        },
+      ),
+    });
+  }
 }

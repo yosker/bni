@@ -58,4 +58,12 @@ export class EmailAccountsController {
       jwtPayload,
     );
   }
+
+  @Patch(':id')
+  delete(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return this.emailAccountsService.delete(id, res);
+  }
 }
