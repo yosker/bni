@@ -17,6 +17,7 @@ import { EmailAccountsModule } from './email-accounts/email-accounts.module';
 import { MenuModule } from './menu/menu.module';
 import { CommentsModule } from './comments/comments.module';
 import { NetinterviewModule } from './netinterview/netinterview.module';
+import { NonAttendanceModule } from './non-attendance/non-attendance.module';
 
 @Module({
   imports: [
@@ -26,10 +27,10 @@ import { NetinterviewModule } from './netinterview/netinterview.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => {
-        // const host = config.get('database.host');
-        // const credentials = config.get('database.credentials');
-        // const name = config.get('database.name');
-        const uri = 'mongodb://localhost:27017/bni'; //`mongodb+srv://${credentials}@${host}/${name}?retryWrites=true&w=majority`;
+        const host = config.get('database.host');
+        const credentials = config.get('database.credentials');
+        const name = config.get('database.name');
+        const uri = `mongodb+srv://${credentials}@${host}/${name}?retryWrites=true&w=majority`;
         console.log(uri);
         return { uri };
       },
@@ -49,6 +50,7 @@ import { NetinterviewModule } from './netinterview/netinterview.module';
     MenuModule,
     CommentsModule,
     NetinterviewModule,
+    NonAttendanceModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],
