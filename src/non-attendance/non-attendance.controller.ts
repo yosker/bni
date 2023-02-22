@@ -22,8 +22,8 @@ export class NonAttendanceController {
   }
 
   @Get()
-  findAll(@Body() find: FindRegisters) {
-    return this.nonAttendanceService.findAll(find.dateFrom, find.dateTo);
+  findAll(@Body() find: FindRegisters, @Res() res: Response) {
+    return this.nonAttendanceService.findAll(find.dateFrom, find.dateTo, res);
   }
 
   @Get(':id')
@@ -35,7 +35,8 @@ export class NonAttendanceController {
   update(
     @Param('id') id: string,
     @Body() updateNonAttendanceDto: UpdateNonAttendanceDto,
+    @Res() res: Response,
   ) {
-    return this.nonAttendanceService.update(id, updateNonAttendanceDto);
+    return this.nonAttendanceService.update(id, updateNonAttendanceDto, res);
   }
 }

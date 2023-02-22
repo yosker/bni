@@ -18,6 +18,7 @@ import { MenuModule } from './menu/menu.module';
 import { CommentsModule } from './comments/comments.module';
 import { NetinterviewModule } from './netinterview/netinterview.module';
 import { NonAttendanceModule } from './non-attendance/non-attendance.module';
+import { MembershipActivitiesModule } from './membership-activities/membership-activities.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { NonAttendanceModule } from './non-attendance/non-attendance.module';
     CommentsModule,
     NetinterviewModule,
     NonAttendanceModule,
+    MembershipActivitiesModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],
