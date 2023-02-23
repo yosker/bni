@@ -17,6 +17,8 @@ import { EmailAccountsModule } from './email-accounts/email-accounts.module';
 import { MenuModule } from './menu/menu.module';
 import { CommentsModule } from './comments/comments.module';
 import { NetinterviewModule } from './netinterview/netinterview.module';
+import { NonAttendanceModule } from './non-attendance/non-attendance.module';
+import { MembershipActivitiesModule } from './membership-activities/membership-activities.module';
 
 @Module({
   imports: [
@@ -49,6 +51,8 @@ import { NetinterviewModule } from './netinterview/netinterview.module';
     MenuModule,
     CommentsModule,
     NetinterviewModule,
+    NonAttendanceModule,
+    MembershipActivitiesModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],

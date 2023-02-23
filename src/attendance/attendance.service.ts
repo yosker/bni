@@ -125,7 +125,7 @@ export class AttendanceService {
     res: Response,
   ): Promise<Response> {
     try {
-      const currentDate = sessionDate.split('-'); //moment().format('YYYY-MM-DD');
+      const currentDate = sessionDate.split('-');
       const newDate =
         currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
 
