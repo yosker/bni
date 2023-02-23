@@ -18,8 +18,8 @@ export class EmailAccounts {
   @Prop({ type: 'string' })
   email: string;
 
-  @Prop({ type: 'boolean' })
-  acceptedAccount: boolean;
+  @Prop({ type: 'string' })
+  acceptedAccount: string;
 
   @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;

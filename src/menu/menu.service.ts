@@ -74,7 +74,7 @@ export class MenuService {
       modulos: [
         {
           nombre: 'Networkers',
-          estilo: 'contact_page',
+          estilo: 'groups',
           ordenModulo: 1,
           subModulos: [
             {
@@ -107,6 +107,58 @@ export class MenuService {
             },
           ],
         },
+        {
+          nombre: "Cuentas de correo",
+          estilo: "contact_mail",
+          ordenModulo: 3,
+          subModulos: [
+              {
+                  idSubModulo: 4,
+                  nombre: "Cuentas de correo",
+                  urlPagina: "emailaccounts.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        },
+        {
+          nombre: "Periodos de prueba",
+          estilo: "engineering",
+          ordenModulo: 4,
+          subModulos: [
+              {
+                  idSubModulo: 5,
+                  nombre: "Periodo de pruebas",
+                  urlPagina: "evaluationperiod.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        },
+        {
+          nombre: "Trabajo membresías",
+          estilo: "checklist",
+          ordenModulo: 5,
+          subModulos: [
+              {
+                  idSubModulo: 6,
+                  nombre: "Trabajo de membresías",
+                  urlPagina: "evaluationperiod.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        },
+        {
+          nombre: "Carta por faltas",
+          estilo: "outgoing_mail",
+          ordenModulo: 6,
+          subModulos: [
+              {
+                  idSubModulo: 7,
+                  nombre: "Carta por faltas",
+                  urlPagina: "evaluationperiod.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        }
       ],
       notificaciones: [],
     };

@@ -26,10 +26,10 @@ import { NetinterviewModule } from './netinterview/netinterview.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => {
-        // const host = config.get('database.host');
-        // const credentials = config.get('database.credentials');
-        // const name = config.get('database.name');
-        const uri = 'mongodb://localhost:27017/bni'; //`mongodb+srv://${credentials}@${host}/${name}?retryWrites=true&w=majority`;
+        const host = config.get('database.host');
+        const credentials = config.get('database.credentials');
+        const name = config.get('database.name');
+        const uri = `mongodb+srv://${credentials}@${host}/${name}?retryWrites=true&w=majority`;
         console.log(uri);
         return { uri };
       },

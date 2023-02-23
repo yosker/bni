@@ -19,7 +19,7 @@ export class CreateEmailAccountsDTO extends PartialType(RegisterAuthDto) {
     example: 'Envío de carta de aceptación.',
   })
   @IsNotEmpty()
-  acceptedAccount: boolean;
+  acceptedAccount: string;
 
   @ApiProperty({
     example: 'Cuenta del correo electrónico.',
