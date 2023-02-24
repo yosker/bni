@@ -8,6 +8,7 @@ import {
   MembershipActivitiesSchema,
 } from './schemas/membership-activity.schema';
 import { ServicesResponse } from 'src/responses/response';
+import { SharedService } from 'src/shared/shared.service';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { ServicesResponse } from 'src/responses/response';
     AuthModule,
   ],
   controllers: [MembershipActivitiesController],
-  providers: [MembershipActivitiesService, ServicesResponse],
+  providers: [MembershipActivitiesService, ServicesResponse, SharedService],
 })
 export class MembershipActivitiesModule {}

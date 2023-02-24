@@ -18,6 +18,9 @@ export class MembershipActivities {
   @Prop({ type: 'string' })
   comments: string;
 
+  @Prop({ type: 'string' })
+  imageURL: string;
+
   @Prop({ default: new Date() })
   startDate: Date;
 

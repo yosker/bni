@@ -8,6 +8,7 @@ import { MembershipActivity } from './interfaces/membership-activity.interfaces'
 import { MembershipActivities } from './schemas/membership-activity.schema';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { SharedService } from 'src/shared/shared.service';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -17,16 +18,32 @@ export class MembershipActivitiesService {
     @InjectModel(MembershipActivities.name)
     private readonly membershipActivity: Model<MembershipActivity>,
     private readonly servicesResponse: ServicesResponse,
+    private readonly sharedService: SharedService,
   ) {}
 
   async create(
     createMembershipActivityDto: CreateMembershipActivityDto,
     jwtPayload: JWTPayload,
+    dataBuffer: Buffer,
+    filename: string,
     res: Response,
   ) {
     try {
+      let s3Response = '';
+      if (String(createMembershipActivityDto.fileRequire) === 'true') {
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            filename,
+            '.jpg',
+            's3-bucket-users',
+          )
+        ).result.toString();
+      }
+
       createMembershipActivityDto = {
         ...createMembershipActivityDto,
+        imageURL: s3Response,
         userId: ObjectId(jwtPayload.id),
       };
 

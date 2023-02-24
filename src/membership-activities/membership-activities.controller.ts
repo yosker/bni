@@ -7,9 +7,11 @@ import {
   Param,
   UseGuards,
   Res,
+  UploadedFile,
+  Request,
+  UseInterceptors,
 } from '@nestjs/common';
 import { MembershipActivitiesService } from './membership-activities.service';
-import { CreateMembershipActivityDto } from './dto/create-membership-activity.dto';
 import { UpdateMembershipActivityDto } from './dto/update-membership-activity.dto';
 import { Response } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -17,6 +19,7 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -28,14 +31,18 @@ export class MembershipActivitiesController {
   ) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
   create(
-    @Body() createMembershipActivityDto: CreateMembershipActivityDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
     @Res() res: Response,
     @Auth() jwtPayload: JWTPayload,
   ) {
     return this.membershipActivitiesService.create(
-      createMembershipActivityDto,
+      req.body,
       jwtPayload,
+      file.buffer,
+      file.originalname,
       res,
     );
   }
