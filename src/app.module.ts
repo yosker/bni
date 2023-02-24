@@ -19,6 +19,7 @@ import { CommentsModule } from './comments/comments.module';
 import { NetinterviewModule } from './netinterview/netinterview.module';
 import { NonAttendanceModule } from './non-attendance/non-attendance.module';
 import { MembershipActivitiesModule } from './membership-activities/membership-activities.module';
+import { EvaluationPeriodModule } from './evaluation-period/evaluation-period.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { MembershipActivitiesModule } from './membership-activities/membership-a
     NetinterviewModule,
     NonAttendanceModule,
     MembershipActivitiesModule,
+    EvaluationPeriodModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],
