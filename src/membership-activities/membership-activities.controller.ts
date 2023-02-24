@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Body,
   Patch,
   Param,
   UseGuards,
@@ -20,6 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateMembershipActivityDto } from './dto/create-membership-activity.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -31,18 +31,14 @@ export class MembershipActivitiesController {
   ) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
   create(
-    @UploadedFile() file: Express.Multer.File,
-    @Request() req,
     @Res() res: Response,
+    @Request() createMembershipActivityDto: CreateMembershipActivityDto,
     @Auth() jwtPayload: JWTPayload,
   ) {
     return this.membershipActivitiesService.create(
-      req.body,
+      createMembershipActivityDto,
       jwtPayload,
-      file.buffer,
-      file.originalname,
       res,
     );
   }
@@ -58,14 +54,18 @@ export class MembershipActivitiesController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('file'))
   update(
     @Param('id') id: string,
-    @Body() updateMembershipActivityDto: UpdateMembershipActivityDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() updateMembershipActivityDto: UpdateMembershipActivityDto,
     @Res() res: Response,
   ) {
     return this.membershipActivitiesService.update(
-      +id,
+      id,
       updateMembershipActivityDto,
+      file.buffer,
+      file.originalname,
       res,
     );
   }

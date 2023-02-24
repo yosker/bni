@@ -28,8 +28,6 @@ export class CreateMembershipActivityDto {
   @IsString()
   comments: string;
 
-  imageURL: string;
-
   @ApiProperty({
     example: 'Fecha inicio.',
   })

@@ -24,27 +24,13 @@ export class MembershipActivitiesService {
   async create(
     createMembershipActivityDto: CreateMembershipActivityDto,
     jwtPayload: JWTPayload,
-    dataBuffer: Buffer,
-    filename: string,
     res: Response,
   ) {
     try {
-      let s3Response = '';
-      if (String(createMembershipActivityDto.fileRequire) === 'true') {
-        s3Response = await (
-          await this.sharedService.uploadFile(
-            dataBuffer,
-            filename,
-            '.jpg',
-            's3-bucket-users',
-          )
-        ).result.toString();
-      }
-
       createMembershipActivityDto = {
         ...createMembershipActivityDto,
-        imageURL: s3Response,
         userId: ObjectId(jwtPayload.id),
+        userNetworkerId: ObjectId(createMembershipActivityDto.userNetworkerId),
       };
 
       const membershipActivity = await this.membershipActivity.create(
@@ -108,11 +94,30 @@ export class MembershipActivitiesService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateMembershipActivityDto: UpdateMembershipActivityDto,
+    dataBuffer: Buffer,
+    filename: string,
     res: Response,
   ) {
     try {
+      let s3Response = '';
+      if (String(updateMembershipActivityDto.fileRequire) === 'true') {
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            filename,
+            '.jpg',
+            's3-bucket-users',
+          )
+        ).result.toString();
+      }
+
+      updateMembershipActivityDto = {
+        ...updateMembershipActivityDto,
+        imageURL: s3Response,
+      };
+
       await this.membershipActivity.findOneAndUpdate(
         {
           _id: ObjectId(id),
