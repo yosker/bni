@@ -8,6 +8,7 @@ import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EmailAccount } from './interfaces/email-accounts.interfaces';
 import { EmailAccounts } from './schemas/email-accounts.schemas';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -15,7 +16,7 @@ const ObjectId = require('mongodb').ObjectId;
 export class EmailAccountsService {
   constructor(
     @InjectModel(EmailAccounts.name)
-    private readonly emailModel: Model<EmailAccount>,
+    private readonly emailAccount: Model<EmailAccount>,
     private servicesResponse: ServicesResponse,
   ) {}
   async create(
@@ -25,7 +26,7 @@ export class EmailAccountsService {
   ) {
     try {
       createEmailAccountsDTO.chapterId = ObjectId(jwtPayload.idChapter);
-      const email = await this.emailModel.create(createEmailAccountsDTO);
+      const email = await this.emailAccount.create(createEmailAccountsDTO);
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -43,16 +44,19 @@ export class EmailAccountsService {
     }
   }
 
-  async findAll(res: Response) {
+  async findAll(res: Response, jwtPayload: JWTPayload) {
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
-      result: await this.emailModel.find(),
+      result: await this.emailAccount.find({
+        chapterId: ObjectId(jwtPayload.idChapter),
+        status: EstatusRegister.Active,
+      }),
     });
   }
 
   async findOne(id: string, res: Response) {
-    const comment = await this.emailModel.findOne({
+    const comment = await this.emailAccount.findOne({
       _id: ObjectId(id),
     });
 
@@ -80,11 +84,26 @@ export class EmailAccountsService {
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
-      result: await this.emailModel.updateOne(
+      result: await this.emailAccount.updateOne(
         {
           _id: ObjectId(id),
         },
         updateEmailAccountsDTO,
+      ),
+    });
+  }
+
+  async delete(id: string, res: Response) {
+    return res.status(HttpStatus.OK).json({
+      statusCode: this.servicesResponse.statusCode,
+      message: this.servicesResponse.message,
+      result: await this.emailAccount.updateOne(
+        {
+          _id: ObjectId(id),
+        },
+        {
+          status: EstatusRegister.Deleted,
+        },
       ),
     });
   }

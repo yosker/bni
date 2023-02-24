@@ -6,19 +6,19 @@ import { Response } from 'express';
 import { NetinterviewDTO } from './dto/netinterview.dto';
 import { Netinterview } from './interfaces/neinterview.interface';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class NetinterviewService {
-
   constructor(
     @InjectModel('Netinterview')
     private readonly netinterviewModel: Model<Netinterview>,
     private servicesResponse: ServicesResponse,
-  ) { }
+  ) {}
 
-  //ENDPOINT PARA LA GUARDAR ENTREVISTAS DE 7 Y 1O MESES 
+  //ENDPOINT PARA LA GUARDAR ENTREVISTAS DE 7 Y 1O MESES
   async createInterview(
     netinterviewDTO: NetinterviewDTO,
     JWTPayload: any,
@@ -26,7 +26,6 @@ export class NetinterviewService {
   ): Promise<Response> {
     const { result } = this.servicesResponse;
     try {
-
       netinterviewDTO = {
         ...netinterviewDTO,
         chapterId: ObjectId(JWTPayload.chapterId),
@@ -51,13 +50,14 @@ export class NetinterviewService {
           ),
         );
     }
-  };
+  }
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODAS LAS ENTREVISTAS
   async findAll(userId: string, res: Response): Promise<Response> {
     try {
-
-      const interview = await this.netinterviewModel.find({ userId: ObjectId(userId), status: "Active" }).sort({ createdAt: -1 })
+      const interview = await this.netinterviewModel
+        .find({ userId: ObjectId(userId), status: EstatusRegister.Active })
+        .sort({ createdAt: -1 });
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -74,12 +74,14 @@ export class NetinterviewService {
           ),
         );
     }
-  };
+  }
 
   //ENDPOINT QUE REGRESA LA INFORMACIÓN DE UNA ENTREVISTA EN PARTICULAR
   async findOne(interviewId: string, res: Response): Promise<Response> {
     try {
-      const interview = await this.netinterviewModel.findById({ _id: ObjectId(interviewId) });
+      const interview = await this.netinterviewModel.findById({
+        _id: ObjectId(interviewId),
+      });
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -108,7 +110,6 @@ export class NetinterviewService {
     const { result } = this.servicesResponse;
 
     try {
-
       netinterviewDTO = {
         ...netinterviewDTO,
         userId: ObjectId(netinterviewDTO.userId),

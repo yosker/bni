@@ -49,10 +49,11 @@ export class InterviewsService {
 
   async findAll(res: Response): Promise<Response> {
     try {
+      const interviews = await this.interviewModel.find();
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: {},
+        result: interviews,
       });
     } catch (error) {
       throw res
@@ -68,10 +69,11 @@ export class InterviewsService {
 
   async findOne(id: string, res: Response): Promise<Response> {
     try {
+      const interview = await this.interviewModel.findById(id);
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: {},
+        result: interview,
       });
     } catch (error) {
       throw res

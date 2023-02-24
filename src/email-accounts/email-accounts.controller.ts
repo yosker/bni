@@ -35,8 +35,8 @@ export class EmailAccountsController {
   }
 
   @Get()
-  findAll(@Res() res: Response) {
-    return this.emailAccountsService.findAll(res);
+  findAll(@Res() res: Response, @Auth() jwtPayload: JWTPayload) {
+    return this.emailAccountsService.findAll(res, jwtPayload);
   }
 
   @Get(':id')
@@ -44,7 +44,7 @@ export class EmailAccountsController {
     return this.emailAccountsService.findOne(id, res);
   }
 
-  @Patch(':id')
+  @Patch('edit/:id')
   update(
     @Param('id') id: string,
     @Body() updateCommentDto: UpdateEmailAccountsDTO,
@@ -57,5 +57,10 @@ export class EmailAccountsController {
       res,
       jwtPayload,
     );
+  }
+
+  @Patch(':id')
+  delete(@Param('id') id: string, @Res() res: Response) {
+    return this.emailAccountsService.delete(id, res);
   }
 }

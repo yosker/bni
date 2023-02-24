@@ -12,6 +12,7 @@ import { Roles } from 'src/roles/schemas/roles.schema';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
@@ -34,7 +35,7 @@ export class UsersService {
     try {
       const filter = {
         ['idChapter']: ObjectId(chapterId),
-        ['status']: 'Active',
+        ['status']: EstatusRegister.Active,
       };
       filter['role'] =
         role == 'nets' ? { $ne: 'Visitante' } : { $eq: 'Visitante' };
@@ -284,7 +285,7 @@ export class UsersService {
       const findUser = await this.usersModel.findOne({
         _id: ObjectId(id),
         idChapter: ObjectId(chapterId),
-        status: 'Active',
+        status: EstatusRegister.Active,
       });
       const qrCreated = await QRCode.toDataURL(id.toString());
 
@@ -318,7 +319,7 @@ export class UsersService {
 
     try {
       await this.usersModel.findByIdAndUpdate(ObjectId(id), {
-        status: 'deleted',
+        status: EstatusRegister.Deleted,
       });
 
       return res.status(HttpStatus.OK).json({

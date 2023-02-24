@@ -25,6 +25,7 @@ async function bootstrap() {
     .addTag('Menu')
     .addTag('Roles')
     .addTag('Email Accounts')
+    .addTag('Membership Activities')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);

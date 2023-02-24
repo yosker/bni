@@ -6,136 +6,200 @@ import { Users } from 'src/users/schemas/users.schema';
 import { Chapter } from 'src/chapters/interfaces/chapters.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class MenuService {
-    constructor(
-        @InjectModel(Users.name) private readonly usersModel: Model<User>,
-        @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
-        private servicesResponse: ServicesResponse,
-    ) { }
+  constructor(
+    @InjectModel(Users.name) private readonly usersModel: Model<User>,
+    @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
+    private servicesResponse: ServicesResponse,
+  ) {}
 
-    //ENDPOINT QUE REGRESA EL MENU PARA EL BACKOFFICE Y APP 
-    async menu(userId: string, role: string, chapterId: string, res: Response): Promise<Response> {
-        try {
-            let objMenu = {};
+  //ENDPOINT QUE REGRESA EL MENU PARA EL BACKOFFICE Y APP
+  async menu(
+    userId: string,
+    role: string,
+    chapterId: string,
+    res: Response,
+  ): Promise<Response> {
+    try {
+      let objMenu = {};
 
-            //OBTENEMOS LA INFORMACIÓN GENERAL DEL USUARIO
-            const objUser = await this.usersModel.findOne({
-                _id: ObjectId(userId),
-                idChapter: ObjectId(chapterId),
-                role: role,
-                status: 'Active',
-            });
-            const chapter = await this.chapterModel.findOne({ _id: ObjectId(chapterId) });
-            if (role == 'Presidente') {
-                objMenu = await this.administratorMenu(chapter.name, objUser);
-            }
-            if (role == 'Membresias') {
-                objMenu = await this.membershipsMenu(chapter.name, objUser);
-            }
+      //OBTENEMOS LA INFORMACIÓN GENERAL DEL USUARIO
+      const objUser = await this.usersModel.findOne({
+        _id: ObjectId(userId),
+        idChapter: ObjectId(chapterId),
+        role: role,
+        status: EstatusRegister.Active,
+      });
+      const chapter = await this.chapterModel.findOne({
+        _id: ObjectId(chapterId),
+      });
+      if (role == 'Presidente') {
+        objMenu = await this.administratorMenu(chapter.name, objUser);
+      }
+      if (role == 'Membresias') {
+        objMenu = await this.membershipsMenu(chapter.name, objUser);
+      }
 
-            return res.status(HttpStatus.OK).json({
-                statusCode: this.servicesResponse.statusCode,
-                message: this.servicesResponse.message,
-                result: objMenu,
-            });
-        } catch (err) {
-            throw res
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .json(
-                    new HttpException(
-                        'INTERNAL_SERVER_ERROR.',
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                    ),
-                );
-        }
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: objMenu,
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
+  }
 
-    async administratorMenu(chapter: any, objUser: any) {
-
-        const menu = {
-            perfil: {
-                "idUsuario": 0,
-                "nombreUsuario": objUser.name + ' ' + objUser.lastName,
-                "avatar": objUser.imageURL,
-                "rol": objUser.role,
-                "idJerarquia": 0,
-                "nombreCompania": chapter,
-            },
-            modulos: [{
-                "nombre": "Networkers",
-                "estilo": "contact_page",
-                "ordenModulo": 1,
-                "subModulos": [
-                    {
-                        "idSubModulo": 1,
-                        "nombre": "Agregar Networker",
-                        "urlPagina": "usersform.html",
-                        "ordenModulo": 1,
-                        "estilo": ""
-                    },
-                    {
-                        "idSubModulo": 2,
-                        "nombre": "Consultar Networkers",
-                        "urlPagina": "userslist.html",
-                        "ordenModulo": 2,
-                        "estilo": ""
-                    }]
+  async administratorMenu(chapter: any, objUser: any) {
+    const menu = {
+      perfil: {
+        idUsuario: 0,
+        nombreUsuario: objUser.name + ' ' + objUser.lastName,
+        avatar: objUser.imageURL,
+        rol: objUser.role,
+        idJerarquia: 0,
+        nombreCompania: chapter,
+      },
+      modulos: [
+        {
+          nombre: 'Networkers',
+          estilo: 'groups',
+          ordenModulo: 1,
+          subModulos: [
+            {
+              idSubModulo: 1,
+              nombre: 'Agregar Networker',
+              urlPagina: 'usersform.html',
+              ordenModulo: 1,
+              estilo: '',
             },
             {
-                "nombre": "Visitantes",
-                "estilo": "contact_page",
-                "ordenModulo": 2,
-                "subModulos": [
-                    {
-                        "idSubModulo": 3,
-                        "nombre": "Consultar Visitantes",
-                        "urlPagina": "visitorslist.html",
-                        "ordenModulo": 1,
-                        "estilo": ""
-                    }]
-            }
-        ],
-            notificaciones: []
-        }
-        return menu;
-    };
-
-    async membershipsMenu(chapter: any, objUser: any) {
-
-        const menu = {
-            perfil: {
-                "idUsuario": 0,
-                "nombreUsuario": objUser.name + ' ' + objUser.lastName,
-                "avatar": objUser.imageURL,
-                "rol": objUser.role,
-                "idJerarquia": 0,
-                "nombreCompania": chapter,
+              idSubModulo: 2,
+              nombre: 'Consultar Networkers',
+              urlPagina: 'userslist.html',
+              ordenModulo: 2,
+              estilo: '',
             },
-            modulos: [{
-                "nombre": "Networkers",
-                "estilo": "contact_page",
-                "ordenModulo": 1,
-                "subModulos": [
-                    {
-                        "idSubModulo": 1,
-                        "nombre": "Agregar Networker",
-                        "urlPagina": "usersform.html",
-                        "ordenModulo": 1,
-                        "estilo": ""
-                    },
-                    {
-                        "idSubModulo": 2,
-                        "nombre": "Consultar Networkers",
-                        "urlPagina": "userslist.html",
-                        "ordenModulo": 2,
-                        "estilo": ""
-                    }]
-            }],
-            notificaciones: []
+          ],
+        },
+        {
+          nombre: 'Visitantes',
+          estilo: 'contact_page',
+          ordenModulo: 2,
+          subModulos: [
+            {
+              idSubModulo: 3,
+              nombre: 'Consultar Visitantes',
+              urlPagina: 'visitorslist.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
+        },
+        {
+          nombre: "Cuentas de correo",
+          estilo: "contact_mail",
+          ordenModulo: 3,
+          subModulos: [
+              {
+                  idSubModulo: 4,
+                  nombre: "Cuentas de correo",
+                  urlPagina: "emailaccounts.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        },
+        {
+          nombre: "Periodos de prueba",
+          estilo: "engineering",
+          ordenModulo: 4,
+          subModulos: [
+              {
+                  idSubModulo: 5,
+                  nombre: "Periodo de pruebas",
+                  urlPagina: "evaluationperiod.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        },
+        {
+          nombre: "Trabajo membresías",
+          estilo: "checklist",
+          ordenModulo: 5,
+          subModulos: [
+              {
+                  idSubModulo: 6,
+                  nombre: "Trabajo de membresías",
+                  urlPagina: "evaluationperiod.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        },
+        {
+          nombre: "Carta por faltas",
+          estilo: "outgoing_mail",
+          ordenModulo: 6,
+          subModulos: [
+              {
+                  idSubModulo: 7,
+                  nombre: "Carta por faltas",
+                  urlPagina: "evaluationperiod.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
         }
-        return menu;
+      ],
+      notificaciones: [],
     };
-};
+    return menu;
+  }
+
+  async membershipsMenu(chapter: any, objUser: any) {
+    const menu = {
+      perfil: {
+        idUsuario: 0,
+        nombreUsuario: objUser.name + ' ' + objUser.lastName,
+        avatar: objUser.imageURL,
+        rol: objUser.role,
+        idJerarquia: 0,
+        nombreCompania: chapter,
+      },
+      modulos: [
+        {
+          nombre: 'Networkers',
+          estilo: 'contact_page',
+          ordenModulo: 1,
+          subModulos: [
+            {
+              idSubModulo: 1,
+              nombre: 'Agregar Networker',
+              urlPagina: 'usersform.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+            {
+              idSubModulo: 2,
+              nombre: 'Consultar Networkers',
+              urlPagina: 'userslist.html',
+              ordenModulo: 2,
+              estilo: '',
+            },
+          ],
+        },
+      ],
+      notificaciones: [],
+    };
+    return menu;
+  }
+}

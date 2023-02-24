@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 export interface Chapter extends Document {
   country: { type: string };
   region: { type: string };
@@ -9,5 +10,5 @@ export interface Chapter extends Document {
   createdAt: {
     type: Date;
   };
-  status: { type: string; default: 'Active'; required: false };
+  status: { type: string; default: EstatusRegister.Active; required: false };
 }

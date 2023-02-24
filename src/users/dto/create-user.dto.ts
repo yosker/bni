@@ -7,6 +7,7 @@ import {
   IsBoolean,
   ValidateIf,
 } from 'class-validator';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 export class CreateUserDto {
   @ApiProperty({
     example: 'Id del Capítulo.',
@@ -93,7 +94,7 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Estatus del Registro.',
   })
-  @Prop({ default: 'Active', required: false })
+  @Prop({ default: EstatusRegister.Active, required: false })
   status: string;
 
   @ApiProperty({
