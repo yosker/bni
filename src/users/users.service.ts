@@ -127,24 +127,24 @@ export class UsersService {
 
       const newUser = await this.usersModel.create(createUserDto);
       if (newUser != null) {
-        const url =
-          process.env.URL_NET_PLATFORM +
-          '?id=' +
-          newUser._id.toString() +
-          '&chapterId=' +
-          newUser.idChapter.toString();
+        // const url =
+        //   process.env.URL_NET_PLATFORM +
+        //   '?id=' +
+        //   newUser._id.toString() +
+        //   '&chapterId=' +
+        //   newUser.idChapter.toString();
 
         //OBJETO PARA EL CORREO
-        const emailProperties = {
-          email: newUser.email,
-          password: '',
-          name: newUser.name + ' ' + newUser.lastName,
-          template: process.env.NETWORKERS_WELCOME_TEMPLATE,
-          subject: process.env.SUBJECT_CHAPTER_WELCOME,
-          urlPlatform: url,
-          amount: '',
-        };
-        await this.sharedService.sendEmail(emailProperties);
+        // const emailProperties = {
+        //   email: newUser.email,
+        //   password: '',
+        //   name: newUser.name + ' ' + newUser.lastName,
+        //   template: process.env.NETWORKERS_WELCOME_TEMPLATE,
+        //   subject: process.env.SUBJECT_CHAPTER_WELCOME,
+        //   urlPlatform: url,
+        //   amount: '',
+        // };
+        // await this.sharedService.sendEmail(emailProperties);
       }
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
