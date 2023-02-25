@@ -8,6 +8,7 @@ import { MembershipActivity } from './interfaces/membership-activity.interfaces'
 import { MembershipActivities } from './schemas/membership-activity.schema';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { SharedService } from 'src/shared/shared.service';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -17,6 +18,7 @@ export class MembershipActivitiesService {
     @InjectModel(MembershipActivities.name)
     private readonly membershipActivity: Model<MembershipActivity>,
     private readonly servicesResponse: ServicesResponse,
+    private readonly sharedService: SharedService,
   ) {}
 
   async create(
@@ -28,6 +30,7 @@ export class MembershipActivitiesService {
       createMembershipActivityDto = {
         ...createMembershipActivityDto,
         userId: ObjectId(jwtPayload.id),
+        userNetworkerId: ObjectId(createMembershipActivityDto.userNetworkerId),
       };
 
       const membershipActivity = await this.membershipActivity.create(
@@ -91,11 +94,30 @@ export class MembershipActivitiesService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateMembershipActivityDto: UpdateMembershipActivityDto,
+    dataBuffer: Buffer,
+    filename: string,
     res: Response,
   ) {
     try {
+      let s3Response = '';
+      if (String(updateMembershipActivityDto.fileRequire) === 'true') {
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            filename,
+            '.jpg',
+            's3-bucket-users',
+          )
+        ).result.toString();
+      }
+
+      updateMembershipActivityDto = {
+        ...updateMembershipActivityDto,
+        imageURL: s3Response,
+      };
+
       await this.membershipActivity.findOneAndUpdate(
         {
           _id: ObjectId(id),

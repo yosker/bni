@@ -22,6 +22,8 @@ export class UpdateMembershipActivityDto extends PartialType(
   @IsString()
   comments: string;
 
+  imageURL: string;
+
   @ApiProperty({
     example: 'Fecha inicio.',
   })

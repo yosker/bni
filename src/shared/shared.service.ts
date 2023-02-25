@@ -3,12 +3,20 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { S3 } from 'aws-sdk';
-import generateSafeId from 'generate-safe-id';
-const region = process.env.AWS_REGION;
-const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+const generateSafeId = require('generate-safe-id');
+
 @Injectable()
 export class SharedService {
+  private region = process.env.AWS_REGION;
+  private accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  private secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+
+  private s3 = new S3({
+    region: this.region,
+    accessKeyId: this.accessKeyId,
+    secretAccessKey: this.secretAccessKey,
+  });
+
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
@@ -72,25 +80,24 @@ export class SharedService {
     ext: string,
     bucketName: string,
   ): Promise<ServicesResponse> {
-    const { statusCode, message } = this.servicesResponse;
-    const s3 = new S3({
-      region,
-      accessKeyId,
-      secretAccessKey,
-    });
+    try {
+      const { statusCode, message } = this.servicesResponse;
 
-    const newId = generateSafeId();
-    const fileName = newId + ext;
+      const newId = generateSafeId();
+      const fileName = newId + ext;
 
-    const uploadResult = await s3
-      .upload({
-        Bucket: bucketName,
-        Body: dataBuffer,
-        Key: fileName,
-      })
-      .promise();
+      const uploadResult = await this.s3
+        .upload({
+          Bucket: bucketName,
+          Body: dataBuffer,
+          Key: fileName,
+        })
+        .promise();
 
-    return { statusCode, message, result: uploadResult.Location };
+      return { statusCode, message, result: uploadResult.Location };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async deleteObjectFromS3(
@@ -98,16 +105,10 @@ export class SharedService {
     objectName: string,
   ): Promise<ServicesResponse> {
     const { statusCode, message, result } = this.servicesResponse;
-    const s3 = new S3({
-      region,
-      accessKeyId,
-      secretAccessKey,
-    });
-
     const params = { Bucket: bucketName, Key: objectName.split('/')[3] };
 
     if (objectName != '') {
-      s3.deleteObject(params, function (err, data) {
+      this.s3.deleteObject(params, function (err, data) {
         if (err) console.log(err);
         return data;
       });
