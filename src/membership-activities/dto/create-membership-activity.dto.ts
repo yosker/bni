@@ -1,10 +1,12 @@
 import { Prop } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 import { now } from "mongoose";
 import { EstatusRegister } from "src/shared/enums/register.enum";
 
 export class CreateMembershipActivityDto {
+  
+  chapterId: object;
   userId: object;
 
   @ApiProperty({
@@ -12,14 +14,23 @@ export class CreateMembershipActivityDto {
   })
   @IsNotEmpty()
   @IsString()
-  userNetworkerId: object;
+  networkerName: string;
 
   @ApiProperty({
-    example: 'Tipo de asistencia.',
+    example: 'Fecha inicio.',
   })
   @IsNotEmpty()
-  @IsBoolean()
-  fileRequire: boolean;
+  @IsString()
+  startDate: string;
+
+  @ApiProperty({
+    example: 'Fecha fin.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  endDate: string;
+
+  concatDate: string;
 
   @ApiProperty({
     example: 'Comentarios.',
@@ -27,18 +38,6 @@ export class CreateMembershipActivityDto {
   @IsNotEmpty()
   @IsString()
   comments: string;
-
-  @ApiProperty({
-    example: 'Fecha inicio.',
-  })
-  @Prop({ default: '', required: true })
-  startDate: string;
-
-  @ApiProperty({
-    example: 'Fecha fin.',
-  })
-  @Prop({ default: '', required: true })
-  endDate: string;
 
   @Prop({ default: now(), required: false })
   createdAt?: Date;

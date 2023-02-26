@@ -9,9 +9,9 @@ import { MembershipActivities } from './schemas/membership-activity.schema';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { SharedService } from 'src/shared/shared.service';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 const ObjectId = require('mongodb').ObjectId;
-
 @Injectable()
 export class MembershipActivitiesService {
   constructor(
@@ -19,7 +19,7 @@ export class MembershipActivitiesService {
     private readonly membershipActivity: Model<MembershipActivity>,
     private readonly servicesResponse: ServicesResponse,
     private readonly sharedService: SharedService,
-  ) {}
+  ) { }
 
   async create(
     createMembershipActivityDto: CreateMembershipActivityDto,
@@ -30,7 +30,8 @@ export class MembershipActivitiesService {
       createMembershipActivityDto = {
         ...createMembershipActivityDto,
         userId: ObjectId(jwtPayload.id),
-        userNetworkerId: ObjectId(createMembershipActivityDto.userNetworkerId),
+        chapterId: ObjectId(jwtPayload.idChapter),
+        concatDate: createMembershipActivityDto.startDate.replace(/\//g, "-") + ' al ' + createMembershipActivityDto.endDate.replace(/\//g, "-")
       };
 
       const membershipActivity = await this.membershipActivity.create(
@@ -53,9 +54,13 @@ export class MembershipActivitiesService {
     }
   }
 
-  async findAll(res: Response) {
+  async findAll(jwtPayload: JWTPayload, date: string, res: Response) {
     try {
-      const activities = await this.membershipActivity.find();
+
+      const activities = await this.membershipActivity.find({
+        chapterId: ObjectId(jwtPayload.idChapter),
+        status: EstatusRegister.Active
+      }).sort({createdAt :-1});
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -102,21 +107,21 @@ export class MembershipActivitiesService {
   ) {
     try {
       let s3Response = '';
-      if (String(updateMembershipActivityDto.fileRequire) === 'true') {
-        s3Response = await (
-          await this.sharedService.uploadFile(
-            dataBuffer,
-            filename,
-            '.jpg',
-            's3-bucket-users',
-          )
-        ).result.toString();
-      }
+      // if (String(updateMembershipActivityDto.fileRequire) === 'true') {
+      //   s3Response = await (
+      //     await this.sharedService.uploadFile(
+      //       dataBuffer,
+      //       filename,
+      //       '.jpg',
+      //       's3-bucket-users',
+      //     )
+      //   ).result.toString();
+      // }
 
-      updateMembershipActivityDto = {
-        ...updateMembershipActivityDto,
-        imageURL: s3Response,
-      };
+      // updateMembershipActivityDto = {
+      //   ...updateMembershipActivityDto,
+      //   imageURL: s3Response,
+      // };
 
       await this.membershipActivity.findOneAndUpdate(
         {
@@ -129,6 +134,31 @@ export class MembershipActivitiesService {
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
         result: {},
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+  async findDates(jwtPayload: JWTPayload, res: Response) {
+    try {
+
+      const dateList = await this.membershipActivity.find({
+        chapterId: ObjectId(jwtPayload.idChapter),
+        status: EstatusRegister.Active
+      }).distinct("concatDate");
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: dateList,
       });
     } catch (error) {
       throw res

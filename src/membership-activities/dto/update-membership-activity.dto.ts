@@ -8,12 +8,6 @@ import { CreateMembershipActivityDto } from './create-membership-activity.dto';
 export class UpdateMembershipActivityDto extends PartialType(
   CreateMembershipActivityDto,
 ) {
-  @ApiProperty({
-    example: 'Tipo de asistencia.',
-  })
-  @IsNotEmpty()
-  @IsBoolean()
-  fileRequire: boolean;
 
   @ApiProperty({
     example: 'Comentarios.',
@@ -21,8 +15,6 @@ export class UpdateMembershipActivityDto extends PartialType(
   @IsNotEmpty()
   @IsString()
   comments: string;
-
-  imageURL: string;
 
   @ApiProperty({
     example: 'Fecha inicio.',

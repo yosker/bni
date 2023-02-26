@@ -6,26 +6,27 @@ export type MembershipActivitiesDocument = MembershipActivities & Document;
 
 @Schema()
 export class MembershipActivities {
+
+  @Prop({ type: 'object' })
+  chapterId: object;
+
   @Prop({ type: 'object' })
   userId: object;
 
-  @Prop({ type: 'object' })
-  userNetworkerId: object;
+  @Prop({ type: 'string' })
+  networkerName: string;
 
-  @Prop({ type: 'boolean' })
-  fileRequire: boolean;
+  @Prop({ type: 'string' })
+  startDate: string;
 
+  @Prop({ type: 'string' })
+  endDate: string;
+
+  @Prop({ type: 'string' })
+  concatDate: string;
+  
   @Prop({ type: 'string' })
   comments: string;
-
-  @Prop({ type: 'string' })
-  imageURL: string;
-
-  @Prop({ default: new Date() })
-  startDate: Date;
-
-  @Prop({ default: new Date() })
-  endDate: Date;
 
   @Prop({ default: new Date() })
   createdAt: Date;

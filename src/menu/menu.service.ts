@@ -141,7 +141,7 @@ export class MenuService {
               {
                   idSubModulo: 6,
                   nombre: "Trabajo de membresías",
-                  urlPagina: "evaluationperiod.html",
+                  urlPagina: "activities.html",
                   ordenModulo: 1,
                   estilo: ""
               }]

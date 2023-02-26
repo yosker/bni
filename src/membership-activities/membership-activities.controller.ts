@@ -9,6 +9,7 @@ import {
   UploadedFile,
   Request,
   UseInterceptors,
+  Body,
 } from '@nestjs/common';
 import { MembershipActivitiesService } from './membership-activities.service';
 import { UpdateMembershipActivityDto } from './dto/update-membership-activity.dto';
@@ -28,12 +29,12 @@ import { CreateMembershipActivityDto } from './dto/create-membership-activity.dt
 export class MembershipActivitiesController {
   constructor(
     private readonly membershipActivitiesService: MembershipActivitiesService,
-  ) {}
+  ) { }
 
   @Post()
   create(
     @Res() res: Response,
-    @Request() createMembershipActivityDto: CreateMembershipActivityDto,
+    @Body() createMembershipActivityDto: CreateMembershipActivityDto,
     @Auth() jwtPayload: JWTPayload,
   ) {
     return this.membershipActivitiesService.create(
@@ -43,9 +44,9 @@ export class MembershipActivitiesController {
     );
   }
 
-  @Get()
-  findAll(@Res() res: Response) {
-    return this.membershipActivitiesService.findAll(res);
+  @Get('/list/:date')
+  findAll(@Param('date') date: string,@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
+    return this.membershipActivitiesService.findAll(jwtPayload, date, res);
   }
 
   @Get(':id')
@@ -68,5 +69,10 @@ export class MembershipActivitiesController {
       file.originalname,
       res,
     );
+  }
+
+  @Get('/findDates/date')
+  findActivitiesByDate(@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
+    return this.membershipActivitiesService.findDates(jwtPayload, res);
   }
 }
