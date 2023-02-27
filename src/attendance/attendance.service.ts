@@ -174,13 +174,13 @@ export class AttendanceService {
     res: Response,
   ): Promise<Response> {
     try {
-      const currentDate = sessionDate.replace(/-/gi, '/');
       const pipeline = await this.AttendanceResult(
         ObjectId(chapterId),
-        currentDate,
+        sessionDate,
         ObjectId(0),
         0,
       );
+      console.log(JSON.stringify(pipeline));
       const userData = await this.attendanceModel.aggregate(pipeline);
 
       return res.status(HttpStatus.OK).json({
@@ -209,14 +209,14 @@ export class AttendanceService {
   ) {
     try {
       const filter = {
-        ['chapterId']: ObjectId(chapterId),
-        ['attendanceDate']: attendaceDate,
+        'chapterId': ObjectId(chapterId),
+        'attendanceDate': attendaceDate,
       };
       if (queryType == 1) {
         filter['userId'] = ObjectId(userId);
       }
 
-      const result = [
+      return [
         {
           $match: filter,
         },
@@ -251,7 +251,6 @@ export class AttendanceService {
           },
         },
       ];
-      return result;
     } catch (error) {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
     }
