@@ -111,8 +111,8 @@ export class AttendanceService {
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
           new HttpException(
-            'INTERNAL_SERVER_ERROR.',
-            HttpStatus.INTERNAL_SERVER_ERROR,
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR
           ),
         );
     }
@@ -160,8 +160,8 @@ export class AttendanceService {
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
           new HttpException(
-            'INTERNAL_SERVER_ERROR.',
-            HttpStatus.INTERNAL_SERVER_ERROR,
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR
           ),
         );
     }
@@ -193,8 +193,8 @@ export class AttendanceService {
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
           new HttpException(
-            'INTERNAL_SERVER_ERROR.',
-            HttpStatus.INTERNAL_SERVER_ERROR,
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR
           ),
         );
     }
@@ -209,8 +209,8 @@ export class AttendanceService {
   ) {
     try {
       const filter = {
-        'chapterId': ObjectId(chapterId),
-        'attendanceDate': attendaceDate,
+        chapterId: ObjectId(chapterId),
+        attendanceDate: attendaceDate,
       };
       if (queryType == 1) {
         filter['userId'] = ObjectId(userId);
@@ -252,7 +252,7 @@ export class AttendanceService {
         },
       ];
     } catch (error) {
-      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      throw new HttpErrorByCode[500]('Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.');
     }
   }
 }

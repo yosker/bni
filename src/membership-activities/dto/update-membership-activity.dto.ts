@@ -1,6 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsBoolean, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { now } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { CreateMembershipActivityDto } from './create-membership-activity.dto';
@@ -8,13 +8,15 @@ import { CreateMembershipActivityDto } from './create-membership-activity.dto';
 export class UpdateMembershipActivityDto extends PartialType(
   CreateMembershipActivityDto,
 ) {
-
   @ApiProperty({
     example: 'Comentarios.',
   })
   @IsNotEmpty()
   @IsString()
   comments: string;
+
+  @IsString()
+  fileUrl: string;
 
   @ApiProperty({
     example: 'Fecha inicio.',

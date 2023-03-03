@@ -29,7 +29,7 @@ import { CreateMembershipActivityDto } from './dto/create-membership-activity.dt
 export class MembershipActivitiesController {
   constructor(
     private readonly membershipActivitiesService: MembershipActivitiesService,
-  ) { }
+  ) {}
 
   @Post()
   create(
@@ -45,7 +45,11 @@ export class MembershipActivitiesController {
   }
 
   @Get('/list/:date')
-  findAll(@Param('date') date: string, @Auth() jwtPayload: JWTPayload, @Res() res: Response) {
+  findAll(
+    @Param('date') date: string,
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response,
+  ) {
     return this.membershipActivitiesService.findAll(jwtPayload, date, res);
   }
 
@@ -54,7 +58,7 @@ export class MembershipActivitiesController {
     return this.membershipActivitiesService.findOne(id, res);
   }
 
-  @Patch(':id')
+  @Patch('updateFile/:id')
   @UseInterceptors(FileInterceptor('file'))
   update1(
     @Param('id') id: string,
@@ -62,7 +66,7 @@ export class MembershipActivitiesController {
     @Request() updateMembershipActivityDto: UpdateMembershipActivityDto,
     @Res() res: Response,
   ) {
-    return this.membershipActivitiesService.update1(
+    return this.membershipActivitiesService.fileUpdate(
       id,
       updateMembershipActivityDto,
       file.buffer,
@@ -80,16 +84,17 @@ export class MembershipActivitiesController {
   async update(
     @Param('id') id: string,
     @Body() createMembershipActivityDto: CreateMembershipActivityDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return await this.membershipActivitiesService.update(id, createMembershipActivityDto, res);
+    return await this.membershipActivitiesService.update(
+      id,
+      createMembershipActivityDto,
+      res,
+    );
   }
 
   @Patch('/delete/:id')
-  async delete(
-    @Param('id') id: string,
-    @Res() res: Response,
-  ) {
+  async delete(@Param('id') id: string, @Res() res: Response) {
     return await this.membershipActivitiesService.delete(id, res);
   }
 }
