@@ -5,4 +5,5 @@ export enum EstatusRegister {
   Deleted = 'Deleted',
   Accepted = 'Accepted',
   Rejected = 'Rejected',
+  Solved = 'Solved',
 }

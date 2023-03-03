@@ -28,7 +28,7 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('/create')
   @UseInterceptors(FileInterceptor('file'))
@@ -102,5 +102,13 @@ export class UsersController {
   @Get('/deleteUser/:userId')
   delete(@Param('userId') userId: string, @Res() res: Response) {
     return this.usersService.delete(userId, res);
+  }
+
+  
+  @Get('/findAllMembership')
+  findAllMembership(
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response) {
+    return this.usersService.findUsersMembership(jwtPayload, res);
   }
 }

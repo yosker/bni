@@ -1,10 +1,11 @@
-import { Prop } from "@nestjs/mongoose";
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
-import { now } from "mongoose";
-import { EstatusRegister } from "src/shared/enums/register.enum";
+import { Prop } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { now } from 'mongoose';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class CreateMembershipActivityDto {
+  chapterId: object;
   userId: object;
 
   @ApiProperty({
@@ -12,33 +13,39 @@ export class CreateMembershipActivityDto {
   })
   @IsNotEmpty()
   @IsString()
-  userNetworkerId: object;
-
-  @ApiProperty({
-    example: 'Tipo de asistencia.',
-  })
-  @IsNotEmpty()
-  @IsBoolean()
-  fileRequire: boolean;
-
-  @ApiProperty({
-    example: 'Comentarios.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  comments: string;
+  networkerName: string;
 
   @ApiProperty({
     example: 'Fecha inicio.',
   })
-  @Prop({ default: '', required: true })
+  @IsNotEmpty()
+  @IsString()
   startDate: string;
 
   @ApiProperty({
     example: 'Fecha fin.',
   })
-  @Prop({ default: '', required: true })
+  @IsNotEmpty()
+  @IsString()
   endDate: string;
+
+  concatDate: string;
+
+  @ApiProperty({
+    example: 'Actividad.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  activity: string;
+
+  @ApiProperty({
+    example: 'Comentarios.',
+  })
+  @IsString()
+  comments: string;
+
+  @Prop({ default: EstatusRegister.Pending, required: false })
+  statusActivity?: string;
 
   @Prop({ default: now(), required: false })
   createdAt?: Date;

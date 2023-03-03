@@ -13,6 +13,7 @@ import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
@@ -133,7 +134,6 @@ export class UsersService {
         //   newUser._id.toString() +
         //   '&chapterId=' +
         //   newUser.idChapter.toString();
-
         //OBJETO PARA EL CORREO
         // const emailProperties = {
         //   email: newUser.email,
@@ -329,6 +329,38 @@ export class UsersService {
       });
     } catch (error) {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+    }
+  }
+
+  //ENDPOINT QUE REGRESA UNA LISTA DE USUARIOS (TIPO NETS)
+  async findUsersMembership(
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
+    try {
+      const users = await this.usersModel.find(
+        {
+          idChapter: ObjectId(jwtPayload.idChapter),
+          status: EstatusRegister.Active,
+          role: 'Membresías',
+        },
+        { _id: 1, name: 1, lastName: 1 },
+      );
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: users,
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
   }
 }

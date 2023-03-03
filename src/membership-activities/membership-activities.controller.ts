@@ -7,11 +7,10 @@ import {
   UseGuards,
   Res,
   UploadedFile,
-  Request,
   UseInterceptors,
+  Body,
 } from '@nestjs/common';
 import { MembershipActivitiesService } from './membership-activities.service';
-import { UpdateMembershipActivityDto } from './dto/update-membership-activity.dto';
 import { Response } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
@@ -33,7 +32,7 @@ export class MembershipActivitiesController {
   @Post()
   create(
     @Res() res: Response,
-    @Request() createMembershipActivityDto: CreateMembershipActivityDto,
+    @Body() createMembershipActivityDto: CreateMembershipActivityDto,
     @Auth() jwtPayload: JWTPayload,
   ) {
     return this.membershipActivitiesService.create(
@@ -43,9 +42,13 @@ export class MembershipActivitiesController {
     );
   }
 
-  @Get()
-  findAll(@Res() res: Response) {
-    return this.membershipActivitiesService.findAll(res);
+  @Get('/list/:date')
+  findAll(
+    @Param('date') date: string,
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response,
+  ) {
+    return this.membershipActivitiesService.findAll(jwtPayload, date, res);
   }
 
   @Get(':id')
@@ -53,20 +56,41 @@ export class MembershipActivitiesController {
     return this.membershipActivitiesService.findOne(id, res);
   }
 
-  @Patch(':id')
+  @Patch('updateFile/:id')
   @UseInterceptors(FileInterceptor('file'))
-  update(
+  update1(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
-    @Request() updateMembershipActivityDto: UpdateMembershipActivityDto,
     @Res() res: Response,
   ) {
-    return this.membershipActivitiesService.update(
+    return this.membershipActivitiesService.fileUpdate(
       id,
-      updateMembershipActivityDto,
       file.buffer,
       file.originalname,
       res,
     );
+  }
+
+  @Get('/findDates/date')
+  findActivitiesByDate(@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
+    return this.membershipActivitiesService.findDates(jwtPayload, res);
+  }
+
+  @Patch('/update/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() createMembershipActivityDto: CreateMembershipActivityDto,
+    @Res() res: Response,
+  ) {
+    return await this.membershipActivitiesService.update(
+      id,
+      createMembershipActivityDto,
+      res,
+    );
+  }
+
+  @Patch('/delete/:id')
+  async delete(@Param('id') id: string, @Res() res: Response) {
+    return await this.membershipActivitiesService.delete(id, res);
   }
 }
