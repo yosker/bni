@@ -3,15 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ServicesResponse } from 'src/responses/response';
 import { CreateMembershipActivityDto } from './dto/create-membership-activity.dto';
-import { UpdateMembershipActivityDto } from './dto/update-membership-activity.dto';
 import { MembershipActivity } from './interfaces/membership-activity.interfaces';
 import { MembershipActivities } from './schemas/membership-activity.schema';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { SharedService } from 'src/shared/shared.service';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
-
 const ObjectId = require('mongodb').ObjectId;
+
 @Injectable()
 export class MembershipActivitiesService {
   constructor(
@@ -104,17 +103,18 @@ export class MembershipActivitiesService {
 
   async fileUpdate(
     id: string,
-    updateMembershipActivityDto: UpdateMembershipActivityDto,
     dataBuffer: Buffer,
     filename: string,
     res: Response,
   ) {
     try {
-      const member = await this.membershipActivity.findOne({
-        _id: ObjectId(id),
-      });
+      const updateMembershipActivityDto = await this.membershipActivity.findOne(
+        {
+          _id: ObjectId(id),
+        },
+      );
 
-      if (!member)
+      if (!updateMembershipActivityDto)
         return res
           .status(HttpStatus.BAD_REQUEST)
           .json(
@@ -133,16 +133,13 @@ export class MembershipActivitiesService {
         )
       ).result.toString();
 
-      updateMembershipActivityDto = {
-        ...updateMembershipActivityDto,
-        fileUrl: s3Response,
-      };
-
-      await this.membershipActivity.findOneAndUpdate(
+      await this.membershipActivity.updateOne(
         {
           _id: ObjectId(id),
         },
-        updateMembershipActivityDto,
+        {
+          fileUrl: s3Response,
+        },
       );
 
       return res.status(HttpStatus.OK).json({

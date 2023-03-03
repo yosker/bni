@@ -7,12 +7,10 @@ import {
   UseGuards,
   Res,
   UploadedFile,
-  Request,
   UseInterceptors,
   Body,
 } from '@nestjs/common';
 import { MembershipActivitiesService } from './membership-activities.service';
-import { UpdateMembershipActivityDto } from './dto/update-membership-activity.dto';
 import { Response } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
@@ -63,12 +61,10 @@ export class MembershipActivitiesController {
   update1(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
-    @Request() updateMembershipActivityDto: UpdateMembershipActivityDto,
     @Res() res: Response,
   ) {
     return this.membershipActivitiesService.fileUpdate(
       id,
-      updateMembershipActivityDto,
       file.buffer,
       file.originalname,
       res,

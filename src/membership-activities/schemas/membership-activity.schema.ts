@@ -17,6 +17,9 @@ export class MembershipActivities {
   networkerName: string;
 
   @Prop({ type: 'string' })
+  fileUrl: string;
+
+  @Prop({ type: 'string' })
   startDate: string;
 
   @Prop({ type: 'string' })
