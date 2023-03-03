@@ -26,7 +26,13 @@ export class MembershipActivities {
   concatDate: string;
   
   @Prop({ type: 'string' })
+  activity: string;
+
+  @Prop({ type: 'string' })
   comments: string;
+  
+  @Prop({ type: 'string', default: EstatusRegister.Pending })
+  statusActivity: string;
 
   @Prop({ default: new Date() })
   createdAt: Date;

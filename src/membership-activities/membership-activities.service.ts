@@ -60,7 +60,7 @@ export class MembershipActivitiesService {
       const activities = await this.membershipActivity.find({
         chapterId: ObjectId(jwtPayload.idChapter),
         status: EstatusRegister.Active
-      }).sort({createdAt :-1});
+      }).sort({ createdAt: -1 });
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -98,7 +98,7 @@ export class MembershipActivitiesService {
     }
   }
 
-  async update(
+  async update1(
     id: string,
     updateMembershipActivityDto: UpdateMembershipActivityDto,
     dataBuffer: Buffer,
@@ -171,4 +171,61 @@ export class MembershipActivitiesService {
         );
     }
   }
+
+  async delete(id: string, res: Response): Promise<Response> {
+
+    try {
+      await this.membershipActivity.findByIdAndUpdate(
+        { _id: ObjectId(id) },
+        { status: EstatusRegister.Deleted },
+      );
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {}
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+  async update(
+    id: string,
+    createMembershipActivityDto: CreateMembershipActivityDto,
+    res: Response,
+  ): Promise<Response> {
+    try {
+
+      createMembershipActivityDto = {
+        ...createMembershipActivityDto,
+         userId: ObjectId(createMembershipActivityDto.userId),
+         statusActivity: createMembershipActivityDto.statusActivity
+      };
+      await this.membershipActivity.findByIdAndUpdate(ObjectId(id), createMembershipActivityDto);
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  };
+
 }

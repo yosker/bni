@@ -45,7 +45,7 @@ export class MembershipActivitiesController {
   }
 
   @Get('/list/:date')
-  findAll(@Param('date') date: string,@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
+  findAll(@Param('date') date: string, @Auth() jwtPayload: JWTPayload, @Res() res: Response) {
     return this.membershipActivitiesService.findAll(jwtPayload, date, res);
   }
 
@@ -56,13 +56,13 @@ export class MembershipActivitiesController {
 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file'))
-  update(
+  update1(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
     @Request() updateMembershipActivityDto: UpdateMembershipActivityDto,
     @Res() res: Response,
   ) {
-    return this.membershipActivitiesService.update(
+    return this.membershipActivitiesService.update1(
       id,
       updateMembershipActivityDto,
       file.buffer,
@@ -74,5 +74,22 @@ export class MembershipActivitiesController {
   @Get('/findDates/date')
   findActivitiesByDate(@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
     return this.membershipActivitiesService.findDates(jwtPayload, res);
+  }
+
+  @Patch('/update/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() createMembershipActivityDto: CreateMembershipActivityDto,
+    @Res() res: Response
+  ) {
+    return await this.membershipActivitiesService.update(id, createMembershipActivityDto, res);
+  }
+
+  @Patch('/delete/:id')
+  async delete(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return await this.membershipActivitiesService.delete(id, res);
   }
 }

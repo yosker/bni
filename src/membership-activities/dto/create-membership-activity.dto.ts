@@ -33,11 +33,20 @@ export class CreateMembershipActivityDto {
   concatDate: string;
 
   @ApiProperty({
-    example: 'Comentarios.',
+    example: 'Actividad.',
   })
   @IsNotEmpty()
   @IsString()
+  activity: string;
+
+  @ApiProperty({
+    example: 'Comentarios.',
+  })
+  @IsString()
   comments: string;
+
+  @Prop({ default: EstatusRegister.Pending, required: false })
+  statusActivity?: string;
 
   @Prop({ default: now(), required: false })
   createdAt?: Date;

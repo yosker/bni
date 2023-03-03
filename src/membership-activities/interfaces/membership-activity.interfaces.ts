@@ -8,7 +8,9 @@ export interface MembershipActivity extends Document {
   startDate: { type: string; required: true };
   endDate: { type: string; required: true };
   concatDate: { type: string; required: true };
-  comments: { type: string; required: true };
+  activity: { type: string; required: true };
+  comments: { type: string; required: false };
+  statusActivity: { type: string; default: EstatusRegister.Pending; required: false };
   createdAt: { type: Date };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }
