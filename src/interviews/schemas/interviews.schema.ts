@@ -1,6 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { References } from '../interfaces/references.interface';
 
 export type InterviewsDocument = Interviews & Document;
 
@@ -13,52 +12,43 @@ export class Interviews {
   chapterId: object;
 
   @Prop({ type: 'object' })
-  references: References;
+  question1: object;
 
-  @Prop({ type: 'Date' })
-  dateOfInterview: Date;
+  @Prop({ type: 'object' })
+  question2: object;
 
-  @Prop({ type: 'string' })
-  candidate: string;
+  @Prop({ type: 'object' })
+  question3: object;
 
-  @Prop({ type: 'string' })
-  company: string;
+  @Prop({ type: 'object' })
+  question4: object;
 
-  @Prop({ type: 'string' })
-  specialty: string;
+  @Prop({ type: 'object' })
+  question5: object;
 
-  @Prop({ type: 'string' })
-  question1: string;
+  @Prop({ type: 'object' })
+  question6: object;
 
-  @Prop({ type: 'string' })
-  question2: string;
+  @Prop({ type: 'object' })
+  question7: object;
 
-  @Prop({ type: 'string' })
-  question3: string;
+  @Prop({ type: 'object' })
+  question8: object;
 
-  @Prop({ type: 'string' })
-  question4: string;
+  @Prop({ type: 'object' })
+  question9: object;
 
-  @Prop({ type: 'string' })
-  question5: string;
+  @Prop({ type: 'object' })
+  question10: object;
 
-  @Prop({ type: 'string' })
-  question6: string;
+  @Prop({ type: 'object' })
+  question11: object;
 
-  @Prop({ type: 'string' })
-  question7: string;
+  @Prop({ type: 'object' })
+  question12: object;
 
-  @Prop({ type: 'string' })
-  question8: string;
-
-  @Prop({ type: 'string' })
-  question9: string;
-
-  @Prop({ type: 'string' })
-  question10: string;
-
-  @Prop({ type: 'string' })
-  question11: string;
+  @Prop({ type: 'object' })
+  question13: object;
 }
 
 export const InterviewsSchema = SchemaFactory.createForClass(Interviews);

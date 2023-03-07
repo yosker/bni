@@ -26,6 +26,8 @@ async function bootstrap() {
     .addTag('Roles')
     .addTag('Email Accounts')
     .addTag('Membership Activities')
+    .addTag('Users Interviews')
+    .addTag('Non Attendance')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);
