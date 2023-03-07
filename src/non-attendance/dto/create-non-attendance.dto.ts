@@ -1,8 +1,8 @@
-import { Prop } from "@nestjs/mongoose";
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
-import { now } from "mongoose";
-import { EstatusRegister } from "src/shared/enums/register.enum";
+import { Prop } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { now } from 'mongoose';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class CreateNonAttendanceDto {
   chapterId: object;

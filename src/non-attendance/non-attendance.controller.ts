@@ -3,12 +3,14 @@ import { NonAttendanceService } from './non-attendance.service';
 import { CreateNonAttendanceDto } from './dto/create-non-attendance.dto';
 import { UpdateNonAttendanceDto } from './dto/update-non-attendance.dto';
 import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
 interface FindRegisters {
   dateFrom: string;
   dateTo: string;
 }
 
+@ApiTags('Non Attendance')
 @Controller('non-attendance')
 export class NonAttendanceController {
   constructor(private readonly nonAttendanceService: NonAttendanceService) {}

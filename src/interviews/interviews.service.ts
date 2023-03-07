@@ -35,15 +35,11 @@ export class InterviewsService {
     createInterviewDto.chapterId = ObjectId(jwtPayload.idChapter);
     createInterviewDto.userId = ObjectId(jwtPayload.id);
 
-    await this.interviewModel.create(createInterviewDto).then(async () => {
-      this.usersModel.findByIdAndUpdate(ObjectId(createInterviewDto.userId), {
-        completedInterview: true,
-      });
-    });
+    await this.interviewModel.create(createInterviewDto);
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
-      result: {},
+      result: createInterviewDto,
     });
   }
 
@@ -106,18 +102,6 @@ export class InterviewsService {
             new HttpException('INTERVIEW_NOT_FOUND.', HttpStatus.NOT_FOUND),
           );
       });
-
-      let index = 0;
-      for (const reference of interview.references) {
-        if (typeof _updateInterviewDto.references[index] != 'undefined') {
-          const referenceModel = _updateInterviewDto.references[index];
-          if (reference.email == referenceModel.email) {
-            reference.questions =
-              _updateInterviewDto.references[index].questions;
-            index++;
-          }
-        }
-      }
 
       await this.interviewModel.findByIdAndUpdate(ObjectId(id), interview);
       return res.status(HttpStatus.OK).json({
