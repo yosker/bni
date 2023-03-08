@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { References } from '../interfaces/references.interface';
 
 export type InterviewsDocument = UsersInterviews & Document;
 
@@ -13,6 +14,9 @@ export class UsersInterviews {
 
   @Prop({ type: 'object' })
   interviewId: object;
+
+  @Prop({ type: 'object' })
+  references: References;
 
   @Prop({ type: 'string' })
   question1: string;
