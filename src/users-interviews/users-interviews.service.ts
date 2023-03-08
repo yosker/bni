@@ -9,6 +9,7 @@ import { Model } from 'mongoose';
 import { User } from 'src/users/interfaces/users.interface';
 import { ServicesResponse } from 'src/responses/response';
 import { Users } from 'src/users/schemas/users.schema';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -24,10 +25,10 @@ export class UsersInterviewsService {
   async create(
     createUsersInterviewDto: CreateUsersInterviewDto,
     res: Response,
+    jwtPayload: JWTPayload,
   ) {
-    createUsersInterviewDto.chapterId = ObjectId(
-      createUsersInterviewDto.chapterId,
-    );
+    createUsersInterviewDto.chapterId = ObjectId(jwtPayload.idChapter);
+    createUsersInterviewDto.userId = ObjectId(jwtPayload.id);
     createUsersInterviewDto.interviewId = ObjectId(
       createUsersInterviewDto.interviewId,
     );
