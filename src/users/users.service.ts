@@ -342,7 +342,7 @@ export class UsersService {
         {
           idChapter: ObjectId(jwtPayload.idChapter),
           status: EstatusRegister.Active,
-          role: 'Membresías',
+          role: ['Membresías', 'Vicepresidente'] ,
         },
         { _id: 1, name: 1, lastName: 1 },
       );

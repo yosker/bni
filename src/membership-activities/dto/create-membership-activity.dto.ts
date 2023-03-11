@@ -6,10 +6,12 @@ import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class CreateMembershipActivityDto {
   chapterId: object;
+
+  @IsNotEmpty()
   userId: object;
 
   @ApiProperty({
-    example: 'Id del Usuario Networker.',
+    example: 'Nombre del Networker a quien se le asigna tareas.',
   })
   @IsNotEmpty()
   @IsString()
@@ -44,8 +46,11 @@ export class CreateMembershipActivityDto {
   @IsString()
   comments: string;
 
-  @Prop({ default: EstatusRegister.Pending, required: false })
-  statusActivity?: string;
+  @ApiProperty({
+    example: 'Estatus de la actividad.',
+  })
+  @IsString()
+  statusActivity: string;
 
   @Prop({ default: now(), required: false })
   createdAt?: Date;

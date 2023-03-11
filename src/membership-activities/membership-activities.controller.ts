@@ -58,7 +58,7 @@ export class MembershipActivitiesController {
 
   @Patch('updateFile/:id')
   @UseInterceptors(FileInterceptor('file'))
-  update1(
+  updateActivityByUser(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
@@ -77,7 +77,7 @@ export class MembershipActivitiesController {
   }
 
   @Patch('/update/:id')
-  async update(
+  async updateActivity(
     @Param('id') id: string,
     @Body() createMembershipActivityDto: CreateMembershipActivityDto,
     @Res() res: Response,
@@ -93,4 +93,21 @@ export class MembershipActivitiesController {
   async delete(@Param('id') id: string, @Res() res: Response) {
     return await this.membershipActivitiesService.delete(id, res);
   }
+
+
+  
+  //SERVICIOS PARA LAS ACTIVIDADES DEL COMITE DE MEMBRESIAS (POR USUARIO)
+
+  @Get('/activitiesByUser/:date')
+  findAllActivitiesByUser(
+    @Param('date') date: string,
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response,
+  ) {
+    return this.membershipActivitiesService.findUserActivities(jwtPayload, date, res);
+  }
+
+
+
+
 }

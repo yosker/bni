@@ -34,7 +34,7 @@ export class MembershipActivities {
   @Prop({ type: 'string' })
   comments: string;
   
-  @Prop({ type: 'string', default: EstatusRegister.Pending })
+  @Prop({ type: 'string' })
   statusActivity: string;
 
   @Prop({ default: new Date() })

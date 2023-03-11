@@ -55,12 +55,4 @@ export class UsersInterviewsService {
     });
   }
 
-  async update(id: string, updateUsersInterviewDto: UpdateUsersInterviewDto) {
-    return this.usersInterview.updateOne(
-      {
-        _id: ObjectId(id),
-      },
-      updateUsersInterviewDto,
-    );
-  }
 }

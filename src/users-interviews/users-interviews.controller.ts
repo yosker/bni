@@ -52,11 +52,4 @@ export class UsersInterviewsController {
     return this.usersInterviewsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUsersInterviewDto: UpdateUsersInterviewDto,
-  ) {
-    return this.usersInterviewsService.update(id, updateUsersInterviewDto);
-  }
 }

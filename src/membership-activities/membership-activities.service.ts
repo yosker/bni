@@ -18,7 +18,7 @@ export class MembershipActivitiesService {
     private readonly membershipActivity: Model<MembershipActivity>,
     private readonly servicesResponse: ServicesResponse,
     private readonly sharedService: SharedService,
-  ) {}
+  ) { }
 
   async create(
     createMembershipActivityDto: CreateMembershipActivityDto,
@@ -28,12 +28,12 @@ export class MembershipActivitiesService {
     try {
       createMembershipActivityDto = {
         ...createMembershipActivityDto,
-        userId: ObjectId(jwtPayload.id),
+        userId: ObjectId(createMembershipActivityDto.userId),
         chapterId: ObjectId(jwtPayload.idChapter),
         concatDate:
           createMembershipActivityDto.startDate.replace(/\//g, '-') +
           ' al ' +
-          createMembershipActivityDto.endDate.replace(/\//g, '-'),
+          createMembershipActivityDto.endDate.replace(/\//g, '-')
       };
 
       const membershipActivity = await this.membershipActivity.create(
@@ -58,9 +58,11 @@ export class MembershipActivitiesService {
 
   async findAll(jwtPayload: JWTPayload, date: string, res: Response) {
     try {
+
       const activities = await this.membershipActivity
         .find({
           chapterId: ObjectId(jwtPayload.idChapter),
+          concatDate: date,
           status: EstatusRegister.Active,
         })
         .sort({ createdAt: -1 });
@@ -128,7 +130,7 @@ export class MembershipActivitiesService {
         await this.sharedService.uploadFile(
           dataBuffer,
           filename,
-          '.jpg',
+          '',
           's3-bucket-users',
         )
       ).result.toString();
@@ -218,6 +220,10 @@ export class MembershipActivitiesService {
       createMembershipActivityDto = {
         ...createMembershipActivityDto,
         userId: ObjectId(createMembershipActivityDto.userId),
+        concatDate:
+          createMembershipActivityDto.startDate.replace(/\//g, '-') +
+          ' al ' +
+          createMembershipActivityDto.endDate.replace(/\//g, '-'),
         statusActivity: createMembershipActivityDto.statusActivity,
       };
       await this.membershipActivity.findByIdAndUpdate(
@@ -241,4 +247,38 @@ export class MembershipActivitiesService {
         );
     }
   }
+
+  //SERVICIOS PARA LAS ACTIVIDADES DEL COMITE DE MEMBRESIAS (POR USUARIO)
+
+
+  async findUserActivities(jwtPayload: JWTPayload, date: string, res: Response) {
+    try {
+
+
+      const activities = await this.membershipActivity
+        .find({
+          chapterId: ObjectId(jwtPayload.idChapter),
+          concatDate: date,
+          userId: ObjectId(jwtPayload.id),
+          status: EstatusRegister.Active,
+        })
+        .sort({ createdAt: -1 });
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: activities,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+
 }
