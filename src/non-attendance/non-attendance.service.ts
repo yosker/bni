@@ -10,6 +10,7 @@ import { Response } from 'express';
 import { NonAttendance } from './interfaces/non-attendance.interfaces';
 import { ServicesResponse } from 'src/responses/response';
 import { NonAttendances } from './schemas/non-attendance.schema';
+import * as moment from 'moment';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -63,10 +64,12 @@ export class NonAttendanceService {
     }
   }
 
-  async findAll(dateFrom: string, dateTo: string, res: Response) {
-    const pipeline = await this.nonAttendanceQuery(dateFrom, dateTo);
-    const resNonAttendances = await this.nonAttendanceModel.aggregate(pipeline);
+  async findAll(res: Response) {
+    const dateFrom = moment().add(-6, 'M').format();
+    const dateTo = moment().format();
 
+    const pipeline = await this.nonAttendanceQuery(dateFrom, dateTo);
+    const resNonAttendances = await this.usersModel.aggregate(pipeline);
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
@@ -111,8 +114,8 @@ export class NonAttendanceService {
       {
         $match: {
           createdAt: {
-            $gte: dateFrom,
-            $lte: dateTo,
+            $gte: new Date(dateFrom),
+            $lte: new Date(dateTo),
           },
         },
       },
@@ -156,5 +159,17 @@ export class NonAttendanceService {
         },
       },
     ];
+  }
+
+  async formatDate(date) {
+    const d = new Date(date);
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    const year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
   }
 }
