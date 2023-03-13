@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Body,
+  Request
 } from '@nestjs/common';
 import { MembershipActivitiesService } from './membership-activities.service';
 import { Response } from 'express';
@@ -19,6 +20,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateMembershipActivityDto } from './dto/create-membership-activity.dto';
+
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -61,10 +63,12 @@ export class MembershipActivitiesController {
   updateActivityByUser(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
+    @Request() req,
     @Res() res: Response,
   ) {
     return this.membershipActivitiesService.fileUpdate(
       id,
+      req.body,
       file.buffer,
       file.originalname,
       res,

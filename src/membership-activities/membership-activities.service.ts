@@ -105,6 +105,7 @@ export class MembershipActivitiesService {
 
   async fileUpdate(
     id: string,
+    req,
     dataBuffer: Buffer,
     filename: string,
     res: Response,
@@ -121,19 +122,24 @@ export class MembershipActivitiesService {
           .status(HttpStatus.BAD_REQUEST)
           .json(
             new HttpException(
-              'Lo sentimos, Membresía no encontrada.',
+              'Lo sentimos, actividad no encontrada.',
               HttpStatus.BAD_REQUEST,
             ),
           );
 
-      const s3Response = await (
-        await this.sharedService.uploadFile(
-          dataBuffer,
-          filename,
-          '',
-          's3-bucket-users',
-        )
-      ).result.toString();
+      let s3Response = '';
+
+      if (filename != 'default') {
+        s3Response = await (await this.sharedService.uploadFile(dataBuffer, filename, '', 's3-bucket-users')).result.toString();
+        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+      } else {
+        if (req.deleteFile == 1) {
+          await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+          s3Response = '';
+        } else {
+          s3Response = req.urlFile;
+        }
+      }
 
       await this.membershipActivity.updateOne(
         {
@@ -141,6 +147,8 @@ export class MembershipActivitiesService {
         },
         {
           fileUrl: s3Response,
+          comments: req.comments,
+          statusActivity: req.statusActivity
         },
       );
 
