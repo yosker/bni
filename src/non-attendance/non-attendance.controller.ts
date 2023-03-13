@@ -5,11 +5,6 @@ import { UpdateNonAttendanceDto } from './dto/update-non-attendance.dto';
 import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 
-interface FindRegisters {
-  dateFrom: string;
-  dateTo: string;
-}
-
 @ApiTags('Non Attendance')
 @Controller('non-attendance')
 export class NonAttendanceController {
@@ -24,8 +19,8 @@ export class NonAttendanceController {
   }
 
   @Get()
-  findAll(@Body() find: FindRegisters, @Res() res: Response) {
-    return this.nonAttendanceService.findAll(find.dateFrom, find.dateTo, res);
+  findAll(@Res() res: Response) {
+    return this.nonAttendanceService.findAll(res);
   }
 
   @Get(':id')
