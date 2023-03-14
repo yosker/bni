@@ -4,16 +4,8 @@ import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 import { References } from '../interfaces/references.interface';
 
 export class CreateUsersInterviewDto {
-  @ApiProperty({
-    example: 'Id de Usuario Invitado.',
-  })
-  @IsNotEmpty()
   userId: object;
 
-  @ApiProperty({
-    example: 'Id de Capítulo.',
-  })
-  @IsNotEmpty()
   chapterId: object;
 
   @ApiProperty({

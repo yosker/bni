@@ -32,11 +32,13 @@ export class UsersInterviewsService {
     createUsersInterviewDto.interviewId = ObjectId(
       createUsersInterviewDto.interviewId,
     );
-    await this.usersInterview.create(createUsersInterviewDto);
+    const interviewUser = await this.usersInterview.create(
+      createUsersInterviewDto,
+    );
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
-      result: createUsersInterviewDto,
+      result: interviewUser,
     });
   }
 
