@@ -52,7 +52,7 @@ export class UsersInterviewsService {
   }
 
   async findOne(id: string) {
-    return this.usersInterview.findById({
+    return this.usersInterview.findOne({
       interviewId: ObjectId(id),
     });
   }
