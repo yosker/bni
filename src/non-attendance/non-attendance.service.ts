@@ -69,7 +69,9 @@ export class NonAttendanceService {
     const dateTo = moment().format();
 
     const pipeline = await this.nonAttendanceQuery(dateFrom, dateTo);
-    const resNonAttendances = await this.usersModel.aggregate(pipeline);
+    const resNonAttendances = await this.usersModel
+      .aggregate(pipeline)
+      .sort({ attended: 1 });
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
@@ -120,26 +122,18 @@ export class NonAttendanceService {
         },
       },
       {
-        $lookup: {
-          from: 'chaptersessions',
-          localField: 'attendancesData.chapterId',
-          foreignField: 'chapterId',
-          as: 'chapterSessionsData',
-        },
-      },
-      {
-        $unwind: {
-          path: '$chapterSessionsData',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
         $project: {
           _id: 1,
-          count: '$chapterSessionsData.count',
           chapterId: '$attendances.DatachapterId',
           userId: '$attendancesData.userId',
           attendanceType: '$attendancesData.attendanceType',
+          attended: {
+            $cond: {
+              if: { $gte: ['$attendancesData.attendanceType', ''] },
+              then: true,
+              else: false,
+            },
+          },
           createdAt: '$attendancesData.createdAt',
           status: '$attendancesData.status',
           sessionDate: '$chapterSessionsData.sessionDate',

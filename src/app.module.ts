@@ -21,6 +21,7 @@ import { NonAttendanceModule } from './non-attendance/non-attendance.module';
 import { MembershipActivitiesModule } from './membership-activities/membership-activities.module';
 import { EvaluationPeriodModule } from './evaluation-period/evaluation-period.module';
 import { UsersInterviewsModule } from './users-interviews/users-interviews.module';
+import { LettersModule } from './letters/letters.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { UsersInterviewsModule } from './users-interviews/users-interviews.modul
     MembershipActivitiesModule,
     EvaluationPeriodModule,
     UsersInterviewsModule,
+    LettersModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],
