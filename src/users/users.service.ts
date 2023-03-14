@@ -25,7 +25,7 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -110,13 +110,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-              await this.sharedService.uploadFile(
-                dataBuffer,
-                filename,
-                '.jpg',
-                's3-bucket-users',
-              )
-            ).result
+            await this.sharedService.uploadFile(
+              dataBuffer,
+              filename,
+              '.jpg',
+              's3-bucket-users',
+            )
+          ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -127,25 +127,25 @@ export class UsersService {
       };
 
       const newUser = await this.usersModel.create(createUserDto);
-      if (newUser != null) {
-        // const url =
-        //   process.env.URL_NET_PLATFORM +
-        //   '?id=' +
-        //   newUser._id.toString() +
-        //   '&chapterId=' +
-        //   newUser.idChapter.toString();
-        //OBJETO PARA EL CORREO
-        // const emailProperties = {
-        //   email: newUser.email,
-        //   password: '',
-        //   name: newUser.name + ' ' + newUser.lastName,
-        //   template: process.env.NETWORKERS_WELCOME_TEMPLATE,
-        //   subject: process.env.SUBJECT_CHAPTER_WELCOME,
-        //   urlPlatform: url,
-        //   amount: '',
-        // };
-        // await this.sharedService.sendEmail(emailProperties);
-      }
+      // if (newUser != null) {
+      //   const url =
+      //     process.env.URL_NET_PLATFORM +
+      //     '?id=' +
+      //     newUser._id.toString() +
+      //     '&chapterId=' +
+      //     newUser.idChapter.toString();
+      //   // OBJETO PARA EL CORREO
+      //   const emailProperties = {
+      //     email: newUser.email,
+      //     password: '',
+      //     name: newUser.name + ' ' + newUser.lastName,
+      //     template: process.env.NETWORKERS_WELCOME_TEMPLATE,
+      //     subject: process.env.SUBJECT_CHAPTER_WELCOME,
+      //     urlPlatform: url,
+      //     amount: '',
+      //   };
+      //   await this.sharedService.sendEmail(emailProperties);
+      // }
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -225,29 +225,17 @@ export class UsersService {
       let s3Response = '';
 
       if (filename != 'avatar.jpg') {
-        s3Response = await (
-          await this.sharedService.uploadFile(
-            dataBuffer,
-            filename,
-            '.jpg',
-            's3-bucket-users',
-          )
-        ).result.toString();
-        await this.sharedService.deleteObjectFromS3(
-          's3-bucket-users',
-          req.s3url,
-        );
+        s3Response = await (await this.sharedService.uploadFile(dataBuffer, filename, '.jpg', 's3-bucket-users')).result.toString();
+        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.s3url);
       } else {
         if (req.deleteAll) {
-          await this.sharedService.deleteObjectFromS3(
-            's3-bucket-users',
-            req.s3url,
-          );
+          await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.s3url);
           s3Response = '';
         } else {
           s3Response = req.s3url;
         }
       }
+
       _updateUserDto = {
         ..._updateUserDto,
         imageURL: s3Response,
@@ -342,7 +330,7 @@ export class UsersService {
         {
           idChapter: ObjectId(jwtPayload.idChapter),
           status: EstatusRegister.Active,
-          role: 'Membresías',
+          role: ['Membresías', 'Vicepresidente'],
         },
         { _id: 1, name: 1, lastName: 1 },
       );

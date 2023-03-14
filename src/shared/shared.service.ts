@@ -84,8 +84,7 @@ export class SharedService {
       const { statusCode, message } = this.servicesResponse;
 
       const newId = generateSafeId();
-      const fileName = newId + ext;
-
+      const fileName = ext != '' ? newId + ext : file;
       const uploadResult = await this.s3
         .upload({
           Bucket: bucketName,

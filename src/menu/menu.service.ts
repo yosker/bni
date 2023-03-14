@@ -40,7 +40,7 @@ export class MenuService {
       if (role == 'Presidente') {
         objMenu = await this.administratorMenu(chapter.name, objUser);
       }
-      if (role == 'Membresias') {
+      if (role == 'Membresías') {
         objMenu = await this.membershipsMenu(chapter.name, objUser);
       }
 
@@ -134,18 +134,19 @@ export class MenuService {
               }]
         },
         {
-          nombre: "Trabajo membresías",
+          nombre: "Actividad membresías",
           estilo: "checklist",
           ordenModulo: 5,
           subModulos: [
               {
                   idSubModulo: 6,
-                  nombre: "Trabajo de membresías",
+                  nombre: "Asignar actividad",
                   urlPagina: "activities.html",
                   ordenModulo: 1,
                   estilo: ""
               }]
         },
+       
         {
           nombre: "Carta por faltas",
           estilo: "outgoing_mail",
@@ -154,7 +155,7 @@ export class MenuService {
               {
                   idSubModulo: 7,
                   nombre: "Carta por faltas",
-                  urlPagina: "evaluationperiod.html",
+                  urlPagina: "absencesform.html",
                   ordenModulo: 1,
                   estilo: ""
               }]
@@ -197,6 +198,50 @@ export class MenuService {
             },
           ],
         },
+        {
+          nombre: 'Visitantes',
+          estilo: 'contact_page',
+          ordenModulo: 2,
+          subModulos: [
+            {
+              idSubModulo: 3,
+              nombre: 'Consultar Visitantes',
+              urlPagina: 'visitorslist.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
+        },
+        {
+          nombre: "Periodos de prueba",
+          estilo: "engineering",
+          ordenModulo: 4,
+          subModulos: [
+              {
+                  idSubModulo: 5,
+                  nombre: "Periodo de pruebas",
+                  urlPagina: "evaluationperiod.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        },
+        {
+          nombre: "Trabajo membresías",
+          estilo: "checklist",
+          ordenModulo: 6,
+          subModulos: [
+              {
+                  idSubModulo: 7,
+                  nombre: "Actividades membresías",
+                  urlPagina: "activitiesform.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
+        },
+
+
+
+
       ],
       notificaciones: [],
     };

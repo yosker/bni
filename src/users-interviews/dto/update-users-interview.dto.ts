@@ -8,6 +8,12 @@ export class UpdateUsersInterviewDto extends PartialType(
   CreateUsersInterviewDto,
 ) {
   @ApiProperty({
+    example: 'Id de Usuario Invitado.',
+  })
+  @IsNotEmpty()
+  userId: object;
+
+  @ApiProperty({
     example: 'Id de Capítulo.',
   })
   @IsNotEmpty()
