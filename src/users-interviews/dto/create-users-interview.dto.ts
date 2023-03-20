@@ -1,6 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 import { References } from '../interfaces/references.interface';
 
 export class CreateUsersInterviewDto {
@@ -73,8 +73,8 @@ export class CreateUsersInterviewDto {
     example: 'Pregunta 4.',
   })
   @IsNotEmpty()
-  @IsString()
-  question4: string;
+  @IsArray()
+  question4: number[];
 
   @ApiProperty({
     example: 'Pregunta 5.',
@@ -94,8 +94,8 @@ export class CreateUsersInterviewDto {
     example: 'Pregunta 7.',
   })
   @IsNotEmpty()
-  @IsObject()
-  question7: object;
+  @IsArray()
+  question7: number[];
 
   @ApiProperty({
     example: 'Pregunta 8.',
@@ -129,8 +129,8 @@ export class CreateUsersInterviewDto {
     example: 'Pregunta 12.',
   })
   @IsNotEmpty()
-  @IsObject()
-  question12: object;
+  @IsArray()
+  question12: number[];
 
   @ApiProperty({
     example: 'Pregunta 13.',

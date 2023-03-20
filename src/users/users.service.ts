@@ -25,7 +25,7 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -110,13 +110,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-            await this.sharedService.uploadFile(
-              dataBuffer,
-              filename,
-              '.jpg',
-              's3-bucket-users',
-            )
-          ).result
+              await this.sharedService.uploadFile(
+                dataBuffer,
+                filename,
+                '.jpg',
+                's3-bucket-users',
+              )
+            ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -225,11 +225,24 @@ export class UsersService {
       let s3Response = '';
 
       if (filename != 'avatar.jpg') {
-        s3Response = await (await this.sharedService.uploadFile(dataBuffer, filename, '.jpg', 's3-bucket-users')).result.toString();
-        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.s3url);
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            filename,
+            '.jpg',
+            's3-bucket-users',
+          )
+        ).result.toString();
+        await this.sharedService.deleteObjectFromS3(
+          's3-bucket-users',
+          req.s3url,
+        );
       } else {
         if (req.deleteAll) {
-          await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.s3url);
+          await this.sharedService.deleteObjectFromS3(
+            's3-bucket-users',
+            req.s3url,
+          );
           s3Response = '';
         } else {
           s3Response = req.s3url;
@@ -275,14 +288,14 @@ export class UsersService {
         idChapter: ObjectId(chapterId),
         status: EstatusRegister.Active,
       });
-      const qrCreated = await QRCode.toDataURL(id.toString());
+      // const qrCreated = await QRCode.toDataURL(id.toString());
 
       const dataUser = {
         name: findUser.name + ' ' + findUser.lastName,
         companyName: findUser.companyName,
         profession: findUser.profession,
         imageURL: findUser.imageURL,
-        qr: qrCreated,
+        // qr: qrCreated,
       };
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,

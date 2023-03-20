@@ -1,6 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUsersInterviewDto } from './dto/create-users-interview.dto';
-import { UpdateUsersInterviewDto } from './dto/update-users-interview.dto';
 import { Response } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsersInterviews } from './schemas/interviews.schema';
@@ -56,5 +55,4 @@ export class UsersInterviewsService {
       interviewId: ObjectId(id),
     });
   }
-
 }

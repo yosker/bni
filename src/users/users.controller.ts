@@ -22,14 +22,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
 
-@ApiBearerAuth()
-@Role('Admin')
-@UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
+  @ApiBearerAuth()
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   @Post('/create')
   @UseInterceptors(FileInterceptor('file'))
   async create(
@@ -45,6 +45,9 @@ export class UsersController {
     );
   }
 
+  @ApiBearerAuth()
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   @Patch('/updateUser')
   @UseInterceptors(FileInterceptor('file'))
   update(
@@ -60,6 +63,9 @@ export class UsersController {
     );
   }
 
+  @ApiBearerAuth()
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   @Post('/createVistor')
   async createVisotors(
     @Body() createUserDto: CreateUserDto,
@@ -68,6 +74,9 @@ export class UsersController {
     return await this.usersService.createVisitor(createUserDto, res);
   }
 
+  @ApiBearerAuth()
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   @Get('/networkersList/:chapterId/:role')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -79,11 +88,17 @@ export class UsersController {
     return this.usersService.findAll(chapterId, role, res);
   }
 
+  @ApiBearerAuth()
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   @Get('/userById/:id')
   findOne(@Param('id') id: string, @Res() res: Response) {
     return this.usersService.findOne(id, res);
   }
 
+  @ApiBearerAuth()
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   @Get('auhtuser')
   findAuth(@Auth() jwtPayload: JWTPayload) {
     console.log(jwtPayload);
@@ -99,16 +114,19 @@ export class UsersController {
     return this.usersService.findNetworkerData(id, chapterId, res);
   }
 
+  @ApiBearerAuth()
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   @Get('/deleteUser/:userId')
   delete(@Param('userId') userId: string, @Res() res: Response) {
     return this.usersService.delete(userId, res);
   }
 
-  
+  @ApiBearerAuth()
+  @Role('Admin')
+  @UseGuards(AuthGuard(), JwtGuard)
   @Get('/findAllMembership')
-  findAllMembership(
-    @Auth() jwtPayload: JWTPayload,
-    @Res() res: Response) {
+  findAllMembership(@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
     return this.usersService.findUsersMembership(jwtPayload, res);
   }
 }

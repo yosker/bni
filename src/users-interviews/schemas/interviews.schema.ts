@@ -27,8 +27,8 @@ export class UsersInterviews {
   @Prop({ type: 'string' })
   question3: string;
 
-  @Prop({ type: 'object' })
-  question4: object;
+  @Prop({ type: 'array' })
+  question4: number[];
 
   @Prop({ type: 'string' })
   question5: string;
@@ -36,8 +36,8 @@ export class UsersInterviews {
   @Prop({ type: 'string' })
   question6: string;
 
-  @Prop({ type: 'object' })
-  question7: object;
+  @Prop({ type: 'array' })
+  question7: number[];
 
   @Prop({ type: 'string' })
   question8: string;
@@ -51,8 +51,8 @@ export class UsersInterviews {
   @Prop({ type: 'string' })
   question11: string;
 
-  @Prop({ type: 'object' })
-  question12: object;
+  @Prop({ type: 'array' })
+  question12: number[];
 
   @Prop({ type: 'string' })
   question13: string;
