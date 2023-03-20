@@ -7,6 +7,7 @@ import {
   Param,
   Res,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { EmailAccountsService } from './email-accounts.service';
 import { CreateEmailAccountsDTO } from './dto/create-email-accounts.dto';
@@ -35,8 +36,9 @@ export class EmailAccountsController {
   }
 
   @Get()
-  findAll(@Res() res: Response, @Auth() jwtPayload: JWTPayload) {
-    return this.emailAccountsService.findAll(res, jwtPayload);
+  
+  findAll(@Res() res: Response,@Headers('page') page: string, @Auth() jwtPayload: JWTPayload) {
+    return this.emailAccountsService.findAll(res,page, jwtPayload);
   }
 
   @Get(':id')
