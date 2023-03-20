@@ -4,6 +4,7 @@ import { EmailAccountsService } from './email-accounts.service';
 import { ServicesResponse } from 'src/responses/response';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from 'src/auth/auth.module';
+import { SharedService } from 'src/shared/shared.service';
 import {
   EmailAccounts,
   EmailAccountsSchema,
@@ -21,6 +22,6 @@ import {
   ],
   exports: [],
   controllers: [EmailAccountsController],
-  providers: [EmailAccountsService, ServicesResponse],
+  providers: [EmailAccountsService, SharedService, ServicesResponse],
 })
-export class EmailAccountsModule {}
+export class EmailAccountsModule { }
