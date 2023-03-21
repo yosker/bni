@@ -34,10 +34,11 @@ export class AttendanceService {
     jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
+      attendanceDTO.userId = ObjectId(jwtPayload.id);
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const existUser = await this.usersModel.findOne({
-        _id: ObjectId(attendanceDTO.userId),
-        idChapter: ObjectId(attendanceDTO.chapterId),
+        _id: ObjectId(jwtPayload.id),
+        idChapter: ObjectId(jwtPayload.idChapter),
         status: EstatusRegister.Active,
       });
 
@@ -63,10 +64,11 @@ export class AttendanceService {
       if (authAttendance) {
         //VALIDAMOS QUE EL USUARIO NO SE REGISTRE DOS VECES EL MISMO DIA EN LA COLECCION DE ASISTENCIA
         const userSession = await this.attendanceModel.findOne({
-          userId: ObjectId(attendanceDTO.userId),
+          userId: ObjectId(jwtPayload.id),
           attendanceDate: currentDate,
           chapterId: ObjectId(attendanceDTO.chapterId),
           status: EstatusRegister.Active,
+          attended: true,
         });
 
         if (userSession) {
@@ -80,8 +82,14 @@ export class AttendanceService {
           attendanceDate: currentDate,
           userId: ObjectId(attendanceDTO.userId),
           chapterId: ObjectId(attendanceDTO.chapterId),
+          attended: true,
         };
-        await this.attendanceModel.create(attendanceDTO);
+        await this.attendanceModel.findOneAndUpdate(
+          {
+            userId: ObjectId(attendanceDTO.userId),
+          },
+          attendanceDTO,
+        );
 
         const pipeline = await this.AttendanceResult(
           attendanceDTO.chapterId,
@@ -112,7 +120,7 @@ export class AttendanceService {
         .json(
           new HttpException(
             'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
-            HttpStatus.INTERNAL_SERVER_ERROR
+            HttpStatus.INTERNAL_SERVER_ERROR,
           ),
         );
     }
@@ -161,7 +169,7 @@ export class AttendanceService {
         .json(
           new HttpException(
             'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
-            HttpStatus.INTERNAL_SERVER_ERROR
+            HttpStatus.INTERNAL_SERVER_ERROR,
           ),
         );
     }
@@ -194,7 +202,7 @@ export class AttendanceService {
         .json(
           new HttpException(
             'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
-            HttpStatus.INTERNAL_SERVER_ERROR
+            HttpStatus.INTERNAL_SERVER_ERROR,
           ),
         );
     }
@@ -241,7 +249,11 @@ export class AttendanceService {
             createdAt: '$createdAt',
             attendanceHour: {
               $concat: [
-                { $toString: { $hour: '$createdAt' } },
+                {
+                  $toString: {
+                    $hour: { date: '$createdAt', timezone: '+1800' },
+                  },
+                },
                 ':',
                 { $toString: { $minute: '$createdAt' } },
               ],
@@ -252,7 +264,9 @@ export class AttendanceService {
         },
       ];
     } catch (error) {
-      throw new HttpErrorByCode[500]('Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.');
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
     }
   }
 }

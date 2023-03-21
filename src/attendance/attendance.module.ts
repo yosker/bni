@@ -22,6 +22,11 @@ import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessio
     AuthModule,
   ],
   controllers: [AttendanceController],
-  providers: [AttendanceService, ServicesResponse, UsersModule, ChapterSessionsModule] 
+  providers: [
+    AttendanceService,
+    ServicesResponse,
+    UsersModule,
+    ChapterSessionsModule,
+  ],
 })
 export class AttendanceModule {}
