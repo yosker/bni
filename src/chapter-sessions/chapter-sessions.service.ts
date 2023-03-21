@@ -36,6 +36,13 @@ export class ChapterSessionsService {
       };
 
       if (findSession == null) {
+        const dateString = chapterSessionDTO.sessionDate;
+        const dateObject = new Date(dateString);
+
+        // TODO: Se agregan 6 horas por la zona horaria MX, revisar en caso de cambiar de país
+        chapterSessionDTO.sessionChapterDate = moment(dateObject)
+          .add(6, 'h')
+          .toISOString();
         await this.chapterSessionModel.create(chapterSessionDTO);
       } else {
         return res

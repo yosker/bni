@@ -66,8 +66,8 @@ export class ChaptersService {
       createUserDto = { ...createUserDto, password: plainToHash };
       const newUser = await this.usersModel.create(createUserDto);
 
-      if (newChapter != null && newUser != null)
-        await this.sharedService.sendEmail(emailProperties);
+      // if (newChapter != null && newUser != null)
+      //   await this.sharedService.sendEmail(emailProperties);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
