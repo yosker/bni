@@ -32,6 +32,9 @@ export class ChapterSessionsService {
   ): Promise<Response> {
     const { result } = this.servicesResponse;
     try {
+      const dateSplit = chapterSessionDTO.sessionDate.split('-');
+      chapterSessionDTO.sessionDate =
+        dateSplit[2] + '-' + dateSplit[1] + '-' + dateSplit[0];
       const findSession = await this.chapterSessionModel.findOne({
         chapterId: ObjectId(chapterSessionDTO.chapterId),
         sessionDate: chapterSessionDTO.sessionDate,
@@ -51,9 +54,6 @@ export class ChapterSessionsService {
           .add(6, 'h')
           .toISOString();
 
-        const dateSplit = chapterSessionDTO.sessionDate.split('-');
-        chapterSessionDTO.sessionDate =
-          dateSplit[2] + '-' + dateSplit[1] + '-' + dateSplit[0];
         const chapterSession = await this.chapterSessionModel.create(
           chapterSessionDTO,
         );
@@ -63,7 +63,6 @@ export class ChapterSessionsService {
             idChapter: ObjectId(chapterSessionDTO.chapterId),
           });
 
-          const currentDate = moment().format('DD-MM-YYYY');
           usersChapter.forEach(async (user) => {
             const attendance: any = {
               chapterId: ObjectId(user.idChapter),
@@ -71,7 +70,8 @@ export class ChapterSessionsService {
               userId: ObjectId(user._id),
               attended: false,
               attendanceType: AttendanceType.OnSite,
-              attendanceDate: currentDate,
+              attendanceDate: chapterSessionDTO.sessionDate,
+              createdAt: new Date().toISOString(),
             };
             await this.attendanceModel.create(attendance);
           });

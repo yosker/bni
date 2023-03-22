@@ -9,6 +9,7 @@ import { Users, UsersSchema } from 'src/users/schemas/users.schema';
 import { UsersModule } from 'src/users/users.module';
 import { ChapterSessionsModule } from 'src/chapter-sessions/chapter-sessions.module';
 import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessions.schema';
+import { PaginateResult } from 'src/shared/pagination/pagination-result';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -27,6 +28,7 @@ import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessio
     ServicesResponse,
     UsersModule,
     ChapterSessionsModule,
+    PaginateResult,
   ],
 })
 export class AttendanceModule {}
