@@ -6,6 +6,7 @@ import {
   UseGuards,
   Param,
   Res,
+  Query,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { AttendanceDTO } from './dto/attendance.dto';
@@ -15,6 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { PaginationParams } from 'src/shared/pagination/paginationParams';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -55,6 +57,22 @@ export class AttendanceController {
       chapterId,
       sessionDate,
       res,
+    );
+  }
+
+  @Get('/noAttendances/:attendaceDate')
+  async getNoAttendances(
+    @Param('attendaceDate') attendaceDate: string,
+    @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
+    @Query() { skip, limit }: PaginationParams,
+  ) {
+    return await this.attendanceService.getNoAttendances(
+      attendaceDate,
+      res,
+      jwtPayload,
+      skip,
+      limit,
     );
   }
 }

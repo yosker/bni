@@ -3,7 +3,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { S3 } from 'aws-sdk';
-import { boolean } from 'joi';
+
 const generateSafeId = require('generate-safe-id');
 
 @Injectable()
@@ -21,7 +21,7 @@ export class SharedService {
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
-  ) { }
+  ) {}
 
   /**
    * @description Genera un password aleatorio
@@ -116,19 +116,31 @@ export class SharedService {
     return { statusCode, message, result };
   }
 
-
   async validatePermissions(page: string, role: string) {
-
-    let response = false; 
+    let response = false;
     try {
-      const arrMemberships = ['usersform','userslist','visitorslist','activitiesform']
-      const arrPresident = ['usersform','userslist','visitorslist','emailaccounts','evaluationperiod','activities','interviewslist','absencesform']
+      const arrMemberships = [
+        'usersform',
+        'userslist',
+        'visitorslist',
+        'activitiesform',
+      ];
+      const arrPresident = [
+        'usersform',
+        'userslist',
+        'visitorslist',
+        'emailaccounts',
+        'evaluationperiod',
+        'activities',
+        'interviewslist',
+        'absencesform',
+      ];
 
       if (role == 'Presidente') {
         const includePage = arrPresident.includes(page);
-        response = includePage ? true : false; 
+        response = includePage ? true : false;
       }
-    } catch (err) { }
+    } catch (err) {}
     return response;
   }
 }

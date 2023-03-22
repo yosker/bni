@@ -2,7 +2,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Attendance } from './interfaces/attendance.interfaces';
 import { AttendanceDTO } from './dto/attendance.dto';
 import { ServicesResponse } from '../responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
@@ -15,16 +14,18 @@ const ObjectId = require('mongodb').ObjectId;
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
+import { PaginateResult } from 'src/shared/pagination/pagination-result';
 
 @Injectable()
 export class AttendanceService {
   constructor(
     @InjectModel('Attendance')
-    private readonly attendanceModel: Model<Attendance>,
+    private readonly attendanceModel: Model<any>,
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     @InjectModel('ChapterSession')
     private readonly chapterSessionModel: Model<ChapterSession>,
     private readonly servicesResponse: ServicesResponse,
+    private readonly paginateResult: PaginateResult,
   ) {}
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
@@ -209,7 +210,7 @@ export class AttendanceService {
   }
 
   //PIPELINE PARA REGRESAR LOS DATOS DEL USUARIO (NETWORKER) CUANDO SE REGISTRA
-  async AttendanceResult(
+  private async AttendanceResult(
     chapterId: object,
     attendaceDate: string,
     userId: object,
@@ -268,5 +269,111 @@ export class AttendanceService {
         'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
       );
     }
+  }
+
+  async getNoAttendances(
+    attendaceDate: string,
+    res: Response,
+    jwtPayload: JWTPayload,
+    skip = 0,
+    limit?: number,
+  ) {
+    try {
+      const pipeline: any = await this.noAttendanceResult(
+        jwtPayload.idChapter,
+        attendaceDate,
+        attendaceDate,
+        skip,
+        limit,
+      );
+
+      const noAttendances = await this.attendanceModel.aggregate(pipeline);
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: await this.paginateResult.getResult(noAttendances),
+        total: await this.paginateResult.getTotalResults(noAttendances),
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+  private async noAttendanceResult(
+    chapterId: string,
+    lteAttendaceDate: string,
+    gteAttendaceDate: string,
+    skip: number,
+    limit: number,
+  ) {
+    const lte = moment(lteAttendaceDate).add(24, 'h').toISOString();
+    const gte = moment(gteAttendaceDate).add(-6, 'M').toISOString();
+    const filter = {
+      chapterId: ObjectId(chapterId),
+      createdAt: {
+        $lte: new Date(lte),
+        $gte: new Date(gte),
+      },
+      attended: false,
+    };
+
+    return [
+      {
+        $match: filter,
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'usersData',
+        },
+      },
+      {
+        $unwind: '$usersData',
+      },
+      {
+        $match: {
+          'usersData.role': {
+            $nin: ['Visitante'],
+          },
+        },
+      },
+      {
+        $project: {
+          _id: '$usersData._id',
+          attendanceDate: '$attendanceDate',
+          attended: '$attended',
+          name: '$usersData.name',
+          lastName: '$usersData.lastName',
+          companyName: '$usersData.companyName',
+          role: '$usersData.role',
+        },
+      },
+      {
+        $sort: {
+          attendanceDate: 1,
+        },
+      },
+      {
+        $facet: {
+          metadata: [{ $count: 'total' }],
+          data: [
+            {
+              $skip: skip > 0 ? (skip - 1) * limit : 0,
+            },
+            { $limit: limit },
+          ],
+        },
+      },
+    ];
   }
 }
