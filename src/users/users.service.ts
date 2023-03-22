@@ -25,7 +25,7 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -110,13 +110,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-              await this.sharedService.uploadFile(
-                dataBuffer,
-                filename,
-                '.jpg',
-                's3-bucket-users',
-              )
-            ).result
+            await this.sharedService.uploadFile(
+              dataBuffer,
+              filename,
+              '.jpg',
+              's3-bucket-users',
+            )
+          ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -352,6 +352,95 @@ export class UsersService {
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
         result: users,
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+  //ENDPOINT PARA ACTUALIZAR LA URL DE LA SOLICIUD
+  async updateAplicationField(
+    id: string,
+    req,
+    dataBuffer: Buffer,
+    filename: string,
+    res: Response,
+  ) {
+    try {
+
+      const userDTO = await this.usersModel.findOne(
+        {
+          _id: ObjectId(id),
+        },
+      );
+
+      if (!userDTO)
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(
+            new HttpException(
+              'Lo sentimos, invitado no encontrado.',
+              HttpStatus.BAD_REQUEST,
+            ),
+          );
+
+      let s3Response = '';
+      
+      let now= new Date();
+      if (filename != 'default') {
+        s3Response = await (await this.sharedService.uploadFile(dataBuffer,   now.getTime() +'_'+ filename, '', 's3-bucket-users')).result.toString();
+        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+      } else {
+        if (req.deleteFile == 1) {
+          await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+          s3Response = '';
+        } else {
+          s3Response = req.urlFile;
+        }
+      }
+
+      await this.usersModel.updateOne(
+        {
+          _id: ObjectId(id),
+        },
+        {
+          completedApplication: s3Response,
+        },
+      );
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+   //ENDPOINT QUE REGRESA LA URL DE ARCHIVO (SOLICITUD)
+   async getApplicationFile(id: string, res: Response): Promise<Response> {
+    try {
+      const user = await this.usersModel.findById({ _id: ObjectId(id) });
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: user.completedApplication,
       });
     } catch (err) {
       throw res

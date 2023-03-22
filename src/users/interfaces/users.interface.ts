@@ -13,7 +13,7 @@ export interface User extends Document {
   profession: string;
   createdAt: Date;
   status: string;
-  completedApplication: boolean;
+  completedApplication: string;
   completedInterview: boolean;
   invitedBy: string;
   accepted: boolean;

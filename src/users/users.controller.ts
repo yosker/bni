@@ -25,10 +25,10 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @ApiBearerAuth()
-  @Role('Admin')
+  // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
   @Post('/create')
   @UseInterceptors(FileInterceptor('file'))
@@ -46,7 +46,7 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  @Role('Admin')
+  // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
   @Patch('/updateUser')
   @UseInterceptors(FileInterceptor('file'))
@@ -64,7 +64,7 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  @Role('Admin')
+  // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
   @Post('/createVistor')
   async createVisotors(
@@ -75,7 +75,7 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  @Role('Admin')
+  // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('/networkersList/:chapterId/:role')
   @ApiBearerAuth()
@@ -89,7 +89,7 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  @Role('Admin')
+  // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('/userById/:id')
   findOne(@Param('id') id: string, @Res() res: Response) {
@@ -97,7 +97,7 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  @Role('Admin')
+  // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('auhtuser')
   findAuth(@Auth() jwtPayload: JWTPayload) {
@@ -115,7 +115,7 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  @Role('Admin')
+  // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('/deleteUser/:userId')
   delete(@Param('userId') userId: string, @Res() res: Response) {
@@ -123,10 +123,40 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  @Role('Admin')
+  // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('/findAllMembership')
   findAllMembership(@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
     return this.usersService.findUsersMembership(jwtPayload, res);
   }
+
+
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), JwtGuard)
+  @Patch('/updateAplicationFile/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateAplication(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+    @Res() res: Response,
+  ): Promise<any> {
+    return await this.usersService.updateAplicationField(
+      id,
+      req.body,
+      file.buffer,
+      file.originalname,
+      res,
+    );
+  }
+
+  @Get('/getApplicationFile/:id')
+  findApplicationFile(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return this.usersService.getApplicationFile(id, res);
+  }
+
 }

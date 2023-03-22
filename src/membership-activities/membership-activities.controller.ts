@@ -29,7 +29,7 @@ import { CreateMembershipActivityDto } from './dto/create-membership-activity.dt
 export class MembershipActivitiesController {
   constructor(
     private readonly membershipActivitiesService: MembershipActivitiesService,
-  ) {}
+  ) { }
 
   @Post()
   create(
@@ -98,10 +98,7 @@ export class MembershipActivitiesController {
     return await this.membershipActivitiesService.delete(id, res);
   }
 
-
-  
   //SERVICIOS PARA LAS ACTIVIDADES DEL COMITE DE MEMBRESIAS (POR USUARIO)
-
   @Get('/activitiesByUser/:date')
   findAllActivitiesByUser(
     @Param('date') date: string,
@@ -110,8 +107,4 @@ export class MembershipActivitiesController {
   ) {
     return this.membershipActivitiesService.findUserActivities(jwtPayload, date, res);
   }
-
-
-
-
 }

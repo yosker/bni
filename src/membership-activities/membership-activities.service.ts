@@ -261,8 +261,6 @@ export class MembershipActivitiesService {
 
   async findUserActivities(jwtPayload: JWTPayload, date: string, res: Response) {
     try {
-
-
       const activities = await this.membershipActivity
         .find({
           chapterId: ObjectId(jwtPayload.idChapter),

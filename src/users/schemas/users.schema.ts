@@ -45,8 +45,8 @@ export class Users {
   @Prop({ type: 'string' })
   profession: string;
 
-  @Prop({ type: 'boolean' })
-  completedApplication: boolean;
+  @Prop({ type: 'string' })
+  completedApplication: string;
 
   @Prop({ type: 'boolean' })
   completedInterview: boolean;

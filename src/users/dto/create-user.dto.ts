@@ -100,9 +100,9 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Solicitud Completada.',
   })
-  @IsNotEmpty()
-  @IsBoolean()
-  completedApplication = false;
+
+  @Prop({ default: '', required: false })
+  completedApplication: string;
 
   @ApiProperty({
     example: 'Entrevista Completada.',
