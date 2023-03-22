@@ -7,6 +7,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
 import * as moment from 'moment';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
+import { User } from 'src/users/interfaces/users.interface';
+import { Users } from 'src/users/schemas/users.schema';
+import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
+import { AttendanceType } from 'src/shared/enums/attendance.enum';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -16,6 +20,9 @@ export class ChapterSessionsService {
     @InjectModel('ChapterSession')
     private readonly chapterSessionModel: Model<ChapterSession>,
     private servicesResponse: ServicesResponse,
+    @InjectModel(Users.name) private readonly usersModel: Model<User>,
+    @InjectModel('Attendance')
+    private readonly attendanceModel: Model<Attendance>,
   ) {}
 
   //ENDPOINT PARA LA CREACION MANUAL DE SESIONES POR CAPITULO
@@ -36,7 +43,39 @@ export class ChapterSessionsService {
       };
 
       if (findSession == null) {
-        await this.chapterSessionModel.create(chapterSessionDTO);
+        const dateString = chapterSessionDTO.sessionDate;
+        const dateObject = new Date(dateString);
+
+        // TODO: Se agregan 6 horas por la zona horaria MX, revisar en caso de cambiar de país
+        chapterSessionDTO.sessionChapterDate = moment(dateObject)
+          .add(6, 'h')
+          .toISOString();
+
+        const dateSplit = chapterSessionDTO.sessionDate.split('-');
+        chapterSessionDTO.sessionDate =
+          dateSplit[2] + '-' + dateSplit[1] + '-' + dateSplit[0];
+        const chapterSession = await this.chapterSessionModel.create(
+          chapterSessionDTO,
+        );
+
+        if (chapterSession) {
+          const usersChapter = await this.usersModel.find({
+            idChapter: ObjectId(chapterSessionDTO.chapterId),
+          });
+
+          const currentDate = moment().format('DD-MM-YYYY');
+          usersChapter.forEach(async (user) => {
+            const attendance: any = {
+              chapterId: ObjectId(user.idChapter),
+              chapterSessionId: Object(chapterSession._id),
+              userId: ObjectId(user._id),
+              attended: false,
+              attendanceType: AttendanceType.OnSite,
+              attendanceDate: currentDate,
+            };
+            await this.attendanceModel.create(attendance);
+          });
+        }
       } else {
         return res
           .status(HttpStatus.BAD_REQUEST)

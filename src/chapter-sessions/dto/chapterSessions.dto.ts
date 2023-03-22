@@ -7,21 +7,20 @@ import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class ChapterSessionDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
-    example: 'Id del capitulo.',
+    example: 'Id del capitulo. 6419d3a580048dea06ab4203',
   })
   @IsNotEmpty()
   chapterId: object;
 
   @ApiProperty({
-    example: 'Fecha de la sesión.',
+    example: 'Fecha de la sesión. 15-03-2023',
   })
   @IsNotEmpty()
   @IsString()
   sessionDate: string;
 
-  @ApiProperty({
-    example: 'Estatus del Registro.',
-  })
+  sessionChapterDate: string;
+
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;
 }

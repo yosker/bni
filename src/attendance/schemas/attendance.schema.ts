@@ -3,7 +3,9 @@ import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export const AttendanceSchema = new Schema({
   chapterId: { type: Object, required: true },
+  chapterSessionId: { type: Object, required: true },
   userId: { type: Object, required: true },
+  attended: { type: Boolean, default: false, required: false },
   attendanceType: { type: String, required: true },
   attendanceDate: { type: String, required: false },
   createdAt: {

@@ -6,7 +6,6 @@ import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 export class AttendanceDTO extends PartialType(RegisterAuthDto) {
-  
   @ApiProperty({
     example: 'Id del Capitulo.',
   })
@@ -14,12 +13,12 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   chapterId: object;
 
-  @ApiProperty({
-    example: 'Id del Usuario.',
-  })
-  @IsNotEmpty()
-  @IsString()
+  chapterSessionId: object;
+
   userId: object;
+
+  @Prop({ default: false, required: false })
+  attended: boolean;
 
   @ApiProperty({
     example: 'Tipo de asistencia.',
@@ -28,10 +27,6 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   attendanceType: string;
 
-  @ApiProperty({
-    example: 'Fecha de asistencia.',
-  })
-  @Prop({ default: '', required: false })
   attendanceDate: string;
 
   @Prop({ default: now(), required: false })
