@@ -392,10 +392,10 @@ export class UsersService {
           );
 
       let s3Response = '';
-      
-      let now= new Date();
+
+      let now = new Date();
       if (filename != 'default') {
-        s3Response = await (await this.sharedService.uploadFile(dataBuffer,   now.getTime() +'_'+ filename, '', 's3-bucket-users')).result.toString();
+        s3Response = await (await this.sharedService.uploadFile(dataBuffer, now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
         await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
       } else {
         if (req.deleteFile == 1) {
@@ -432,8 +432,8 @@ export class UsersService {
     }
   }
 
-   //ENDPOINT QUE REGRESA LA URL DE ARCHIVO (SOLICITUD)
-   async getApplicationFile(id: string, res: Response): Promise<Response> {
+  //ENDPOINT QUE REGRESA LA URL DE ARCHIVO (SOLICITUD)
+  async getApplicationFile(id: string, res: Response): Promise<Response> {
     try {
       const user = await this.usersModel.findById({ _id: ObjectId(id) });
 
