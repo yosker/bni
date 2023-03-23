@@ -10,11 +10,11 @@ import {
   UseInterceptors,
   UploadedFile,
   Request,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Role } from '../auth/decorators/Role.decorator';
 import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
@@ -25,7 +25,7 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @ApiBearerAuth()
   // @Role('Admin')
@@ -117,9 +117,13 @@ export class UsersController {
   @ApiBearerAuth()
   // @Role('Admin')
   @UseGuards(AuthGuard(), JwtGuard)
-  @Get('/deleteUser/:userId')
-  delete(@Param('userId') userId: string, @Res() res: Response) {
-    return this.usersService.delete(userId, res);
+  @Delete('/deleteUser/:userId/:chapterId')
+  delete(
+    @Param('userId') userId: string,
+    @Param('chapterId') chapterId: string,
+    @Res() res: Response,
+  ) {
+    return this.usersService.delete(userId, chapterId, res);
   }
 
   @ApiBearerAuth()
@@ -129,8 +133,6 @@ export class UsersController {
   findAllMembership(@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
     return this.usersService.findUsersMembership(jwtPayload, res);
   }
-
-
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), JwtGuard)
@@ -152,11 +154,7 @@ export class UsersController {
   }
 
   @Get('/getApplicationFile/:id')
-  findApplicationFile(
-    @Param('id') id: string,
-    @Res() res: Response,
-  ) {
+  findApplicationFile(@Param('id') id: string, @Res() res: Response) {
     return this.usersService.getApplicationFile(id, res);
   }
-
 }

@@ -12,6 +12,8 @@ import { RolesModule } from 'src/roles/roles.module';
 import { Roles, RolesSchema } from 'src/roles/schemas/roles.schema';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
 import { SharedService } from 'src/shared/shared.service';
+import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessions.schema';
+import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
 
 @Module({
   imports: [
@@ -20,12 +22,12 @@ import { SharedService } from 'src/shared/shared.service';
         name: Users.name,
         schema: UsersSchema,
       },
-    ]),
-    MongooseModule.forFeature([
       {
         name: Roles.name,
         schema: RolesSchema,
       },
+      { name: 'ChapterSession', schema: ChapterSessionSchema },
+      { name: 'Attendance', schema: AttendanceSchema },
     ]),
     AuthModule,
     PassportModule.register({
