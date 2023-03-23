@@ -9,6 +9,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { jwtConstants } from 'src/auth/jwt.constants';
 import { ServicesResponse } from 'src/responses/response';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
+import { Users, UsersSchema } from 'src/users/schemas/users.schema';
 
 @Module({
   imports: [
@@ -16,6 +17,12 @@ import { JwtStrategy } from 'src/auth/jwt.strategy';
       {
         name: References.name,
         schema: ReferencesSchema,
+      },
+    ]),
+    MongooseModule.forFeature([
+      {
+        name: Users.name,
+        schema: UsersSchema,
       },
     ]),
     AuthModule,

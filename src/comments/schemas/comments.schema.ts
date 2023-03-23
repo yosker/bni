@@ -11,6 +11,9 @@ export class Comments {
   @Prop({ type: 'object' })
   userId: object;
 
+  @Prop({ type: 'object' })
+  userInterviewId: object;
+
   @Prop({ type: 'string' })
   comment: string;
 

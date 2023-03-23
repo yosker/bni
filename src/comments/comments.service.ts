@@ -61,9 +61,9 @@ export class CommentsService {
     });
   }
 
-  async findOne(id: string, res: Response) {
+  async findOne(userInterviewId: string, res: Response) {
     const comment = await this.commentModel.findOne({
-      _id: ObjectId(id),
+      userInterviewId: ObjectId(userInterviewId),
     });
 
     if (!comment)

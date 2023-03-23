@@ -31,6 +31,9 @@ export class UsersInterviewsService {
     createUsersInterviewDto.interviewId = ObjectId(
       createUsersInterviewDto.interviewId,
     );
+    createUsersInterviewDto.userInterviewId = ObjectId(
+      createUsersInterviewDto.userInterviewId,
+    );
     const interviewUser = await this.usersInterview.create(
       createUsersInterviewDto,
     );
@@ -52,7 +55,7 @@ export class UsersInterviewsService {
 
   async findOne(id: string) {
     return this.usersInterview.findOne({
-      interviewId: ObjectId(id),
+      userInterviewId: ObjectId(id),
     });
   }
 }

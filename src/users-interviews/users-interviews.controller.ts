@@ -45,8 +45,8 @@ export class UsersInterviewsController {
     return this.usersInterviewsService.findAll(skip, limit);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersInterviewsService.findOne(id);
+  @Get(':userInterviewId')
+  findOne(@Param('userInterviewId') userInterviewId: string) {
+    return this.usersInterviewsService.findOne(userInterviewId);
   }
 }

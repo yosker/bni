@@ -26,6 +26,9 @@ export class ReferencesService {
     createReferenceDto.chapterId = ObjectId(jwtPayload.idChapter);
     createReferenceDto.userId = ObjectId(jwtPayload.id);
     createReferenceDto.interviewId = ObjectId(createReferenceDto.interviewId);
+    createReferenceDto.userInterviewId = ObjectId(
+      createReferenceDto.userInterviewId,
+    );
     const interviewUser = await this.referenceModel.create(createReferenceDto);
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
@@ -43,9 +46,9 @@ export class ReferencesService {
     return query;
   }
 
-  async findOne(id: string) {
+  async findOne(userInterviewId: string) {
     return this.referenceModel.findOne({
-      interviewId: ObjectId(id),
+      userInterviewId: ObjectId(userInterviewId),
     });
   }
 }

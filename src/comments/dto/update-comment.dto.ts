@@ -7,10 +7,16 @@ export class UpdateCommentDto extends PartialType(CreateCommentDto) {
   createdBy: object;
 
   @ApiProperty({
-    example: 'Usuario invitado.',
+    example: 'Usuario que Comenta.',
   })
   @IsNotEmpty()
   userId: object;
+
+  @ApiProperty({
+    example: 'Id Usuario invitado.',
+  })
+  @IsNotEmpty()
+  userInterviewId: object;
 
   @ApiProperty({
     example: 'Comentario del usuario.',
@@ -22,7 +28,7 @@ export class UpdateCommentDto extends PartialType(CreateCommentDto) {
     example: 'Aceptado Si-No.',
   })
   @IsBoolean()
-  accepted: boolean ;
+  accepted: boolean;
 
   @ApiProperty({
     example: 'Fecha de Actualizaación del Registro.',

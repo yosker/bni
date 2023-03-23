@@ -39,8 +39,8 @@ export class ReferencesController {
     return this.referencesService.findAll(skip, limit);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.referencesService.findOne(id);
+  @Get(':userInterviewId')
+  findOne(@Param('userInterviewId') userInterviewId: string) {
+    return this.referencesService.findOne(userInterviewId);
   }
 }
