@@ -26,7 +26,7 @@ export class AttendanceService {
     private readonly chapterSessionModel: Model<ChapterSession>,
     private readonly servicesResponse: ServicesResponse,
     private readonly paginateResult: PaginateResult,
-  ) { }
+  ) {}
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
   async create(
@@ -309,14 +309,14 @@ export class AttendanceService {
     skip: number,
     limit: number,
   ) {
-    let now = new Date();
+    const now = new Date();
     const gte = moment(now).add(-6, 'M').toISOString();
     const filter = {
       chapterId: ObjectId(chapterId),
       createdAt: {
         $gte: new Date(gte),
       },
-      attended: false,  
+      attended: false,
     };
 
     return [
@@ -350,14 +350,13 @@ export class AttendanceService {
           name: '$usersData.name',
           lastName: '$usersData.lastName',
           companyName: '$usersData.companyName',
-          letterSent: '$letterSent'
+          letterSent: '$letterSent',
         },
       },
       {
         $sort: {
           name: 1,
           attendanceDate: 1,
-
         },
       },
       {
@@ -379,13 +378,11 @@ export class AttendanceService {
     jwtPayload: JWTPayload,
     res: Response,
   ): Promise<Response> {
-
     try {
-
       await this.attendanceModel.updateOne(
         {
           _id: ObjectId(id),
-          chapterId: ObjectId(jwtPayload.idChapter)
+          chapterId: ObjectId(jwtPayload.idChapter),
         },
         {
           letterSent: true,
@@ -397,7 +394,6 @@ export class AttendanceService {
         message: this.servicesResponse.message,
         result: {},
       });
-
     } catch (error) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)

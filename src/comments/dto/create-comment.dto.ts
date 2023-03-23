@@ -6,10 +6,16 @@ export class CreateCommentDto {
   createdBy: object;
 
   @ApiProperty({
-    example: 'Usuario invitado.',
+    example: 'Id Usuario invitado.',
   })
   @IsNotEmpty()
   userId: object;
+
+  @ApiProperty({
+    example: 'Id Usuario Invitado.',
+  })
+  @IsNotEmpty()
+  userInterviewId: object;
 
   @ApiProperty({
     example: 'Id de entrevista.',

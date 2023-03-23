@@ -14,9 +14,13 @@ import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
+import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
+import { AttendanceType } from 'src/shared/enums/attendance.enum';
 
 const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -25,7 +29,11 @@ export class UsersService {
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
-  ) { }
+    @InjectModel('ChapterSession')
+    private readonly chapterSessionModel: Model<ChapterSession>,
+    @InjectModel('Attendance')
+    private readonly attendanceModel: Model<Attendance>,
+  ) {}
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -110,13 +118,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-            await this.sharedService.uploadFile(
-              dataBuffer,
-              filename,
-              '.jpg',
-              's3-bucket-users',
-            )
-          ).result
+              await this.sharedService.uploadFile(
+                dataBuffer,
+                filename,
+                '.jpg',
+                's3-bucket-users',
+              )
+            ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -146,6 +154,9 @@ export class UsersService {
       //   };
       //   await this.sharedService.sendEmail(emailProperties);
       // }
+
+      //Setea las fechas de sesion del usuario
+      await this.setUserSessions(newUser._id, newUser.idChapter.toString());
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -374,12 +385,9 @@ export class UsersService {
     res: Response,
   ) {
     try {
-
-      const userDTO = await this.usersModel.findOne(
-        {
-          _id: ObjectId(id),
-        },
-      );
+      const userDTO = await this.usersModel.findOne({
+        _id: ObjectId(id),
+      });
 
       if (!userDTO)
         return res
@@ -395,11 +403,24 @@ export class UsersService {
 
       let now = new Date();
       if (filename != 'default') {
-        s3Response = await (await this.sharedService.uploadFile(dataBuffer, now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
-        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            now.getTime() + '_' + filename,
+            '',
+            's3-bucket-users',
+          )
+        ).result.toString();
+        await this.sharedService.deleteObjectFromS3(
+          's3-bucket-users',
+          req.urlFile,
+        );
       } else {
         if (req.deleteFile == 1) {
-          await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+          await this.sharedService.deleteObjectFromS3(
+            's3-bucket-users',
+            req.urlFile,
+          );
           s3Response = '';
         } else {
           s3Response = req.urlFile;
@@ -451,6 +472,31 @@ export class UsersService {
             HttpStatus.INTERNAL_SERVER_ERROR,
           ),
         );
+    }
+  }
+
+  private async setUserSessions(userId: string, chapterId: string) {
+    try {
+      const chapterSessions = await this.chapterSessionModel.find({
+        sessionChapterDate: {
+          $gte: new Date().toISOString(),
+        },
+      });
+
+      chapterSessions.forEach(async (session) => {
+        const attendance: any = {
+          chapterId: ObjectId(chapterId),
+          chapterSessionId: Object(session._id),
+          userId: ObjectId(userId),
+          attended: false,
+          attendanceType: AttendanceType.OnSite,
+          attendanceDate: session.sessionDate,
+          createdAt: new Date().toISOString(),
+        };
+        await this.attendanceModel.create(attendance);
+      });
+    } catch {
+      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
     }
   }
 }
