@@ -26,7 +26,7 @@ export class AttendanceService {
     private readonly chapterSessionModel: Model<ChapterSession>,
     private readonly servicesResponse: ServicesResponse,
     private readonly paginateResult: PaginateResult,
-  ) {}
+  ) { }
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
   async create(
@@ -272,7 +272,6 @@ export class AttendanceService {
   }
 
   async getNoAttendances(
-    attendaceDate: string,
     res: Response,
     jwtPayload: JWTPayload,
     skip = 0,
@@ -281,8 +280,6 @@ export class AttendanceService {
     try {
       const pipeline: any = await this.noAttendanceResult(
         jwtPayload.idChapter,
-        attendaceDate,
-        attendaceDate,
         skip,
         limit,
       );
@@ -309,20 +306,17 @@ export class AttendanceService {
 
   private async noAttendanceResult(
     chapterId: string,
-    lteAttendaceDate: string,
-    gteAttendaceDate: string,
     skip: number,
     limit: number,
   ) {
-    const lte = moment(lteAttendaceDate).add(24, 'h').toISOString();
-    const gte = moment(gteAttendaceDate).add(-6, 'M').toISOString();
+    let now = new Date();
+    const gte = moment(now).add(-6, 'M').toISOString();
     const filter = {
       chapterId: ObjectId(chapterId),
       createdAt: {
-        $lte: new Date(lte),
         $gte: new Date(gte),
       },
-      attended: false,
+      attended: false,  
     };
 
     return [
@@ -349,18 +343,21 @@ export class AttendanceService {
       },
       {
         $project: {
-          _id: '$usersData._id',
+          _id: '$_id',
+          userId: '$usersData._id',
           attendanceDate: '$attendanceDate',
           attended: '$attended',
           name: '$usersData.name',
           lastName: '$usersData.lastName',
           companyName: '$usersData.companyName',
-          role: '$usersData.role',
+          letterSent: '$letterSent'
         },
       },
       {
         $sort: {
+          name: 1,
           attendanceDate: 1,
+
         },
       },
       {
@@ -375,5 +372,41 @@ export class AttendanceService {
         },
       },
     ];
+  }
+
+  async sendLetter(
+    id: string,
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
+
+    try {
+
+      await this.attendanceModel.updateOne(
+        {
+          _id: ObjectId(id),
+          chapterId: ObjectId(jwtPayload.idChapter)
+        },
+        {
+          letterSent: true,
+        },
+      );
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 }

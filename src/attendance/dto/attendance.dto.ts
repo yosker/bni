@@ -29,6 +29,9 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
 
   attendanceDate: string;
 
+  @Prop({ default: false, required: false })
+  letterSent:boolean
+
   createdAt?: Date;
 
   @Prop({ default: now(), required: false })

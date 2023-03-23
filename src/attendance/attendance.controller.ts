@@ -23,7 +23,7 @@ import { PaginationParams } from 'src/shared/pagination/paginationParams';
 @ApiTags('Attendance')
 @Controller('attendance')
 export class AttendanceController {
-  constructor(private attendanceService: AttendanceService) {}
+  constructor(private attendanceService: AttendanceService) { }
 
   @Post('/create')
   async create(
@@ -60,19 +60,27 @@ export class AttendanceController {
     );
   }
 
-  @Get('/noAttendances/:attendaceDate')
+  @Get('/noAttendances/')
   async getNoAttendances(
-    @Param('attendaceDate') attendaceDate: string,
     @Res() res: Response,
     @Auth() jwtPayload: JWTPayload,
-    @Query() { skip, limit }: PaginationParams,
+    @Query() { skip = 0, limit = 200 }: PaginationParams,
   ) {
     return await this.attendanceService.getNoAttendances(
-      attendaceDate,
       res,
       jwtPayload,
       skip,
       limit,
     );
+  }
+
+  @Get('/updateLetter/:id')
+  async updatLetterSend(
+    @Param('id') id: string,
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response,
+
+  ) {
+    return await this.attendanceService.sendLetter(id, jwtPayload, res);
   }
 }
