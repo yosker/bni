@@ -155,8 +155,11 @@ export class UsersService {
       //   await this.sharedService.sendEmail(emailProperties);
       // }
 
-      //Setea las fechas de sesion del usuario
-      await this.setUserSessions(newUser._id, newUser.idChapter.toString());
+      if (newUser.role.toLowerCase() != 'visitante') {
+        //Setea las fechas de sesion del usuario
+        await this.setUserSessions(newUser._id, newUser.idChapter.toString());
+      }
+
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
