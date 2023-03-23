@@ -3,6 +3,7 @@ import { References } from './references.interface';
 
 export interface UsersInterview extends Document {
   userId: object;
+  userInterviewId: object;
   chapterId: object;
   interviewId: object;
   references: References;

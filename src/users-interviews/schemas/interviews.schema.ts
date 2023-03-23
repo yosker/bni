@@ -10,6 +10,9 @@ export class UsersInterviews {
   userId: object;
 
   @Prop({ type: 'object' })
+  userInterviewId: object;
+
+  @Prop({ type: 'object' })
   chapterId: object;
 
   @Prop({ type: 'object' })

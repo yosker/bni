@@ -11,7 +11,7 @@ export class UpdateUsersInterviewDto extends PartialType(
     example: 'Id de Usuario Invitado.',
   })
   @IsNotEmpty()
-  userId: object;
+  userInterviewId: object;
 
   @ApiProperty({
     example: 'Id de Capítulo.',

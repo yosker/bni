@@ -9,6 +9,12 @@ export class CreateUsersInterviewDto {
   chapterId: object;
 
   @ApiProperty({
+    example: 'Id de Usuario Entrevistado.',
+  })
+  @IsNotEmpty()
+  userInterviewId: object;
+
+  @ApiProperty({
     example: 'Id de Entrevista.',
   })
   @IsNotEmpty()

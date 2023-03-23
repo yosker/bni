@@ -4,21 +4,20 @@ import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class NetinterviewDTO {
-   
-    chapterId: object;
-    createdBy: string;
-   
-    @ApiProperty({
-        example: 'Id del networker.',
-    })
-    @IsNotEmpty()
-    userId: object;
+  chapterId: object;
+  createdBy: string;
 
-    @ApiProperty({
-        example: 'Fuerza 1.',
-    })
-    @IsString()
-    strength1: string;
+  @ApiProperty({
+    example: 'Id del networker.',
+  })
+  @IsNotEmpty()
+  userId: object;
+
+  @ApiProperty({
+    example: 'Fuerza 1.',
+  })
+  @IsString()
+  strength1: string;
 
   @ApiProperty({
     example: 'Fuerza 2.',
@@ -26,18 +25,17 @@ export class NetinterviewDTO {
   @IsString()
   strength2: string;
 
-    @ApiProperty({
-        example: 'Desarrollo 1.',
-    })
-    @IsString()
-    growth1: string;
+  @ApiProperty({
+    example: 'Desarrollo 1.',
+  })
+  @IsString()
+  growth1: string;
 
-    
-    @ApiProperty({
-        example: 'Desarrollo 2.',
-    })
-    @IsString()
-    growth2: string;
+  @ApiProperty({
+    example: 'Desarrollo 2.',
+  })
+  @IsString()
+  growth2: string;
 
   @ApiProperty({
     example: 'Tipo de entrevista.',
