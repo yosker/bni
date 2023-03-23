@@ -1,14 +1,9 @@
-export interface References {
+export interface IReference {
   name: string;
-  business: string;
   relationShip: string;
   position: string;
   phoneNumber: string;
   email: string;
-  questions: Questions;
-}
-
-interface Questions {
   question1: string;
   question2: string;
   question3: string;

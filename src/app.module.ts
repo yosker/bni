@@ -22,6 +22,7 @@ import { MembershipActivitiesModule } from './membership-activities/membership-a
 import { EvaluationPeriodModule } from './evaluation-period/evaluation-period.module';
 import { UsersInterviewsModule } from './users-interviews/users-interviews.module';
 import { LettersModule } from './letters/letters.module';
+import { ReferencesModule } from './references/references.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { LettersModule } from './letters/letters.module';
     EvaluationPeriodModule,
     UsersInterviewsModule,
     LettersModule,
+    ReferencesModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],

@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Res,
   Query,
@@ -11,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { UsersInterviewsService } from './users-interviews.service';
 import { CreateUsersInterviewDto } from './dto/create-users-interview.dto';
-import { UpdateUsersInterviewDto } from './dto/update-users-interview.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { PaginationParams } from 'src/shared/pagination/paginationParams';
@@ -51,5 +49,4 @@ export class UsersInterviewsController {
   findOne(@Param('id') id: string) {
     return this.usersInterviewsService.findOne(id);
   }
-
 }

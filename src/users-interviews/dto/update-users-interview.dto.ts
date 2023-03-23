@@ -1,7 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
-import { References } from '../interfaces/references.interface';
 import { CreateUsersInterviewDto } from './create-users-interview.dto';
 
 export class UpdateUsersInterviewDto extends PartialType(
@@ -26,12 +25,6 @@ export class UpdateUsersInterviewDto extends PartialType(
   @IsNotEmpty()
   @IsString()
   interviewId: object;
-
-  @ApiProperty({
-    example: 'Referencias del Usuario Invitado (solo 2 obligatorios).',
-  })
-  @IsNotEmpty()
-  references: References;
 
   @ApiProperty({
     example: 'Nombre del Candidato.',

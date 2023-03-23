@@ -1,12 +1,9 @@
 import { Prop } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { CreateReferenceDto } from './create-reference.dto';
 
-export class CreateUsersInterviewDto {
-  userId: object;
-
-  chapterId: object;
-
+export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
   @ApiProperty({
     example: 'Id de Usuario Entrevistado.',
   })
@@ -24,28 +21,35 @@ export class CreateUsersInterviewDto {
   })
   @IsNotEmpty()
   @IsString()
-  candidate: string;
+  name: string;
 
   @ApiProperty({
-    example: 'Nombre de Empresa.',
+    example: 'Relación con el Networker.',
   })
   @IsNotEmpty()
   @IsString()
-  company: string;
+  relationShip: string;
 
   @ApiProperty({
-    example: 'Especialidad/Giro de la Empresa.',
+    example: 'Relación con el Networker.',
   })
   @IsNotEmpty()
   @IsString()
-  specialty: string;
+  position: string;
 
   @ApiProperty({
-    example: 'Fecha de Entrevista.',
+    example: 'Teléfono.',
   })
   @IsNotEmpty()
-  @Prop({ default: new Date() })
-  dateOfInterview: Date = new Date();
+  @IsString()
+  phoneNumber: string;
+
+  @ApiProperty({
+    example: 'Email.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  email: string;
 
   @ApiProperty({
     example: 'Pregunta 1.',
@@ -72,8 +76,8 @@ export class CreateUsersInterviewDto {
     example: 'Pregunta 4.',
   })
   @IsNotEmpty()
-  @IsArray()
-  question4: number[];
+  @IsString()
+  question4: string;
 
   @ApiProperty({
     example: 'Pregunta 5.',
@@ -93,51 +97,9 @@ export class CreateUsersInterviewDto {
     example: 'Pregunta 7.',
   })
   @IsNotEmpty()
-  @IsArray()
-  question7: number[];
-
-  @ApiProperty({
-    example: 'Pregunta 8.',
-  })
-  @IsNotEmpty()
   @IsString()
-  question8: string;
-
-  @ApiProperty({
-    example: 'Pregunta 9.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  question9: string;
-
-  @ApiProperty({
-    example: 'Pregunta 10.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  question10: string;
-
-  @ApiProperty({
-    example: 'Pregunta 11.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  question11: string;
-
-  @ApiProperty({
-    example: 'Pregunta 12.',
-  })
-  @IsNotEmpty()
-  @IsArray()
-  question12: number[];
-
-  @ApiProperty({
-    example: 'Pregunta 13.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  question13: string;
+  question7: string;
 
   @Prop({ default: new Date() })
-  createdAt: Date;
+  updatedAt: Date;
 }
