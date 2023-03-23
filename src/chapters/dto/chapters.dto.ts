@@ -24,9 +24,18 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
     example: 'Nombre de Capítulo.',
   })
+  
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  @ApiProperty({
+    example: 'Correo de Capítulo.',
+  })
+  
+  @IsNotEmpty()
+  @IsString()
+  chapterEmail: string;
 
   @ApiProperty({
     example: 'Fecha de Sesión de Capítulo.',

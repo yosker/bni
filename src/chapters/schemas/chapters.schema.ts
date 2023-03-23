@@ -5,6 +5,7 @@ export const ChapterSchema = new Schema({
   country: { type: String, required: true },
   region: { type: String, required: true },
   name: { type: String, required: true, length: 80, unique: true },
+  chapterEmail: { type: String, required: true, unique: true },
   sessionDate: { type: String, required: true },
   sessionSchedule: { type: String, required: true },
   sessionType: { type: String, required: true },

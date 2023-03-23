@@ -11,6 +11,8 @@ import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { hash } from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
+import { JWTPayload } from 'src/auth/jwt.payload';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
@@ -20,16 +22,35 @@ export class ChaptersService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
-  ) {}
+  ) { }
 
   async getChapters() {
     const chapters = this.chapterModel.find();
     return chapters;
   }
 
-  async getChapter(chapterId: string) {
-    const chapter = this.chapterModel.findById(chapterId);
-    return chapter;
+
+  async getChapter(
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
+    try {
+      const chapter = await this.chapterModel.findOne({ _id: ObjectId(jwtPayload.idChapter) });
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: chapter,
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 
   async create(
@@ -93,19 +114,41 @@ export class ChaptersService {
   }
 
   async updateChapter(
-    chapterId: string,
+    jwtPayload: JWTPayload,
     createChapterDTO: CreateChapterDTO,
     res: Response,
   ): Promise<Response> {
-    const chapterUpdated = this.chapterModel.findByIdAndUpdate(
-      chapterId,
-      createChapterDTO,
-      { new: true },
-    );
-    return res.status(HttpStatus.OK).json({
-      statusCode: this.servicesResponse.statusCode,
-      message: this.servicesResponse.message,
-      result: chapterUpdated,
-    });
+
+    try {
+
+      await this.chapterModel.updateOne(
+        { _id: ObjectId(jwtPayload.idChapter) },
+        {
+          $set:
+            { name: createChapterDTO.name, 
+              chapterEmail: createChapterDTO.chapterEmail, 
+              sessionDate: createChapterDTO.sessionDate,
+              sessionType: createChapterDTO.sessionType
+            }
+        })
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+
+    } catch (error) {
+      if (error.code === 11000) {
+        return res.status(HttpStatus.OK).json({
+          statusCode: 409,
+          message: 'RECORD_DUPLICATED',
+          result: {},
+        });
+      } else {
+        throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      }
+    }
   }
+
 }

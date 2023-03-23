@@ -13,6 +13,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { JWTPayload } from 'src/auth/jwt.payload';
+import { Delete } from '@nestjs/common/decorators';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -30,10 +33,21 @@ export class ChapterSessionsController {
   }
 
   @Get('/:chapterId')
-  async getVisitors(
+  async getChapterSessions(
     @Param('chapterId') chapterId: string,
+    @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
   ): Promise<Response> {
-    return await this.chapterSessionService.sessionList(chapterId, res);
+    return await this.chapterSessionService.sessionList(chapterId,jwtPayload, res);
+  }
+
+  
+  @Get('/deleteDate/:sessionDate')
+  async deleteDate(
+    @Param('sessionDate') sessionDate: string,
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response,
+  ): Promise<Response> {
+    return await this.chapterSessionService.deleteDate(sessionDate,jwtPayload, res);
   }
 }

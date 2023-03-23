@@ -72,6 +72,23 @@ export class MenuService {
         nombreCompania: chapter,
       },
       modulos: [
+
+        {
+          nombre: 'Capítulo',
+          estilo: 'settings',
+          ordenModulo: 0,
+          subModulos: [
+            {
+              idSubModulo: 0,
+              nombre: 'Configuración capítulo',
+              urlPagina: 'chapterform.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          
+          ],
+        },
+
         {
           nombre: 'Networkers',
           estilo: 'groups',
@@ -182,6 +199,8 @@ export class MenuService {
           estilo: 'contact_page',
           ordenModulo: 1,
           subModulos: [
+           
+
             {
               idSubModulo: 1,
               nombre: 'Agregar Networker',
