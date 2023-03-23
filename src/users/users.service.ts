@@ -257,7 +257,6 @@ export class UsersService {
             's3-bucket-users',
             req.s3url,
           );
-          s3Response = '';
         } else {
           s3Response = req.s3url;
         }
@@ -329,13 +328,19 @@ export class UsersService {
   }
 
   //ENDPOINT PARA ELIMINAR (BAJA LOGICA) UN REGISTRO DE LA BASE DE DATOS
-  async delete(id: string, res: Response): Promise<Response> {
+  async delete(
+    userId: string,
+    chapterId: string,
+    res: Response,
+  ): Promise<Response> {
     const { result } = this.servicesResponse;
 
     try {
-      await this.usersModel.findByIdAndUpdate(ObjectId(id), {
+      await this.usersModel.findByIdAndUpdate(ObjectId(userId), {
         status: EstatusRegister.Deleted,
       });
+
+      await this.deleteUserSessions(userId, chapterId);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -404,7 +409,7 @@ export class UsersService {
 
       let s3Response = '';
 
-      let now = new Date();
+      const now = new Date();
       if (filename != 'default') {
         s3Response = await (
           await this.sharedService.uploadFile(
@@ -424,7 +429,6 @@ export class UsersService {
             's3-bucket-users',
             req.urlFile,
           );
-          s3Response = '';
         } else {
           s3Response = req.urlFile;
         }
@@ -497,6 +501,22 @@ export class UsersService {
           createdAt: new Date().toISOString(),
         };
         await this.attendanceModel.create(attendance);
+      });
+    } catch {
+      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+    }
+  }
+
+  private async deleteUserSessions(userId: string, chapterId: string) {
+    try {
+      const date = new Date().toISOString().substring(0, 10);
+      await this.attendanceModel.deleteMany({
+        userId: ObjectId(userId),
+        chapterId: ObjectId(chapterId),
+        attended: false,
+        createdAt: {
+          $gte: date,
+        },
       });
     } catch {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
