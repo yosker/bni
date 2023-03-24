@@ -188,7 +188,7 @@ export class AttendanceService {
         ObjectId(0),
         0,
       );
-      console.log(JSON.stringify(pipeline));
+
       const userData = await this.attendanceModel.aggregate(pipeline);
 
       return res.status(HttpStatus.OK).json({
@@ -219,6 +219,7 @@ export class AttendanceService {
       const filter = {
         chapterId: ObjectId(chapterId),
         attendanceDate: attendaceDate,
+        attended: true,
       };
       if (queryType == 1) {
         filter['userId'] = ObjectId(userId);
@@ -238,6 +239,13 @@ export class AttendanceService {
         },
         {
           $unwind: '$userData',
+        },
+        {
+          $match: {
+            role: {
+              $ne: 'Visitante',
+            },
+          },
         },
         {
           $project: {
