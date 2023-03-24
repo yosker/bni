@@ -35,7 +35,6 @@ export class AttendanceService {
     jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
-      attendanceDTO.userId = ObjectId(jwtPayload.id);
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const existUser = await this.usersModel.findOne({
         _id: ObjectId(attendanceDTO.userId),
@@ -48,13 +47,13 @@ export class AttendanceService {
           .status(HttpStatus.BAD_REQUEST)
           .json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
       }
-      attendanceDTO.chapterId = ObjectId(jwtPayload.idChapter);
-      const currentDate = moment().format('DD-MM-YYYY');
+
+      const currentDate = moment().format('YYYY-MM-DD');
       let authAttendance = false;
 
       //VALIDAMOS QUE LA SESION EXISTA EXISTA Y QUE ESTE ACTIVA
       const chapterSession = await this.chapterSessionModel.findOne({
-        chapterId: ObjectId(attendanceDTO.chapterId),
+        chapterId: ObjectId(jwtPayload.idChapter),
         sessionDate: currentDate,
         status: EstatusRegister.Active,
       });
@@ -67,7 +66,7 @@ export class AttendanceService {
         const userSession = await this.attendanceModel.findOne({
           userId: ObjectId(attendanceDTO.userId),
           attendanceDate: currentDate,
-          chapterId: ObjectId(attendanceDTO.chapterId),
+          chapterId: ObjectId(jwtPayload.idChapter),
           status: EstatusRegister.Active,
           attended: true,
         });
@@ -82,7 +81,7 @@ export class AttendanceService {
           ...attendanceDTO,
           attendanceDate: currentDate,
           userId: ObjectId(attendanceDTO.userId),
-          chapterId: ObjectId(attendanceDTO.chapterId),
+          chapterId: ObjectId(jwtPayload.idChapter),
           attended: true,
         };
         await this.attendanceModel.findOneAndUpdate(
@@ -93,9 +92,9 @@ export class AttendanceService {
         );
 
         const pipeline = await this.AttendanceResult(
-          attendanceDTO.chapterId,
+          jwtPayload.idChapter,
           currentDate,
-          attendanceDTO.userId,
+          attendanceDTO.userId.toString(),
           1,
         );
         const userData = await this.attendanceModel.aggregate(pipeline);
@@ -211,9 +210,9 @@ export class AttendanceService {
 
   //PIPELINE PARA REGRESAR LOS DATOS DEL USUARIO (NETWORKER) CUANDO SE REGISTRA
   private async AttendanceResult(
-    chapterId: object,
+    chapterId: string,
     attendaceDate: string,
-    userId: object,
+    userId: string,
     queryType: number,
   ) {
     try {
