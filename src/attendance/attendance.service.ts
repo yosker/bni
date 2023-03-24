@@ -38,7 +38,7 @@ export class AttendanceService {
       attendanceDTO.userId = ObjectId(jwtPayload.id);
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const existUser = await this.usersModel.findOne({
-        _id: ObjectId(jwtPayload.id),
+        _id: ObjectId(attendanceDTO.userId),
         idChapter: ObjectId(jwtPayload.idChapter),
         status: EstatusRegister.Active,
       });
@@ -65,7 +65,7 @@ export class AttendanceService {
       if (authAttendance) {
         //VALIDAMOS QUE EL USUARIO NO SE REGISTRE DOS VECES EL MISMO DIA EN LA COLECCION DE ASISTENCIA
         const userSession = await this.attendanceModel.findOne({
-          userId: ObjectId(jwtPayload.id),
+          userId: ObjectId(attendanceDTO.userId),
           attendanceDate: currentDate,
           chapterId: ObjectId(attendanceDTO.chapterId),
           status: EstatusRegister.Active,

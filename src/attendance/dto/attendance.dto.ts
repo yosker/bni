@@ -10,6 +10,11 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
 
   chapterSessionId: object;
 
+  @ApiProperty({
+    example: 'Id de Usuario.',
+  })
+  @IsNotEmpty()
+  @IsString()
   userId: object;
 
   @Prop({ default: false, required: false })
