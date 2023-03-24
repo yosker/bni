@@ -7,7 +7,7 @@ export interface Attendance extends Document {
   attended: boolean;
   attendanceType: string;
   attendanceDate: string;
-  letterSent:boolean;
+  letterSent: boolean;
   createdAt: { type: Date };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }
