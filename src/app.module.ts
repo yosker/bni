@@ -23,6 +23,8 @@ import { EvaluationPeriodModule } from './evaluation-period/evaluation-period.mo
 import { UsersInterviewsModule } from './users-interviews/users-interviews.module';
 import { LettersModule } from './letters/letters.module';
 import { ReferencesModule } from './references/references.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+
 
 @Module({
   imports: [
@@ -61,6 +63,7 @@ import { ReferencesModule } from './references/references.module';
     UsersInterviewsModule,
     LettersModule,
     ReferencesModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],
