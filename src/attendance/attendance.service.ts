@@ -133,18 +133,14 @@ export class AttendanceService {
     res: Response,
   ): Promise<Response> {
     try {
-      const currentDate = sessionDate.split('-');
-      const newDate =
-        currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
-
       const visitorList = await this.usersModel.find(
         {
           idChapter: ObjectId(chapterId),
           role: 'Visitante',
           status: EstatusRegister.Active,
           createdAt: {
-            $gte: moment(`${newDate}T00:00:00.000`),
-            $lt: moment(`${newDate}T23:59:59.999`),
+            $gte: moment(`${sessionDate}T00:00:00.000`),
+            $lt: moment(`${sessionDate}T23:59:59.999`),
           },
         },
         {
