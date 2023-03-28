@@ -29,7 +29,7 @@ export class AttendanceService {
   ) {}
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
-  async create(
+  async update(
     attendanceDTO: AttendanceDTO,
     res: Response,
     jwtPayload: JWTPayload,
@@ -83,6 +83,7 @@ export class AttendanceService {
           userId: ObjectId(attendanceDTO.userId),
           chapterId: ObjectId(jwtPayload.idChapter),
           attended: true,
+          createdAt: new Date(),
         };
         await this.attendanceModel.findOneAndUpdate(
           {
@@ -314,10 +315,12 @@ export class AttendanceService {
   ) {
     const now = new Date();
     const gte = moment(now).add(-6, 'M').toISOString();
+    const lte = moment(now).toISOString();
     const filter = {
       chapterId: ObjectId(chapterId),
       createdAt: {
         $gte: new Date(gte),
+        $lt: new Date(lte),
       },
       attended: false,
     };

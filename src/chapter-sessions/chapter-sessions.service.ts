@@ -63,6 +63,9 @@ export class ChapterSessionsService {
         if (chapterSession) {
           const usersChapter = await this.usersModel.find({
             idChapter: ObjectId(chapterSessionDTO.chapterId),
+            role: {
+              ne: 'Visitantes',
+            },
           });
 
           usersChapter.forEach(async (user) => {
@@ -185,7 +188,7 @@ export class ChapterSessionsService {
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: {},
+        result: result,
       });
     } catch (error) {
       throw res

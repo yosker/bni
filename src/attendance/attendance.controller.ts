@@ -23,15 +23,15 @@ import { PaginationParams } from 'src/shared/pagination/paginationParams';
 @ApiTags('Attendance')
 @Controller('attendance')
 export class AttendanceController {
-  constructor(private attendanceService: AttendanceService) { }
+  constructor(private attendanceService: AttendanceService) {}
 
-  @Post('/create')
-  async create(
+  @Post('/update')
+  async update(
     @Body() attendanceDTO: AttendanceDTO,
     @Res() res: Response,
     @Auth() jwtPayload: JWTPayload,
   ) {
-    return await this.attendanceService.create(attendanceDTO, res, jwtPayload);
+    return await this.attendanceService.update(attendanceDTO, res, jwtPayload);
   }
 
   @Get('/visitors/:chapterId/:sessionDate')
@@ -79,7 +79,6 @@ export class AttendanceController {
     @Param('id') id: string,
     @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
-
   ) {
     return await this.attendanceService.sendLetter(id, jwtPayload, res);
   }
