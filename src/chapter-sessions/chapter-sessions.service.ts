@@ -24,7 +24,7 @@ export class ChapterSessionsService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
-  ) { }
+  ) {}
 
   //ENDPOINT PARA LA CREACION MANUAL DE SESIONES POR CAPITULO
   async create(
@@ -79,13 +79,11 @@ export class ChapterSessionsService {
           });
         }
       } else {
-        return res
-          .status(200)
-          .json({
-            statusCode: 409,
-            message: "RECORD_DUPLICATED",
-            result: {},
-          });
+        return res.status(200).json({
+          statusCode: 409,
+          message: 'RECORD_DUPLICATED',
+          result: {},
+        });
       }
 
       return res.status(HttpStatus.OK).json({
@@ -106,12 +104,17 @@ export class ChapterSessionsService {
   }
 
   //ENDPOINT QUE REGRESA UNA LISTA DE FECHAS DE SESION POR CAPITULO
-  async sessionList(chapterId: string, jwtPayload: JWTPayload, res: Response): Promise<Response> {
+  async sessionList(
+    chapterId: string,
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
     try {
       const currentDate = moment().format('YYYY-MM-DD');
 
       let filter = {};
-      if (chapterId != '0') { //DESDE EL BO SE ENVIAR CERO PARA QUE REGRESE TODAS LAS SESIONES
+      if (chapterId != '0') {
+        //DESDE EL BO SE ENVIAR CERO PARA QUE REGRESE TODAS LAS SESIONES
         filter = {
           chapterId: ObjectId(chapterId),
           status: EstatusRegister.Active,
@@ -127,13 +130,10 @@ export class ChapterSessionsService {
       }
 
       const chapterSessionList = await this.chapterSessionModel
-        .find(
-          filter,
-          {
-            _id: 0,
-            sessionDate: 1,
-          },
-        )
+        .find(filter, {
+          _id: 0,
+          sessionDate: 1,
+        })
         .sort({ sessionChapterDate: -1 });
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -153,24 +153,34 @@ export class ChapterSessionsService {
   }
 
   //ENDPOINT PARA ELIMINAR (BAJA LOGICA) UN REGISTRO DE LA BASE DE DATOS (SESIONES DEL CAPITULO)
-  async deleteDate(sessionDate: string, jwtPayload: JWTPayload, res: Response): Promise<Response> {
+  async deleteDate(
+    sessionDate: string,
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
     const { result } = this.servicesResponse;
 
     try {
-      const session = await this.chapterSessionModel.findOne({ chapterId: ObjectId(jwtPayload.idChapter), sessionDate: sessionDate.toString() });
+      const session = await this.chapterSessionModel.findOne({
+        chapterId: ObjectId(jwtPayload.idChapter),
+        sessionDate: sessionDate.toString(),
+      });
       await this.chapterSessionModel.updateOne(
-        { chapterId: ObjectId(jwtPayload.idChapter), sessionDate: sessionDate.toString() },
         {
-          $set:
-            { status: EstatusRegister.Deleted }
-        })
+          chapterId: ObjectId(jwtPayload.idChapter),
+          sessionDate: sessionDate.toString(),
+        },
+        {
+          $set: { status: EstatusRegister.Deleted },
+        },
+      );
 
       await this.attendanceModel.updateMany(
         { chapterSessionId: ObjectId(session._id) },
         {
-          $set:
-            { status: EstatusRegister.Deleted }
-        })
+          $set: { status: EstatusRegister.Deleted },
+        },
+      );
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -188,5 +198,4 @@ export class ChapterSessionsService {
         );
     }
   }
-
 }
