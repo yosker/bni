@@ -35,7 +35,10 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   
   @IsNotEmpty()
   @IsString()
-  chapterEmail: string;
+  email: string;
+
+  @Prop({ default: '', required: false })
+  password: string;
 
   @ApiProperty({
     example: 'Fecha de Sesión de Capítulo.',

@@ -4,7 +4,8 @@ export interface Chapter extends Document {
   country: { type: string };
   region: { type: string };
   name: { type: string };
-  chapterEmail: { type: string };
+  email: { type: string };
+  password: { type: string };
   sessionDate: { type: string };
   sessionSchedule: { type: string };
   sessionType: { type: string };

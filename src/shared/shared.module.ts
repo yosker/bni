@@ -9,16 +9,18 @@ import { ServicesResponse } from 'src/responses/response';
   imports: [
     MailerModule.forRootAsync({
       useFactory: () => {
-        console.log(process.env.EMAIL_HOST);
+      
         return {
           transport: {
             host: process.env.EMAIL_HOST,
-            secure: false,
             port: process.env.EMAIL_PORT,
+            secureConnection: false,
+            service: "Outlook365",
             auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS,
             },
+            //from: process.env.EMAIL_USER
           },
           template: {
             dir: join(__dirname, 'mails'),

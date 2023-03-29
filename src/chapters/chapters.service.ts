@@ -29,7 +29,6 @@ export class ChaptersService {
     return chapters;
   }
 
-
   async getChapter(
     jwtPayload: JWTPayload,
     res: Response,
@@ -75,6 +74,7 @@ export class ChaptersService {
       //OBJETO PARA EL CORREO
       const emailProperties = {
         email: createChapterDTO.email,
+        from: 'meeting.reporter@outlook.com',
         password: password,
         name: createChapterDTO.name,
         template: process.env.CHAPTERS_WELCOME,
@@ -87,8 +87,8 @@ export class ChaptersService {
       createUserDto = { ...createUserDto, password: plainToHash };
       const newUser = await this.usersModel.create(createUserDto);
 
-      // if (newChapter != null && newUser != null)
-      //   await this.sharedService.sendEmail(emailProperties);
+      if (newChapter != null && newUser != null)
+        await this.sharedService.sendEmail(emailProperties);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -125,11 +125,13 @@ export class ChaptersService {
         { _id: ObjectId(jwtPayload.idChapter) },
         {
           $set:
-            { name: createChapterDTO.name, 
-              chapterEmail: createChapterDTO.chapterEmail, 
-              sessionDate: createChapterDTO.sessionDate,
-              sessionType: createChapterDTO.sessionType
-            }
+          {
+            name: createChapterDTO.name,
+            chapterEmail: createChapterDTO.email,
+            password: createChapterDTO.password,
+            sessionDate: createChapterDTO.sessionDate,
+            sessionType: createChapterDTO.sessionType
+          }
         })
 
       return res.status(HttpStatus.OK).json({

@@ -108,7 +108,8 @@ export class DashboardService {
                 jwtPayload.idChapter,
             );
             const totalvisitors = await this.usersModel.aggregate(pipeline);
-            return totalvisitors[0].totalVisitors;
+            let totalVisitors = totalvisitors[0] == undefined ? 0 : totalvisitors[0].totalVisitors
+            return totalVisitors
         } catch (err) {
             throw new HttpErrorByCode[500](
                 'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',

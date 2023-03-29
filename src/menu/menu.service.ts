@@ -62,10 +62,12 @@ export class MenuService {
   }
 
   async administratorMenu(chapter: any, objUser: any) {
+
+    let lastName = objUser.lastName == undefined ? '' : objUser.lastName;
     const menu = {
       perfil: {
         idUsuario: 0,
-        nombreUsuario: objUser.name + ' ' + objUser.lastName,
+        nombreUsuario: objUser.name + ' ' + lastName,
         avatar: objUser.imageURL,
         rol: objUser.role,
         idJerarquia: 0,

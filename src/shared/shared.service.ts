@@ -59,9 +59,10 @@ export class SharedService {
         ...emailProperties,
         urlPlatform: process.env.URL_PLATFORM,
       };
+
       await this.mailerService.sendMail({
         to: emailProperties.email,
-        from: process.env.SENDER_EMAIL,
+        from: emailProperties.from,
         subject: emailProperties.subject,
         template: emailProperties.template,
         context: {
