@@ -7,6 +7,8 @@ import { Model } from 'mongoose';
 import { References } from './schemas/references.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
+import { Users } from 'src/users/schemas/users.schema';
+import { User } from 'src/users/interfaces/users.interface';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -16,6 +18,7 @@ export class ReferencesService {
     private servicesResponse: ServicesResponse,
     @InjectModel(References.name)
     private readonly referenceModel: Model<IReference>,
+    @InjectModel(Users.name) private readonly usersModel: Model<User>,
   ) {}
 
   async create(
@@ -30,6 +33,9 @@ export class ReferencesService {
       createReferenceDto.userInterviewId,
     );
     const interviewUser = await this.referenceModel.create(createReferenceDto);
+    await this.usersModel.findByIdAndUpdate(jwtPayload.id, {
+      completedInterview: true,
+    });
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
