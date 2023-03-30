@@ -26,8 +26,8 @@ export class CreateNonAttendanceDto {
   @Prop({ default: '', required: false })
   attendanceDate: string;
 
-  @Prop({ default: new Date().toISOString(), required: false })
-  createdAt?: string;
+  @Prop({ default: new Date(), required: false })
+  createdAt?: Date;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

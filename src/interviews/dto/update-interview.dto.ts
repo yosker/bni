@@ -96,6 +96,6 @@ export class UpdateInterviewDto extends PartialType(CreateInterviewDto) {
   @IsObject()
   question13: object;
 
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 }

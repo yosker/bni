@@ -25,8 +25,8 @@ export class EmailAccounts {
   @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }
 
 export const EmailAccountsSchema = SchemaFactory.createForClass(EmailAccounts);

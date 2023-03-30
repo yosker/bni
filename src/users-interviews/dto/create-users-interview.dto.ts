@@ -45,7 +45,7 @@ export class CreateUsersInterviewDto {
     example: 'Fecha de Entrevista.',
   })
   @IsNotEmpty()
-  @Prop({ default: new Date().toISOString() })
+  @Prop({ default: new Date() })
   dateOfInterview: string;
 
   @ApiProperty({
@@ -139,6 +139,6 @@ export class CreateUsersInterviewDto {
   @IsString()
   question13: string;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }

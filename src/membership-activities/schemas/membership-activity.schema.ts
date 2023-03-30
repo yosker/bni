@@ -37,8 +37,8 @@ export class MembershipActivities {
   @Prop({ type: 'string' })
   statusActivity: string;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 
   @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;

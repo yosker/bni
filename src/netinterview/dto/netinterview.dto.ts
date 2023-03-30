@@ -90,8 +90,8 @@ export class NetinterviewDTO {
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 
   @ApiProperty({
     example: 'Estatus del Registro.',

@@ -12,8 +12,8 @@ export const ChapterSchema = new Schema({
   sessionSchedule: { type: String, required: true },
   sessionType: { type: String, required: true },
   createdAt: {
-    type: String,
-    default: new Date().toISOString(),
+    type: Date,
+    default: new Date(),
   },
   status: { type: String, default: EstatusRegister.Active, required: false },
 });

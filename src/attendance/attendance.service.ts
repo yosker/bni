@@ -82,11 +82,11 @@ export class AttendanceService {
 
         attendanceDTO = {
           ...attendanceDTO,
-          attendanceDate: new Date().toISOString(),
+          attendanceDate: new Date(),
           userId: ObjectId(attendanceDTO.userId),
           chapterId: ObjectId(jwtPayload.idChapter),
           attended: true,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date(),
         };
         await this.attendanceModel.findOneAndUpdate(
           {
@@ -320,8 +320,8 @@ export class AttendanceService {
     limit: number,
   ) {
     const now = moment();
-    const gte = moment(now).add(-6, 'M').toISOString();
-    const lte = moment(now).toISOString();
+    const gte = moment(now).add(-6, 'M');
+    const lte = moment(now);
     const filter = {
       chapterId: ObjectId(chapterId),
       createdAt: {

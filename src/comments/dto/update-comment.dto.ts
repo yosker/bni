@@ -34,6 +34,6 @@ export class UpdateCommentDto extends PartialType(CreateCommentDto) {
   @ApiProperty({
     example: 'Fecha de Actualizaación del Registro.',
   })
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 }

@@ -18,11 +18,11 @@ export class Users {
   @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 
   @Prop({ type: 'object' })
   idChapter: object;

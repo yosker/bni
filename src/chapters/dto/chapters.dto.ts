@@ -58,8 +58,8 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   sessionType: string;
 
-  @Prop({ default: new Date().toISOString(), required: false })
-  createdAt: string;
+  @Prop({ default: new Date(), required: false })
+  createdAt: Date;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

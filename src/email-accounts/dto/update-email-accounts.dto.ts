@@ -29,8 +29,8 @@ export class UpdateEmailAccountsDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
     example: 'Fecha de Actualización del Registro.',
   })
-  @Prop({ default: new Date().toISOString(), required: false })
-  updatedAt?: string;
+  @Prop({ default: new Date(), required: false })
+  updatedAt?: Date;
 
   @ApiProperty({
     example: 'Estatus del Registro.',

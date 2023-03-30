@@ -115,6 +115,6 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }

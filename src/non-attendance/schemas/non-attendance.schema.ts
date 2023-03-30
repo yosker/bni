@@ -16,11 +16,11 @@ export class NonAttendances {
   @Prop({ type: 'string' })
   attendanceType: string;
 
-  @Prop({ default: new Date().toISOString() })
+  @Prop({ default: new Date() })
   attendanceDate: string;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 
   @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;

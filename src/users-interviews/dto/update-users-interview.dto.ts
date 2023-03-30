@@ -52,7 +52,7 @@ export class UpdateUsersInterviewDto extends PartialType(
     example: 'Fecha de Entrevista.',
   })
   @IsNotEmpty()
-  @Prop({ default: new Date().toISOString() })
+  @Prop({ default: new Date() })
   dateOfInterview: string;
 
   @ApiProperty({
@@ -145,6 +145,6 @@ export class UpdateUsersInterviewDto extends PartialType(
   @IsNotEmpty()
   @IsString()
   question13: string;
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 }

@@ -32,8 +32,8 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   @Prop({ default: false, required: false })
   letterSent: boolean;
 
-  @Prop({ default: new Date().toISOString(), required: false })
-  updatedAt?: string;
+  @Prop({ default: new Date(), required: false })
+  updatedAt?: Date;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

@@ -36,6 +36,6 @@ export class CreateReferenceDto {
 
   email: string;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }

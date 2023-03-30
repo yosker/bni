@@ -49,8 +49,8 @@ export class EvaluationPeriodDTO extends PartialType(RegisterAuthDto) {
   @IsNotEmpty()
   commitments: Commitments;
 
-  @Prop({ default: new Date().toISOString(), required: false })
-  createdAt?: string;
+  @Prop({ default: new Date(), required: false })
+  createdAt?: Date;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

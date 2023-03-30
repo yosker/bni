@@ -21,11 +21,11 @@ export class Comments {
   @Prop({ type: 'boolean' })
   accepted: boolean;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 }
 
 export const CommentsSchema = SchemaFactory.createForClass(Comments);

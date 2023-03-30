@@ -29,8 +29,8 @@ export class UpdateMembershipActivityDto extends PartialType(
   @Prop({ default: '', required: true })
   endDate: string;
 
-  @Prop({ default: new Date().toISOString(), required: false })
-  updatedAt?: string;
+  @Prop({ default: new Date(), required: false })
+  updatedAt?: Date;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

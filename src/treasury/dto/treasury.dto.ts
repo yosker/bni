@@ -30,8 +30,8 @@ export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   paymentDate: string;
 
-  @Prop({ default: new Date().toISOString(), required: false })
-  createdAt?: string;
+  @Prop({ default: new Date(), required: false })
+  createdAt?: Date;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

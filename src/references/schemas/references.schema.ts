@@ -54,8 +54,8 @@ export class References {
   @Prop({ type: 'string' })
   question7: string;
 
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 }
 
 export const ReferencesSchema = SchemaFactory.createForClass(References);

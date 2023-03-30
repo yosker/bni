@@ -62,6 +62,6 @@ export class UpdateUserDto {
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 }

@@ -101,6 +101,6 @@ export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
   @IsString()
   question7: string;
 
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 }

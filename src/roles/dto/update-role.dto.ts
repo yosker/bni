@@ -17,6 +17,6 @@ export class UpdateRoleDto extends PartialType(CreateRoleDto) {
   })
   description: string;
 
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: string;
+  @Prop({ default: new Date() })
+  updatedAt: Date;
 }

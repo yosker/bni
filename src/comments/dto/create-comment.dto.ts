@@ -36,6 +36,6 @@ export class CreateCommentDto {
   @IsBoolean()
   accepted: boolean;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }

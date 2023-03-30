@@ -15,8 +15,8 @@ export class Roles {
   @Prop({ type: 'string' })
   status: string;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }
 
 export const RolesSchema = SchemaFactory.createForClass(Roles);

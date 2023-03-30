@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Schema } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
@@ -9,8 +8,8 @@ export const TreasurySchema = new Schema({
   monthYear: { type: String, required: true },
   paymentDate: { type: String, required: true },
   createdAt: {
-    type: String,
-    default: new Date().toISOString(),
+    type: Date,
+    default: new Date(),
     required: false,
   },
   status: { type: String, default: EstatusRegister.Active, required: false },

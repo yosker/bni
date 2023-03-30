@@ -484,7 +484,7 @@ export class UsersService {
     try {
       const chapterSessions = await this.chapterSessionModel.find({
         sessionChapterDate: {
-          $gte: new Date().toISOString(),
+          $gte: new Date(),
         },
       });
 
@@ -496,7 +496,7 @@ export class UsersService {
           attended: false,
           attendanceType: AttendanceType.OnSite,
           attendanceDate: session.sessionDate,
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
         };
         await this.attendanceModel.create(attendance);
       });
@@ -507,7 +507,7 @@ export class UsersService {
 
   private async deleteUserSessions(userId: string, chapterId: string) {
     try {
-      const date = new Date().toISOString().substring(0, 10);
+      const date = new Date().substring(0, 10);
       await this.attendanceModel.deleteMany({
         userId: ObjectId(userId),
         chapterId: ObjectId(chapterId),

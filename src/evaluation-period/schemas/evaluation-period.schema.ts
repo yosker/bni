@@ -12,8 +12,8 @@ export const EvaluationPeriodSchema = new Schema({
   notes: { type: String },
   commitments: { type: Array<Commitments> },
   createdAt: {
-    type: String,
-    default: new Date().toISOString(),
+    type: Date,
+    default: new Date(),
     required: false,
   },
   status: { type: String, default: EstatusRegister.Active, required: false },

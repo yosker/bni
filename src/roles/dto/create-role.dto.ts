@@ -17,6 +17,6 @@ export class CreateRoleDto {
   @IsString()
   description: string;
 
-  @Prop({ default: new Date().toISOString() })
-  createdAt: string;
+  @Prop({ default: new Date() })
+  createdAt: Date;
 }
