@@ -10,6 +10,7 @@ import { EmailAccount } from './interfaces/email-accounts.interfaces';
 import { EmailAccounts } from './schemas/email-accounts.schemas';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { SharedService } from 'src/shared/shared.service';
+
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -19,7 +20,7 @@ export class EmailAccountsService {
     private readonly emailAccount: Model<EmailAccount>,
     private servicesResponse: ServicesResponse,
     private readonly sharedService: SharedService,
-  ) { }
+  ) {}
   async create(
     createEmailAccountsDTO: CreateEmailAccountsDTO,
     res: Response,
@@ -46,29 +47,29 @@ export class EmailAccountsService {
   }
 
   async findAll(res: Response, page: string, jwtPayload: JWTPayload) {
-
     try {
-
-      const accessGranted = await this.sharedService.validatePermissions(page, jwtPayload.role);
+      const accessGranted = await this.sharedService.validatePermissions(
+        page,
+        jwtPayload.role,
+      );
 
       let { statusCode, message, result } = this.servicesResponse;
       if (accessGranted) {
         result = await this.emailAccount.find({
           chapterId: ObjectId(jwtPayload.idChapter),
           status: EstatusRegister.Active,
-        })
+        });
       } else {
         statusCode = 427;
-        message = 'noPermission'
-        result = { }
+        message = 'noPermission';
+        result = {};
       }
 
       return res.status(HttpStatus.OK).json({
         statusCode: statusCode,
         message: message,
-        result: result
+        result: result,
       });
-
     } catch (err) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
