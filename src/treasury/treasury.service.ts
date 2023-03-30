@@ -20,7 +20,7 @@ export class TreasuryService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private readonly servicesResponse: ServicesResponse,
     private readonly sharedService: SharedService,
-  ) {}
+  ) { }
 
   //ENDPOINT PARA GUARDAR UNA APORTACIÓN
   async create(
@@ -30,8 +30,9 @@ export class TreasuryService {
   ): Promise<Response> {
     const { result } = this.servicesResponse;
     try {
-      treasuryDTO.userId = ObjectId(jwtPayload.id);
+      treasuryDTO.userId = ObjectId(treasuryDTO.userId);
       treasuryDTO.chapterId = ObjectId(jwtPayload.idChapter);
+      treasuryDTO.paymentDate = treasuryDTO.paymentDate;
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const findUser = await this.usersModel.findOne({
         _id: ObjectId(treasuryDTO.userId),
@@ -45,6 +46,7 @@ export class TreasuryService {
         userId: ObjectId(treasuryDTO.userId),
         monthYear: treasuryDTO.monthYear,
         status: EstatusRegister.Active,
+        chapterId: ObjectId(jwtPayload.idChapter)
       });
 
       if (findPayment == null) {
@@ -70,7 +72,7 @@ export class TreasuryService {
             password: '',
           };
 
-          await this.sharedService.sendEmail(emailProperties);
+          //await this.sharedService.sendEmail(emailProperties);
         }
       } else {
         return res
@@ -115,6 +117,61 @@ export class TreasuryService {
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
         result: paymentList,
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+  //ENDPOINT QUE REGRESA UN LISTADO GENERAL DE TODAS LAS APORTACIONES 
+  async findAll(
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
+    try {
+
+      const payments = await this.treasuryModel.aggregate([
+        {
+          $match: {
+            chapterId: ObjectId(jwtPayload.idChapter),
+            status: 'Active'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'users',
+          }
+        },
+        {
+          $unwind: '$users'
+        },
+        {
+          $project: {
+            userId: '$users._id',
+            name: { $concat: ["$users.name", " ", "$users.lastName"] },
+            email: '$users.email',
+            companyName: '$users.companyName',
+            ammount: '$payment',
+            monthYear: '$monthYear',
+            paymentDate: '$paymentDate',
+          }
+        }
+      ]);
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: payments,
       });
     } catch (err) {
       throw res

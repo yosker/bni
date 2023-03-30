@@ -4,9 +4,9 @@ import { EstatusRegister } from 'src/shared/enums/register.enum';
 export interface Treasury extends Document {
   chapterId: { type: object };
   userId: { type: object };
-  payment: { type: number };
+  payment: { type: number  };
   monthYear: { type: string };
-  paymentDate: { type: string };
+  paymentDate: { type: Date };
   createdAt: { type: Date };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

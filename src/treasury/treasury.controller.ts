@@ -39,4 +39,12 @@ export class TreasuryController {
   ): Promise<Response> {
     return await this.treasusyService.userPaymentList(userId, res);
   }
+
+  @Get('/findAll')
+  async findAll(
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response,
+  ): Promise<Response> {
+    return await this.treasusyService.findAll(jwtPayload, res);
+  }
 }

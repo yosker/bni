@@ -9,13 +9,17 @@ import { EstatusRegister } from 'src/shared/enums/register.enum';
 export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
 
+  @ApiProperty({
+    example: 'Id del usuario que realiza la aportación.',
+  })
+  @IsNotEmpty()
   userId: object;
 
   @ApiProperty({
     example: 'Monto de aportación.',
   })
+ 
   @IsNotEmpty()
-  @IsNumber()
   payment: number;
 
   @ApiProperty({
@@ -27,9 +31,9 @@ export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
     example: 'Fecha de la aportación. DD/MM/AAAA',
   })
+
   @IsNotEmpty()
-  @IsString()
-  paymentDate: string;
+  paymentDate: Date;
 
   @Prop({ default: now(), required: false })
   createdAt?: Date;

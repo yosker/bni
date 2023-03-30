@@ -178,6 +178,19 @@ export class MenuService {
                   ordenModulo: 1,
                   estilo: ""
               }]
+        },
+        {
+          nombre: "Aportaciones",
+          estilo: "payments",
+          ordenModulo: 7,
+          subModulos: [
+              {
+                  idSubModulo: 8,
+                  nombre: "Aportaciones",
+                  urlPagina: "contributionList.html",
+                  ordenModulo: 1,
+                  estilo: ""
+              }]
         }
       ],
       notificaciones: [],
