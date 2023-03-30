@@ -120,12 +120,6 @@ export class SharedService {
   async validatePermissions(page: string, role: string) {
     let response = false;
     try {
-      const arrMemberships = [
-        'usersform',
-        'userslist',
-        'visitorslist',
-        'activitiesform',
-      ];
       const arrPresident = [
         'usersform',
         'userslist',

@@ -34,9 +34,7 @@ export class ChapterSessionsService {
   ): Promise<Response> {
     const { result } = this.servicesResponse;
     try {
-      chapterSessionDTO.sessionDate = moment(
-        chapterSessionDTO.sessionDate,
-      ).toISOString();
+      chapterSessionDTO.sessionDate = new Date(chapterSessionDTO.sessionDate);
 
       const findSession = await this.chapterSessionModel.findOne({
         chapterId: ObjectId(chapterSessionDTO.chapterId),
@@ -51,9 +49,8 @@ export class ChapterSessionsService {
 
       if (findSession == null) {
         // TODO: Se agregan 6 horas por la zona horaria MX, revisar en caso de cambiar de país
-        chapterSessionDTO.sessionDate = moment(chapterSessionDTO.sessionDate)
-          .add(6, 'h')
-          .toISOString();
+        const dateiso = moment(chapterSessionDTO.sessionDate).add(6, 'h');
+        chapterSessionDTO.sessionDate = new Date(dateiso.toString());
 
         const chapterSession = await this.chapterSessionModel.create(
           chapterSessionDTO,

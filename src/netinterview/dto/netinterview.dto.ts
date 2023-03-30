@@ -2,7 +2,6 @@ import { Prop } from '@nestjs/mongoose';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
-import moment from 'moment';
 
 export class NetinterviewDTO {
   chapterId: object;

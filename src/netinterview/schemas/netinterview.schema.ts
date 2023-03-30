@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Schema } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 

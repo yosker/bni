@@ -17,7 +17,7 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
-import moment from 'moment';
+
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -407,7 +407,7 @@ export class UsersService {
 
       let s3Response = '';
 
-      const now = moment();
+      const now = new Date();
       if (filename != 'default') {
         s3Response = await (
           await this.sharedService.uploadFile(
@@ -507,7 +507,7 @@ export class UsersService {
 
   private async deleteUserSessions(userId: string, chapterId: string) {
     try {
-      const date = new Date().substring(0, 10);
+      const date = new Date().toString().substring(0, 10);
       await this.attendanceModel.deleteMany({
         userId: ObjectId(userId),
         chapterId: ObjectId(chapterId),

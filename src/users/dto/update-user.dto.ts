@@ -1,6 +1,5 @@
 import { IsNotEmpty, IsString, IsEmail, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import moment from 'moment';
 import { Prop } from '@nestjs/mongoose';
 
 export class UpdateUserDto {

@@ -1,7 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
-import moment from 'moment';
 import { CreateUsersInterviewDto } from './create-users-interview.dto';
 
 export class UpdateUsersInterviewDto extends PartialType(

@@ -9,7 +9,7 @@ import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { SharedService } from 'src/shared/shared.service';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
-import moment from 'moment';
+
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -129,7 +129,7 @@ export class MembershipActivitiesService {
           );
 
       let s3Response = '';
-      const now = moment();
+      const now = new Date();
       if (filename != 'default') {
         s3Response = await (
           await this.sharedService.uploadFile(

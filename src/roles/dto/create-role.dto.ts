@@ -1,7 +1,7 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-import moment from 'moment';
+
 export class CreateRoleDto {
   @ApiProperty({
     example: 'Nombre del Rol.',

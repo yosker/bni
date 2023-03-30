@@ -1,7 +1,7 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-import moment from 'moment';
+
 import { CreateRoleDto } from './create-role.dto';
 
 export class UpdateRoleDto extends PartialType(CreateRoleDto) {

@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import moment from 'moment';
+
 import { Document } from 'mongoose';
 
 export type RolesDocument = Roles & Document;

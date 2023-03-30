@@ -1,7 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
-import moment from 'moment';
 
 export class CreateUsersInterviewDto {
   userId: object;

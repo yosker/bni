@@ -1,5 +1,4 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import moment from 'moment';
 import { Document } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
