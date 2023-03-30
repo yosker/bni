@@ -1,6 +1,7 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
+import moment from 'moment';
 import { CreateReferenceDto } from './create-reference.dto';
 
 export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
@@ -100,6 +101,6 @@ export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
   @IsString()
   question7: string;
 
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  updatedAt: string;
 }

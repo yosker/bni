@@ -8,13 +8,13 @@ import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
-import * as moment from 'moment';
 
 const ObjectId = require('mongodb').ObjectId;
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
+import moment from 'moment';
 
 @Injectable()
 export class AttendanceService {
@@ -48,30 +48,33 @@ export class AttendanceService {
           .json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
       }
 
-      const currentDate = moment().format('YYYY-MM-DD');
+      const currentDate = moment().add(-6, 'h').toISOString();
       let authAttendance = false;
 
       //VALIDAMOS QUE LA SESION EXISTA EXISTA Y QUE ESTE ACTIVA
       const chapterSession = await this.chapterSessionModel.findOne({
         chapterId: ObjectId(jwtPayload.idChapter),
-        sessionDate: currentDate,
+        sessionDate: {
+          gte: currentDate,
+        },
         status: EstatusRegister.Active,
       });
-      if (chapterSession != null) {
-        authAttendance = true;
-      }
+
+      if (chapterSession != null) authAttendance = true;
 
       if (authAttendance) {
         //VALIDAMOS QUE EL USUARIO NO SE REGISTRE DOS VECES EL MISMO DIA EN LA COLECCION DE ASISTENCIA
-        const userSession = await this.attendanceModel.findOne({
+        const attendance = await this.attendanceModel.findOne({
           userId: ObjectId(attendanceDTO.userId),
-          attendanceDate: currentDate,
+          attendanceDate: {
+            gte: currentDate,
+          },
           chapterId: ObjectId(jwtPayload.idChapter),
           status: EstatusRegister.Active,
           attended: true,
         });
 
-        if (userSession) {
+        if (attendance) {
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(new HttpException('RECORD_DUPLICATED.', HttpStatus.CONFLICT));
@@ -79,11 +82,11 @@ export class AttendanceService {
 
         attendanceDTO = {
           ...attendanceDTO,
-          attendanceDate: currentDate,
+          attendanceDate: new Date().toISOString(),
           userId: ObjectId(attendanceDTO.userId),
           chapterId: ObjectId(jwtPayload.idChapter),
           attended: true,
-          createdAt: new Date(),
+          updatedAt: new Date().toISOString(),
         };
         await this.attendanceModel.findOneAndUpdate(
           {
@@ -98,6 +101,7 @@ export class AttendanceService {
           attendanceDTO.userId.toString(),
           1,
         );
+
         const userData = await this.attendanceModel.aggregate(pipeline);
 
         return res.status(HttpStatus.OK).json({
@@ -140,8 +144,8 @@ export class AttendanceService {
           role: 'Visitante',
           status: EstatusRegister.Active,
           createdAt: {
-            $gte: moment(`${sessionDate}T00:00:00.000`),
-            $lt: moment(`${sessionDate}T23:59:59.999`),
+            $gte: new Date(`${sessionDate}T00:00:00.000`),
+            $lt: new Date(`${sessionDate}T23:59:59.999`),
           },
         },
         {
@@ -215,7 +219,9 @@ export class AttendanceService {
     try {
       const filter = {
         chapterId: ObjectId(chapterId),
-        attendanceDate: attendaceDate,
+        attendanceDate: {
+          $gte: attendaceDate,
+        },
         attended: true,
       };
       if (queryType == 1) {
@@ -313,14 +319,14 @@ export class AttendanceService {
     skip: number,
     limit: number,
   ) {
-    const now = new Date();
+    const now = moment();
     const gte = moment(now).add(-6, 'M').toISOString();
     const lte = moment(now).toISOString();
     const filter = {
       chapterId: ObjectId(chapterId),
       createdAt: {
-        $gte: new Date(gte),
-        $lt: new Date(lte),
+        $gte: gte,
+        $lt: lte,
       },
       attended: false,
     };

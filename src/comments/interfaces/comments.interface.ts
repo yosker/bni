@@ -6,5 +6,5 @@ export interface Comment extends Document {
   userInterviewId: object;
   comment: string;
   accepted: boolean;
-  createdAt: Date;
+  createdAt: string;
 }

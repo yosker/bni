@@ -19,8 +19,6 @@ export class ChapterSessionDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   sessionDate: string;
 
-  sessionChapterDate: string;
-
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;
 }

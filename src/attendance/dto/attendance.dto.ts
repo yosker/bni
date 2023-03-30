@@ -1,10 +1,10 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Prop } from '@nestjs/mongoose';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { now } from 'mongoose';
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
+
 export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
 
@@ -32,10 +32,8 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   @Prop({ default: false, required: false })
   letterSent: boolean;
 
-  createdAt?: Date;
-
-  @Prop({ default: now(), required: false })
-  updatedAt?: Date;
+  @Prop({ default: new Date().toISOString(), required: false })
+  updatedAt?: string;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

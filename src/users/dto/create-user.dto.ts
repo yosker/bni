@@ -7,6 +7,7 @@ import {
   IsBoolean,
   ValidateIf,
 } from 'class-validator';
+import moment from 'moment';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 export class CreateUserDto {
   @ApiProperty({
@@ -114,6 +115,6 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  createdAt: string;
 }

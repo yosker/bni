@@ -10,7 +10,7 @@ export interface Chapter extends Document {
   sessionSchedule: { type: string };
   sessionType: { type: string };
   createdAt: {
-    type: Date;
+    type: string;
   };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

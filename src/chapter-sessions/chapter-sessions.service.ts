@@ -5,13 +5,14 @@ import { ChapterSessionDTO } from './dto/chapterSessions.dto';
 import { ChapterSession } from './interfaces/chapterSessions.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
-import * as moment from 'moment';
+
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import moment from 'moment';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -33,9 +34,10 @@ export class ChapterSessionsService {
   ): Promise<Response> {
     const { result } = this.servicesResponse;
     try {
-      const dateSplit = chapterSessionDTO.sessionDate.split('-');
-      chapterSessionDTO.sessionDate =
-        dateSplit[2] + '-' + dateSplit[1] + '-' + dateSplit[0];
+      chapterSessionDTO.sessionDate = moment(
+        chapterSessionDTO.sessionDate,
+      ).toISOString();
+
       const findSession = await this.chapterSessionModel.findOne({
         chapterId: ObjectId(chapterSessionDTO.chapterId),
         sessionDate: chapterSessionDTO.sessionDate,
@@ -48,11 +50,8 @@ export class ChapterSessionsService {
       };
 
       if (findSession == null) {
-        const dateString = chapterSessionDTO.sessionDate;
-        const dateObject = new Date(dateString);
-
         // TODO: Se agregan 6 horas por la zona horaria MX, revisar en caso de cambiar de país
-        chapterSessionDTO.sessionChapterDate = moment(dateObject)
+        chapterSessionDTO.sessionDate = moment(chapterSessionDTO.sessionDate)
           .add(6, 'h')
           .toISOString();
 
@@ -166,12 +165,12 @@ export class ChapterSessionsService {
     try {
       const session = await this.chapterSessionModel.findOne({
         chapterId: ObjectId(jwtPayload.idChapter),
-        sessionDate: sessionDate.toString(),
+        sessionDate: new Date(sessionDate).toISOString(),
       });
       await this.chapterSessionModel.updateOne(
         {
           chapterId: ObjectId(jwtPayload.idChapter),
-          sessionDate: sessionDate.toString(),
+          sessionDate: new Date(sessionDate).toISOString(),
         },
         {
           $set: { status: EstatusRegister.Deleted },

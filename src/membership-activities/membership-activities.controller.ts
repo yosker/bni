@@ -9,7 +9,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Body,
-  Request
+  Request,
 } from '@nestjs/common';
 import { MembershipActivitiesService } from './membership-activities.service';
 import { Response } from 'express';
@@ -21,7 +21,6 @@ import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateMembershipActivityDto } from './dto/create-membership-activity.dto';
 
-
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Membership Activities')
@@ -29,7 +28,7 @@ import { CreateMembershipActivityDto } from './dto/create-membership-activity.dt
 export class MembershipActivitiesController {
   constructor(
     private readonly membershipActivitiesService: MembershipActivitiesService,
-  ) { }
+  ) {}
 
   @Post()
   create(
@@ -105,6 +104,10 @@ export class MembershipActivitiesController {
     @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
   ) {
-    return this.membershipActivitiesService.findUserActivities(jwtPayload, date, res);
+    return this.membershipActivitiesService.findUserActivities(
+      jwtPayload,
+      date,
+      res,
+    );
   }
 }

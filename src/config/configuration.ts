@@ -5,6 +5,6 @@ export default () => ({
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 27017,
     name: process.env.DB_NAME || 'bni',
-    credentials: `${process.env.DB_USER}:${process.env.DB_PASSWORD}`
+    credentials: `${process.env.DB_USER}:${process.env.DB_PASSWORD}`,
   },
 });

@@ -3,7 +3,6 @@ import { Prop } from '@nestjs/mongoose';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { now } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class TreasuryDTO extends PartialType(RegisterAuthDto) {
@@ -31,8 +30,8 @@ export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   paymentDate: string;
 
-  @Prop({ default: now(), required: false })
-  createdAt?: Date;
+  @Prop({ default: new Date().toISOString(), required: false })
+  createdAt?: string;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

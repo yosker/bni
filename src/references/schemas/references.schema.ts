@@ -1,4 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import moment from 'moment';
 import { Document } from 'mongoose';
 
 export type ReferencesDocument = References & Document;
@@ -53,8 +54,8 @@ export class References {
   @Prop({ type: 'string' })
   question7: string;
 
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  updatedAt: string;
 }
 
 export const ReferencesSchema = SchemaFactory.createForClass(References);

@@ -1,4 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import moment from 'moment';
 import { Document } from 'mongoose';
 
 export type RolesDocument = Roles & Document;
@@ -14,8 +15,8 @@ export class Roles {
   @Prop({ type: 'string' })
   status: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  createdAt: string;
 }
 
 export const RolesSchema = SchemaFactory.createForClass(Roles);

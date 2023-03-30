@@ -10,8 +10,8 @@ export interface MembershipActivity extends Document {
   concatDate: { type: string; required: true };
   activity: { type: string; required: true };
   comments: { type: string; required: false };
-  fileUrl?: { type: string; };
+  fileUrl?: { type: string };
   statusActivity: { type: string; required: false };
-  createdAt: { type: Date };
+  createdAt: { type: string };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

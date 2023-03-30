@@ -17,8 +17,8 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
+import moment from 'moment';
 
-const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -301,14 +301,12 @@ export class UsersService {
         idChapter: ObjectId(chapterId),
         status: EstatusRegister.Active,
       });
-      // const qrCreated = await QRCode.toDataURL(id.toString());
 
       const dataUser = {
         name: findUser.name + ' ' + findUser.lastName,
         companyName: findUser.companyName,
         profession: findUser.profession,
         imageURL: findUser.imageURL,
-        // qr: qrCreated,
       };
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -409,12 +407,12 @@ export class UsersService {
 
       let s3Response = '';
 
-      const now = new Date();
+      const now = moment();
       if (filename != 'default') {
         s3Response = await (
           await this.sharedService.uploadFile(
             dataBuffer,
-            now.getTime() + '_' + filename,
+            now.valueOf() + '_' + filename,
             '',
             's3-bucket-users',
           )

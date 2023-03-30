@@ -7,6 +7,6 @@ export interface Treasury extends Document {
   payment: { type: number };
   monthYear: { type: string };
   paymentDate: { type: string };
-  createdAt: { type: Date };
+  createdAt: { type: string };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Schema } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
@@ -11,7 +12,7 @@ export const ChapterSchema = new Schema({
   sessionSchedule: { type: String, required: true },
   sessionType: { type: String, required: true },
   createdAt: {
-    type: Date,
+    type: String,
     default: new Date().toISOString(),
   },
   status: { type: String, default: EstatusRegister.Active, required: false },

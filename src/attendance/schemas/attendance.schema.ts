@@ -10,7 +10,7 @@ export const AttendanceSchema = new Schema({
   attendanceDate: { type: String, required: false },
   letterSent: { type: Boolean, default: false, required: false },
   createdAt: {
-    type: Date,
+    type: String,
     default: new Date().toISOString(),
     required: false,
   },

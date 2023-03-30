@@ -1,6 +1,7 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
+import moment from 'moment';
 export class CreateRoleDto {
   @ApiProperty({
     example: 'Nombre del Rol.',
@@ -16,6 +17,6 @@ export class CreateRoleDto {
   @IsString()
   description: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  createdAt: string;
 }

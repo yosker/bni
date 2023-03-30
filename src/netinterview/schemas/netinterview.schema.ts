@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Schema } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
@@ -16,6 +17,6 @@ export const NetinterviewSchema = new Schema({
   question4: { type: String, required: true },
   question5: { type: String, required: true },
   question6: { type: String, required: true },
-  createdAt: { type: Date, required: false, default: new Date() },
+  createdAt: { type: String, required: false, default: new Date().toISOString() },
   status: { type: String, default: EstatusRegister.Active, required: false },
 });

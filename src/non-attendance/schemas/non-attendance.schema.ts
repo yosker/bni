@@ -1,4 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import moment from 'moment';
 import { Document } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
@@ -15,11 +16,11 @@ export class NonAttendances {
   @Prop({ type: 'string' })
   attendanceType: string;
 
-  @Prop({ default: new Date() })
-  attendanceDate: Date;
+  @Prop({ default: new Date().toISOString() })
+  attendanceDate: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  createdAt: string;
 
   @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;

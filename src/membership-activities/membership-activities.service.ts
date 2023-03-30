@@ -9,6 +9,8 @@ import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { SharedService } from 'src/shared/shared.service';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
+import moment from 'moment';
+
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -18,7 +20,7 @@ export class MembershipActivitiesService {
     private readonly membershipActivity: Model<MembershipActivity>,
     private readonly servicesResponse: ServicesResponse,
     private readonly sharedService: SharedService,
-  ) { }
+  ) {}
 
   async create(
     createMembershipActivityDto: CreateMembershipActivityDto,
@@ -33,7 +35,7 @@ export class MembershipActivitiesService {
         concatDate:
           createMembershipActivityDto.startDate.replace(/\//g, '-') +
           ' al ' +
-          createMembershipActivityDto.endDate.replace(/\//g, '-')
+          createMembershipActivityDto.endDate.replace(/\//g, '-'),
       };
 
       const membershipActivity = await this.membershipActivity.create(
@@ -58,7 +60,6 @@ export class MembershipActivitiesService {
 
   async findAll(jwtPayload: JWTPayload, date: string, res: Response) {
     try {
-
       const activities = await this.membershipActivity
         .find({
           chapterId: ObjectId(jwtPayload.idChapter),
@@ -128,14 +129,26 @@ export class MembershipActivitiesService {
           );
 
       let s3Response = '';
-      let now = new Date();
+      const now = moment();
       if (filename != 'default') {
-        s3Response = await (await this.sharedService.uploadFile(dataBuffer, now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
-        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            now.valueOf() + '_' + filename,
+            '',
+            's3-bucket-users',
+          )
+        ).result.toString();
+        await this.sharedService.deleteObjectFromS3(
+          's3-bucket-users',
+          req.urlFile,
+        );
       } else {
         if (req.deleteFile == 1) {
-          await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
-          s3Response = '';
+          await this.sharedService.deleteObjectFromS3(
+            's3-bucket-users',
+            req.urlFile,
+          );
         } else {
           s3Response = req.urlFile;
         }
@@ -148,7 +161,7 @@ export class MembershipActivitiesService {
         {
           fileUrl: s3Response,
           comments: req.comments,
-          statusActivity: req.statusActivity
+          statusActivity: req.statusActivity,
         },
       );
 
@@ -258,8 +271,11 @@ export class MembershipActivitiesService {
 
   //SERVICIOS PARA LAS ACTIVIDADES DEL COMITE DE MEMBRESIAS (POR USUARIO)
 
-
-  async findUserActivities(jwtPayload: JWTPayload, date: string, res: Response) {
+  async findUserActivities(
+    jwtPayload: JWTPayload,
+    date: string,
+    res: Response,
+  ) {
     try {
       const activities = await this.membershipActivity
         .find({
@@ -285,6 +301,4 @@ export class MembershipActivitiesService {
         );
     }
   }
-
-
 }

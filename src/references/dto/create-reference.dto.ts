@@ -1,6 +1,7 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
+import moment from 'moment';
 
 export class CreateReferenceDto {
   userId: object;
@@ -35,6 +36,6 @@ export class CreateReferenceDto {
 
   email: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  createdAt: string;
 }

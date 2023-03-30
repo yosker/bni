@@ -1,5 +1,7 @@
 import { IsNotEmpty, IsString, IsEmail, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import moment from 'moment';
+import { Prop } from '@nestjs/mongoose';
 
 export class UpdateUserDto {
   @IsNotEmpty()
@@ -56,4 +58,10 @@ export class UpdateUserDto {
   })
   @IsBoolean()
   accepted: boolean;
+
+  @ApiProperty({
+    example: 'Fecha de Creación del Registro.',
+  })
+  @Prop({ default: new Date().toISOString() })
+  createdAt: string;
 }

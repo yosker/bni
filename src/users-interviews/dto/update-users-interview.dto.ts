@@ -1,6 +1,7 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import moment from 'moment';
 import { CreateUsersInterviewDto } from './create-users-interview.dto';
 
 export class UpdateUsersInterviewDto extends PartialType(
@@ -51,8 +52,8 @@ export class UpdateUsersInterviewDto extends PartialType(
     example: 'Fecha de Entrevista.',
   })
   @IsNotEmpty()
-  @Prop({ default: new Date() })
-  dateOfInterview: Date = new Date();
+  @Prop({ default: new Date().toISOString() })
+  dateOfInterview: string;
 
   @ApiProperty({
     example: 'Pregunta 1.',
@@ -144,6 +145,6 @@ export class UpdateUsersInterviewDto extends PartialType(
   @IsNotEmpty()
   @IsString()
   question13: string;
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  updatedAt: string;
 }

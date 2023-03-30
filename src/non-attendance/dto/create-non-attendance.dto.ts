@@ -1,7 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { now } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class CreateNonAttendanceDto {
@@ -27,8 +26,8 @@ export class CreateNonAttendanceDto {
   @Prop({ default: '', required: false })
   attendanceDate: string;
 
-  @Prop({ default: now(), required: false })
-  createdAt?: Date;
+  @Prop({ default: new Date().toISOString(), required: false })
+  createdAt?: string;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

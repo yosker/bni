@@ -10,7 +10,6 @@ import {
 import { ServicesResponse } from 'src/responses/response';
 import { SharedService } from 'src/shared/shared.service';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -21,4 +20,4 @@ import { SharedService } from 'src/shared/shared.service';
   controllers: [MembershipActivitiesController],
   providers: [MembershipActivitiesService, ServicesResponse, SharedService],
 })
-export class MembershipActivitiesModule { }
+export class MembershipActivitiesModule {}

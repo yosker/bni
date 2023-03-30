@@ -1,4 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import moment from 'moment';
 import { Document } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
@@ -6,7 +7,6 @@ export type MembershipActivitiesDocument = MembershipActivities & Document;
 
 @Schema()
 export class MembershipActivities {
-
   @Prop({ type: 'object' })
   chapterId: object;
 
@@ -27,18 +27,18 @@ export class MembershipActivities {
 
   @Prop({ type: 'string' })
   concatDate: string;
-  
+
   @Prop({ type: 'string' })
   activity: string;
 
   @Prop({ type: 'string' })
   comments: string;
-  
+
   @Prop({ type: 'string' })
   statusActivity: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  createdAt: string;
 
   @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;

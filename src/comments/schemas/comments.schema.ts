@@ -1,4 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import moment from 'moment';
 import { Document } from 'mongoose';
 
 export type CommentsDocument = Comments & Document;
@@ -20,11 +21,11 @@ export class Comments {
   @Prop({ type: 'boolean' })
   accepted: boolean;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  createdAt: string;
 
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: new Date().toISOString() })
+  updatedAt: string;
 }
 
 export const CommentsSchema = SchemaFactory.createForClass(Comments);
