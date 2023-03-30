@@ -53,7 +53,7 @@ export class ReferencesService {
   }
 
   async findOne(userInterviewId: string) {
-    return this.referenceModel.findOne({
+    return this.referenceModel.find({
       userInterviewId: ObjectId(userInterviewId),
     });
   }
