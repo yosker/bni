@@ -28,13 +28,6 @@ export class TreasuryDTO extends PartialType(RegisterAuthDto) {
   @IsString()
   monthYear: string;
 
-  @ApiProperty({
-    example: 'Fecha de la aportación. DD/MM/AAAA',
-  })
-
-  @IsNotEmpty()
-  paymentDate: Date;
-
   @Prop({ default: now(), required: false })
   createdAt?: Date;
 

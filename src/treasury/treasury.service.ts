@@ -32,7 +32,7 @@ export class TreasuryService {
     try {
       treasuryDTO.userId = ObjectId(treasuryDTO.userId);
       treasuryDTO.chapterId = ObjectId(jwtPayload.idChapter);
-      treasuryDTO.paymentDate = treasuryDTO.paymentDate;
+   
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const findUser = await this.usersModel.findOne({
         _id: ObjectId(treasuryDTO.userId),
@@ -163,8 +163,11 @@ export class TreasuryService {
             companyName: '$users.companyName',
             ammount: '$payment',
             monthYear: '$monthYear',
-            paymentDate: '$paymentDate',
+            paymentDate: '$createdAt',
           }
+        },
+        {
+          $sort: { createdAt : -1 }    
         }
       ]);
 

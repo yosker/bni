@@ -6,7 +6,6 @@ export const TreasurySchema = new Schema({
   userId: { type: Object, required: true },
   payment: {  type: Number,required: true },
   monthYear: { type: String, required: true },
-  paymentDate: { type: Date, required: true },
   createdAt: {
     type: Date,
     default: new Date().toISOString(),

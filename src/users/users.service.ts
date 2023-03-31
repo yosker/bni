@@ -53,6 +53,9 @@ export class UsersService {
         {
           $match: filter,
         },
+        {
+          $sort: { name : 1 } 
+     }
       ]);
 
       return res.status(HttpStatus.OK).json({
