@@ -75,9 +75,11 @@ export class TreasuryService {
           //await this.sharedService.sendEmail(emailProperties);
         }
       } else {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json(new HttpException('PAYMENT_FOUND.', HttpStatus.NOT_FOUND));
+        return res.status(200).json({
+          statusCode: 409,
+          message: 'RECORD_DUPLICATED',
+          result: {},
+        });
       }
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -177,6 +179,40 @@ export class TreasuryService {
         result: payments,
       });
     } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+  //ENDPOINT PARA ELIMINAR (BAJA LOGICA) UN REGISTRO DE LA BASE DE DATOS (APORTACIONES)
+  async deleteRow(
+    id: string,
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
+    const { result } = this.servicesResponse;
+    try {
+      await this.treasuryModel.updateOne(
+        {
+          chapterId: ObjectId(jwtPayload.idChapter),
+          _id: ObjectId(id),
+        },
+        {
+          $set: { status: EstatusRegister.Deleted },
+        },
+      );
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: result,
+      });
+    } catch (error) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
