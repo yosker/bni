@@ -22,19 +22,18 @@ export class ChaptersService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
-  ) { }
+  ) {}
 
   async getChapters() {
     const chapters = this.chapterModel.find();
     return chapters;
   }
 
-  async getChapter(
-    jwtPayload: JWTPayload,
-    res: Response,
-  ): Promise<Response> {
+  async getChapter(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
-      const chapter = await this.chapterModel.findOne({ _id: ObjectId(jwtPayload.idChapter) });
+      const chapter = await this.chapterModel.findOne({
+        _id: ObjectId(jwtPayload.idChapter),
+      });
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -54,6 +53,7 @@ export class ChaptersService {
 
   async create(
     createChapterDTO: CreateChapterDTO,
+    jwtPayload: JWTPayload,
     res: Response,
   ): Promise<Response> {
     const { result } = this.servicesResponse;
@@ -74,8 +74,8 @@ export class ChaptersService {
       //OBJETO PARA EL CORREO
       const emailProperties = {
         email: createChapterDTO.email,
-        from: 'meeting.reporter@outlook.com',
-        password: password,
+        from: newChapter.email,
+        password: newChapter.password,
         name: createChapterDTO.name,
         template: process.env.CHAPTERS_WELCOME,
         subject: process.env.SUBJECT_CHAPTER_WELCOME,
@@ -88,7 +88,7 @@ export class ChaptersService {
       const newUser = await this.usersModel.create(createUserDto);
 
       if (newChapter != null && newUser != null)
-        await this.sharedService.sendEmail(emailProperties);
+        await this.sharedService.sendMailer(emailProperties);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -118,28 +118,25 @@ export class ChaptersService {
     createChapterDTO: CreateChapterDTO,
     res: Response,
   ): Promise<Response> {
-
     try {
-
       await this.chapterModel.updateOne(
         { _id: ObjectId(jwtPayload.idChapter) },
         {
-          $set:
-          {
+          $set: {
             name: createChapterDTO.name,
             chapterEmail: createChapterDTO.email,
             password: createChapterDTO.password,
             sessionDate: createChapterDTO.sessionDate,
-            sessionType: createChapterDTO.sessionType
-          }
-        })
+            sessionType: createChapterDTO.sessionType,
+          },
+        },
+      );
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
         result: {},
       });
-
     } catch (error) {
       if (error.code === 11000) {
         return res.status(HttpStatus.OK).json({
@@ -152,5 +149,4 @@ export class ChaptersService {
       }
     }
   }
-
 }

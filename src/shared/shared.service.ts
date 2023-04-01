@@ -4,6 +4,7 @@ import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { S3 } from 'aws-sdk';
 
+const nodemailer = require('nodemailer');
 const generateSafeId = require('generate-safe-id');
 
 @Injectable()
@@ -120,12 +121,6 @@ export class SharedService {
   async validatePermissions(page: string, role: string) {
     let response = false;
     try {
-      const arrMemberships = [
-        'usersform',
-        'userslist',
-        'visitorslist',
-        'activitiesform',
-      ];
       const arrPresident = [
         'usersform',
         'userslist',
@@ -143,5 +138,43 @@ export class SharedService {
       }
     } catch (err) {}
     return response;
+  }
+
+  async sendMailer(emailProperties: any) {
+    try {
+      const transport: any = {
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: false,
+        service: 'Outlook365',
+        auth: {
+          user: emailProperties.emailConfig,
+          pass: emailProperties.password,
+        },
+      };
+
+      const mailTransport = nodemailer.createTransport(transport);
+
+      mailTransport.sendMail(
+        {
+          from: emailProperties.emailConfig,
+          to: 'yosk_13@msn.com',
+          replyTo: emailProperties.emailConfig,
+          subject: emailProperties.subject,
+          text: emailProperties.template,
+        },
+        function (error: any) {
+          if (error) {
+            console.log(error);
+            return;
+          }
+          console.log('Message sent');
+          mailTransport.close();
+        },
+      );
+    } catch (error) {
+      console.log('Error getConfigEmail: ', error);
+      throw error;
+    }
   }
 }

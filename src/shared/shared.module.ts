@@ -7,28 +7,21 @@ import { ServicesResponse } from 'src/responses/response';
 
 @Module({
   imports: [
-    MailerModule.forRootAsync({
-      useFactory: () => {
-      
-        return {
-          transport: {
-            host: process.env.EMAIL_HOST,
-            port: process.env.EMAIL_PORT,
-            secureConnection: false,
-            service: "Outlook365",
-            auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS,
-            },
-            //from: process.env.EMAIL_USER
-          },
-          template: {
-            dir: join(__dirname, 'mails'),
-            adapter: new HandlebarsAdapter(),
-          },
-        };
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT),
+        secure: false,
+        service: 'Outlook365',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
       },
-      imports: undefined,
+      template: {
+        dir: join(__dirname, 'mails'),
+        adapter: new HandlebarsAdapter(),
+      },
     }),
   ],
   controllers: [],

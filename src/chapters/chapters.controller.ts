@@ -16,9 +16,10 @@ export class ChaptersController {
   @Post('/create')
   async create(
     @Body() chapterDTO: CreateChapterDTO,
-    @Res() res: Response
+    @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
   ): Promise<Response> {
-    return await this.chapterService.create(chapterDTO, res);
+    return await this.chapterService.create(chapterDTO, jwtPayload, res);
   }
 
   @ApiBearerAuth()
