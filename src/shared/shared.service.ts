@@ -4,8 +4,10 @@ import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { S3 } from 'aws-sdk';
 
+const hbs = require('nodemailer-express-handlebars');
 const nodemailer = require('nodemailer');
 const generateSafeId = require('generate-safe-id');
+import { join } from 'path';
 
 @Injectable()
 export class SharedService {
@@ -155,6 +157,18 @@ export class SharedService {
 
       const mailTransport = nodemailer.createTransport(transport);
 
+      // point to the template folder
+      const handlebarOptions = {
+        viewEngine: {
+          partialsDir: join(__dirname, 'mails'),
+          defaultLayout: false,
+        },
+        viewPath: join(__dirname, 'mails'),
+      };
+
+      // use a template file with nodemailer
+      mailTransport.use('compile', hbs(handlebarOptions));
+
       mailTransport.sendMail(
         {
           from: emailProperties.emailConfig,
@@ -162,6 +176,7 @@ export class SharedService {
           replyTo: emailProperties.emailConfig,
           subject: emailProperties.subject,
           text: emailProperties.template,
+          template: emailProperties.template,
         },
         function (error: any) {
           if (error) {
