@@ -24,6 +24,7 @@ import { UsersInterviewsModule } from './users-interviews/users-interviews.modul
 import { LettersModule } from './letters/letters.module';
 import { ReferencesModule } from './references/references.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ChargesModule } from './charges/charges.module';
 
 
 @Module({
@@ -64,6 +65,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     LettersModule,
     ReferencesModule,
     DashboardModule,
+    ChargesModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],

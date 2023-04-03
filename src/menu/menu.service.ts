@@ -180,7 +180,7 @@ export class MenuService {
               }]
         },
         {
-          nombre: "Aportaciones",
+          nombre: "Tesorería",
           estilo: "payments",
           ordenModulo: 7,
           subModulos: [
@@ -190,7 +190,22 @@ export class MenuService {
                   urlPagina: "contributionList.html",
                   ordenModulo: 1,
                   estilo: ""
-              }]
+              },
+              {
+                idSubModulo: 9,
+                nombre: "Gastos",
+                urlPagina: "chargesList.html",
+                ordenModulo: 2,
+                estilo: ""
+            },
+            {
+              idSubModulo: 10,
+              nombre: "Ingresos - Egresos",
+              urlPagina: "report.html",
+              ordenModulo: 2,
+              estilo: ""
+          }
+            ]
         }
       ],
       notificaciones: [],
