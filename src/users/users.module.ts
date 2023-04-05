@@ -14,6 +14,7 @@ import { JwtStrategy } from 'src/auth/jwt.strategy';
 import { SharedService } from 'src/shared/shared.service';
 import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessions.schema';
 import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
+import { ChapterSchema } from 'src/chapters/schemas/chapters.schema';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
       },
       { name: 'ChapterSession', schema: ChapterSessionSchema },
       { name: 'Attendance', schema: AttendanceSchema },
+      { name: 'Chapter', schema: ChapterSchema },
     ]),
     AuthModule,
     PassportModule.register({

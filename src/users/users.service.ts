@@ -17,8 +17,8 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
+import { Chapter } from 'src/chapters/interfaces/chapters.interface';
 
-const QRCode = require('qrcode');
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -33,6 +33,7 @@ export class UsersService {
     private readonly chapterSessionModel: Model<ChapterSession>,
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
+    @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
   ) {}
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
@@ -145,17 +146,20 @@ export class UsersService {
           newUser._id.toString() +
           '&chapterId=' +
           newUser.idChapter.toString();
+
+        const chapter = await this.chapterModel.findById(newUser.idChapter);
         // OBJETO PARA EL CORREO
         const emailProperties = {
-          email: newUser.email,
-          password: '',
+          emailConfig: chapter.email,
+          password: chapter.password,
           name: newUser.name + ' ' + newUser.lastName,
           template: process.env.NETWORKERS_WELCOME_TEMPLATE,
           subject: process.env.SUBJECT_CHAPTER_WELCOME,
           urlPlatform: url,
           amount: '',
+          to: newUser.email,
         };
-        await this.sharedService.sendEmail(emailProperties);
+        await this.sharedService.sendMailer(emailProperties);
       }
 
       if (newUser.role.toLowerCase() != 'visitante') {
@@ -304,7 +308,6 @@ export class UsersService {
         idChapter: ObjectId(chapterId),
         status: EstatusRegister.Active,
       });
-      // const qrCreated = await QRCode.toDataURL(id.toString());
 
       const dataUser = {
         name: findUser.name + ' ' + findUser.lastName,

@@ -4,7 +4,10 @@ import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { S3 } from 'aws-sdk';
 
+const hbs = require('nodemailer-express-handlebars');
+const nodemailer = require('nodemailer');
 const generateSafeId = require('generate-safe-id');
+import { join } from 'path';
 
 @Injectable()
 export class SharedService {
@@ -120,12 +123,6 @@ export class SharedService {
   async validatePermissions(page: string, role: string) {
     let response = false;
     try {
-      const arrMemberships = [
-        'usersform',
-        'userslist',
-        'visitorslist',
-        'activitiesform',
-      ];
       const arrPresident = [
         'usersform',
         'userslist',
@@ -143,5 +140,56 @@ export class SharedService {
       }
     } catch (err) {}
     return response;
+  }
+
+  async sendMailer(emailProperties: any) {
+    try {
+      const transport: any = {
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: false,
+        service: 'Outlook365',
+        auth: {
+          user: emailProperties.emailConfig,
+          pass: emailProperties.password,
+        },
+      };
+
+      const mailTransport = nodemailer.createTransport(transport);
+
+      // point to the template folder
+      const handlebarOptions = {
+        viewEngine: {
+          partialsDir: join(__dirname, 'mails'),
+          defaultLayout: false,
+        },
+        viewPath: join(__dirname, 'mails'),
+      };
+
+      // use a template file with nodemailer
+      mailTransport.use('compile', hbs(handlebarOptions));
+
+      mailTransport.sendMail(
+        {
+          from: emailProperties.emailConfig,
+          to: 'yosk_13@msn.com',
+          replyTo: emailProperties.emailConfig,
+          subject: emailProperties.subject,
+          text: emailProperties.template,
+          template: emailProperties.template,
+        },
+        function (error: any) {
+          if (error) {
+            console.log(error);
+            return;
+          }
+          console.log('Message sent');
+          mailTransport.close();
+        },
+      );
+    } catch (error) {
+      console.log('Error getConfigEmail: ', error);
+      throw error;
+    }
   }
 }

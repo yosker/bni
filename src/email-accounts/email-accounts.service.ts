@@ -53,7 +53,9 @@ export class EmailAccountsService {
         jwtPayload.role,
       );
 
-      let { statusCode, message, result } = this.servicesResponse;
+      let { statusCode, message } = this.servicesResponse;
+      let result = {};
+
       if (accessGranted) {
         result = await this.emailAccount.find({
           chapterId: ObjectId(jwtPayload.idChapter),
@@ -62,7 +64,6 @@ export class EmailAccountsService {
       } else {
         statusCode = 427;
         message = 'noPermission';
-        result = {};
       }
 
       return res.status(HttpStatus.OK).json({
