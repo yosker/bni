@@ -25,6 +25,7 @@ import { LettersModule } from './letters/letters.module';
 import { ReferencesModule } from './references/references.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ChargesModule } from './charges/charges.module';
+import { TreasuryReportModule } from './treasury-report/treasury-report.module';
 
 
 @Module({
@@ -66,6 +67,7 @@ import { ChargesModule } from './charges/charges.module';
     ReferencesModule,
     DashboardModule,
     ChargesModule,
+    TreasuryReportModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],
