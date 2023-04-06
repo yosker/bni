@@ -177,6 +177,9 @@ export class SharedService {
           subject: emailProperties.subject,
           text: emailProperties.template,
           template: emailProperties.template,
+          context: {
+            objMail: emailProperties,
+          },
         },
         function (error: any) {
           if (error) {

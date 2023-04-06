@@ -25,11 +25,11 @@ export class CommentsService {
     jwtPayload: JWTPayload,
   ) {
     try {
-      const comments = await this.commentModel.findOne({
+      const comments = await this.commentModel.find({
         interviewId: ObjectId(createCommentDto.interviewId),
       });
 
-      if (comments.length >= 5) {
+      if (comments?.length >= 5) {
         this.userModel.findByIdAndUpdate(ObjectId(createCommentDto.userId), {
           accepted: createCommentDto.accepted,
         });

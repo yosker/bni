@@ -1,4 +1,8 @@
 export interface IReference {
+  chapterId: object;
+  userId: object;
+  interviewId: object;
+  userInterviewId: object;
   name: string;
   relationShip: string;
   position: string;
