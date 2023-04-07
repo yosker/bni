@@ -9,91 +9,91 @@ export class UpdateInterviewDto extends PartialType(CreateInterviewDto) {
   })
   @IsNotEmpty()
   @IsObject()
-  question1: object;
+  question1: string;
 
   @ApiProperty({
     example: 'Pregunta 2.',
   })
   @IsNotEmpty()
   @IsObject()
-  question2: object;
+  question2: string;
 
   @ApiProperty({
     example: 'Pregunta 3.',
   })
   @IsNotEmpty()
   @IsObject()
-  question3: object;
+  question3: string;
 
   @ApiProperty({
     example: 'Pregunta 4.',
   })
   @IsNotEmpty()
   @IsObject()
-  question4: object;
+  question4: string;
 
   @ApiProperty({
     example: 'Pregunta 5.',
   })
   @IsNotEmpty()
   @IsObject()
-  question5: object;
+  question5: string;
 
   @ApiProperty({
     example: 'Pregunta 6.',
   })
   @IsNotEmpty()
   @IsObject()
-  question6: object;
+  question6: string;
 
   @ApiProperty({
     example: 'Pregunta 7.',
   })
   @IsNotEmpty()
   @IsObject()
-  question7: object;
+  question7: string;
 
   @ApiProperty({
     example: 'Pregunta 8.',
   })
   @IsNotEmpty()
   @IsObject()
-  question8: object;
+  question8: string;
 
   @ApiProperty({
     example: 'Pregunta 9.',
   })
   @IsNotEmpty()
   @IsObject()
-  question9: object;
+  question9: string;
 
   @ApiProperty({
     example: 'Pregunta 10.',
   })
   @IsNotEmpty()
   @IsObject()
-  question10: object;
+  question10: string;
 
   @ApiProperty({
     example: 'Pregunta 11.',
   })
   @IsNotEmpty()
   @IsObject()
-  question11: object;
+  question11: string;
 
   @ApiProperty({
     example: 'Pregunta 12.',
   })
   @IsNotEmpty()
   @IsObject()
-  question12: object;
+  question12: string;
 
   @ApiProperty({
     example: 'Pregunta 13.',
   })
   @IsNotEmpty()
   @IsObject()
-  question13: object;
+  question13: string;
 
   @Prop({ default: new Date() })
   updatedAt: Date;

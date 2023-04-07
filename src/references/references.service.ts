@@ -32,10 +32,35 @@ export class ReferencesService {
     createReferenceDto.userInterviewId = ObjectId(
       createReferenceDto.userInterviewId,
     );
-    const interviewUser = await this.referenceModel.create(createReferenceDto);
-    await this.usersModel.findByIdAndUpdate(jwtPayload.id, {
-      completedInterview: true,
+
+    const reference = await this.referenceModel.findOne({
+      chapterId: createReferenceDto.chapterId,
+      userId: createReferenceDto.userId,
+      interviewId: createReferenceDto.interviewId,
+      userInterviewId: createReferenceDto.userInterviewId,
     });
+
+    let interviewUser;
+    if (!reference) {
+      interviewUser = await this.referenceModel.create(createReferenceDto);
+    } else {
+      await this.referenceModel.findOneAndUpdate(
+        {
+          chapterId: createReferenceDto.chapterId,
+          userId: createReferenceDto.userId,
+          interviewId: createReferenceDto.interviewId,
+          userInterviewId: createReferenceDto.userInterviewId,
+        },
+        createReferenceDto,
+      );
+    }
+
+    await this.usersModel.findByIdAndUpdate(
+      createReferenceDto.userInterviewId,
+      {
+        completedInterview: true,
+      },
+    );
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
