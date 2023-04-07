@@ -1,0 +1,75 @@
+import { Prop } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+
+export class CreateQuestionsReferenceDto {
+  @ApiProperty({
+    example: 'Id de Referencia.',
+  })
+  @IsNotEmpty()
+  referenceId: object;
+
+  @ApiProperty({
+    example: 'Id de Usuario Entrevistado.',
+  })
+  @IsNotEmpty()
+  userInterviewId: object;
+
+  @ApiProperty({
+    example: 'Id de Entrevista.',
+  })
+  @IsNotEmpty()
+  interviewId: object;
+
+  @ApiProperty({
+    example: 'Pregunta 1.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question1: string;
+
+  @ApiProperty({
+    example: 'Pregunta 2.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question2: string;
+
+  @ApiProperty({
+    example: 'Pregunta 3.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question3: string;
+
+  @ApiProperty({
+    example: 'Pregunta 4.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question4: string;
+
+  @ApiProperty({
+    example: 'Pregunta 5.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question5: string;
+
+  @ApiProperty({
+    example: 'Pregunta 6.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question6: string;
+
+  @ApiProperty({
+    example: 'Pregunta 7.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question7: string;
+
+  @Prop({ default: new Date() })
+  updatedAt: Date;
+}

@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateReferenceDto } from './dto/create-reference.dto';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { ServicesResponse } from 'src/responses/response';
@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
 import { Users } from 'src/users/schemas/users.schema';
 import { User } from 'src/users/interfaces/users.interface';
+import { UpdateReferenceDto } from './dto/update-reference.dto';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -66,6 +67,34 @@ export class ReferencesService {
       message: this.servicesResponse.message,
       result: interviewUser,
     });
+  }
+
+  async update(updateReferenceDto: UpdateReferenceDto, res: Response) {
+    try {
+      await this.referenceModel.findOneAndUpdate(
+        {
+          chapterId: updateReferenceDto.chapterId,
+          userId: updateReferenceDto.userId,
+          interviewId: updateReferenceDto.interviewId,
+          userInterviewId: updateReferenceDto.userInterviewId,
+        },
+        updateReferenceDto,
+      );
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: updateReferenceDto,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 
   async findAll(skip = 0, limit?: number) {

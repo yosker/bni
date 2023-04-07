@@ -7,6 +7,7 @@ import {
   UseGuards,
   Res,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { ReferencesService } from './references.service';
 import { CreateReferenceDto } from './dto/create-reference.dto';
@@ -17,6 +18,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { Response } from 'express';
 import { PaginationParams } from 'src/shared/pagination/paginationParams';
+import { UpdateReferenceDto } from './dto/update-reference.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -32,6 +34,11 @@ export class ReferencesController {
     @Auth() jwtPayload: JWTPayload,
   ) {
     return this.referencesService.create(createReferenceDto, res, jwtPayload);
+  }
+
+  @Patch()
+  update(@Body() updateReferenceDto: UpdateReferenceDto, @Res() res: Response) {
+    return this.referencesService.update(updateReferenceDto, res);
   }
 
   @Get()

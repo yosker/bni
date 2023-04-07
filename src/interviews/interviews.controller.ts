@@ -50,11 +50,7 @@ export class InterviewsController {
     @Body() updateInterviewDto: UpdateInterviewDto,
     @Res() res: Response,
   ) {
-    return this.interviewsService.updateQuestionsReferences(
-      id,
-      updateInterviewDto,
-      res,
-    );
+    return this.interviewsService.updateReferences(id, updateInterviewDto, res);
   }
 
   @Patch('interviewUser/:id')

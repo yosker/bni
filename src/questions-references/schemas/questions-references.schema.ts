@@ -1,10 +1,10 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type ReferencesDocument = References & Document;
+export type QuestionsReferencesDocument = QuestionsReferences & Document;
 
 @Schema()
-export class References {
+export class QuestionsReferences {
   @Prop({ type: 'object' })
   referenceId: object;
 
@@ -21,22 +21,29 @@ export class References {
   interviewId: object;
 
   @Prop({ type: 'string' })
-  name: string;
+  question1: string;
 
   @Prop({ type: 'string' })
-  relationShip: string;
+  question2: string;
 
   @Prop({ type: 'string' })
-  position: string;
+  question3: string;
 
   @Prop({ type: 'string' })
-  phoneNumber: string;
+  question4: string;
 
   @Prop({ type: 'string' })
-  email: string;
+  question5: string;
+
+  @Prop({ type: 'string' })
+  question6: string;
+
+  @Prop({ type: 'string' })
+  question7: string;
 
   @Prop({ default: new Date() })
   updatedAt: Date;
 }
 
-export const ReferencesSchema = SchemaFactory.createForClass(References);
+export const QuestionsReferencesSchema =
+  SchemaFactory.createForClass(QuestionsReferences);

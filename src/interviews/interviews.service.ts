@@ -35,11 +35,11 @@ export class InterviewsService {
     createInterviewDto.chapterId = ObjectId(jwtPayload.idChapter);
     createInterviewDto.userId = ObjectId(jwtPayload.id);
 
-    await this.interviewModel.create(createInterviewDto);
+    const interview = await this.interviewModel.create(createInterviewDto);
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
-      result: createInterviewDto,
+      result: interview,
     });
   }
 
@@ -89,7 +89,7 @@ export class InterviewsService {
    * @param _updateInterviewDto Objeto con las Preguntas a Actualizar
    * @returns Objeto Actualizado
    */
-  async updateQuestionsReferences( //TODO: CAMBIAR LLOGICA DE GUARDADO A NUEVA COLECCION DE QUESTIONSREFERENCES
+  async updateReferences(
     id: string,
     _updateInterviewDto: UpdateInterviewDto,
     res: Response,
