@@ -15,40 +15,40 @@ export class Interviews {
   question1: object;
 
   @Prop({ type: 'object' })
-  question2: object;
+  question2: string;
 
-  @Prop({ type: 'object' })
-  question3: object;
+  @Prop({ type: 'string' })
+  question3: string;
 
-  @Prop({ type: 'object' })
-  question4: object;
+  @Prop({ type: 'string' })
+  question4: string;
 
-  @Prop({ type: 'object' })
-  question5: object;
+  @Prop({ type: 'string' })
+  question5: string;
 
-  @Prop({ type: 'object' })
-  question6: object;
+  @Prop({ type: 'string' })
+  question6: string;
 
-  @Prop({ type: 'object' })
-  question7: object;
+  @Prop({ type: 'string' })
+  question7: string;
 
-  @Prop({ type: 'object' })
-  question8: object;
+  @Prop({ type: 'string' })
+  question8: string;
 
-  @Prop({ type: 'object' })
-  question9: object;
+  @Prop({ type: 'string' })
+  question9: string;
 
-  @Prop({ type: 'object' })
-  question10: object;
+  @Prop({ type: 'string' })
+  question10: string;
 
-  @Prop({ type: 'object' })
-  question11: object;
+  @Prop({ type: 'string' })
+  question11: string;
 
-  @Prop({ type: 'object' })
-  question12: object;
+  @Prop({ type: 'string' })
+  question12: string;
 
-  @Prop({ type: 'object' })
-  question13: object;
+  @Prop({ type: 'string' })
+  question13: string;
 }
 
 export const InterviewsSchema = SchemaFactory.createForClass(Interviews);
