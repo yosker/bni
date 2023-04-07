@@ -11,10 +11,10 @@ export class Interviews {
   @Prop({ type: 'object' })
   chapterId: object;
 
-  @Prop({ type: 'object' })
+  @Prop({ type: 'string' })
   question1: object;
 
-  @Prop({ type: 'object' })
+  @Prop({ type: 'string' })
   question2: string;
 
   @Prop({ type: 'string' })
