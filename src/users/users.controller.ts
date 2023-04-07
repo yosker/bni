@@ -21,6 +21,7 @@ import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -156,5 +157,19 @@ export class UsersController {
   @Get('/getApplicationFile/:id')
   findApplicationFile(@Param('id') id: string, @Res() res: Response) {
     return this.usersService.getApplicationFile(id, res);
+  }
+
+
+  @Post('/editVisitorRow/:id')
+  async updateVisitor(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Res() res: Response,
+  ) {
+    return await this.usersService.updateVisitor(
+      id,
+      updateUserDto,
+      res,
+    );
   }
 }

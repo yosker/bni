@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString, IsEmail, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Prop } from '@nestjs/mongoose';
 
 export class UpdateUserDto {
   @IsNotEmpty()
@@ -56,4 +57,12 @@ export class UpdateUserDto {
   })
   @IsBoolean()
   accepted: boolean;
+
+
+  @ApiProperty({
+    example: 'Invitado Por',
+  })
+  @Prop({ default: '', required: false })
+  @IsString()
+  invitedBy: string
 }

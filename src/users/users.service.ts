@@ -18,6 +18,7 @@ import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
 import { Chapter } from 'src/chapters/interfaces/chapters.interface';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -34,7 +35,7 @@ export class UsersService {
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
-  ) {}
+  ) { }
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -55,8 +56,8 @@ export class UsersService {
           $match: filter,
         },
         {
-          $sort: { name : 1 } 
-     }
+          $sort: { createdAt: -1 }
+        }
       ]);
 
       return res.status(HttpStatus.OK).json({
@@ -122,13 +123,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-              await this.sharedService.uploadFile(
-                dataBuffer,
-                filename,
-                '.jpg',
-                's3-bucket-users',
-              )
-            ).result
+            await this.sharedService.uploadFile(
+              dataBuffer,
+              filename,
+              '.jpg',
+              's3-bucket-users',
+            )
+          ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -295,6 +296,45 @@ export class UsersService {
       }
     }
   }
+
+
+  async updateVisitor(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    res: Response): Promise<Response> {
+
+    try {
+
+      updateUserDto = {
+        ...updateUserDto,
+        idChapter: ObjectId(updateUserDto.idChapter),
+      };
+
+      await this.usersModel.findByIdAndUpdate(
+        ObjectId(id),
+        updateUserDto,
+      );
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+
+    }
+    catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+
+  }
+
 
   //ENDPOIT QUE REGRESA LA INFO GENERAL DEL USUARIO JUNTO CON UN QR PARA LA ASISTENCIA
   async findNetworkerData(
