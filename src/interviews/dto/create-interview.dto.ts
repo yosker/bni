@@ -31,8 +31,7 @@ export class CreateInterviewDto {
     example: 'Pregunta 4.',
   })
   @IsNotEmpty()
-  @IsString()
-  question4: string;
+  question4: Array<number>;
 
   @ApiProperty({
     example: 'Pregunta 5.',
@@ -52,8 +51,7 @@ export class CreateInterviewDto {
     example: 'Pregunta 7.',
   })
   @IsNotEmpty()
-  @IsString()
-  question7: string;
+  question7: Array<number>;
 
   @ApiProperty({
     example: 'Pregunta 8.',
@@ -87,8 +85,7 @@ export class CreateInterviewDto {
     example: 'Pregunta 12.',
   })
   @IsNotEmpty()
-  @IsString()
-  question12: string;
+  question12: Array<number>;
 
   @ApiProperty({
     example: 'Pregunta 13.',

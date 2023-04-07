@@ -20,8 +20,8 @@ export class Interviews {
   @Prop({ type: 'string' })
   question3: string;
 
-  @Prop({ type: 'string' })
-  question4: string;
+  @Prop({ type: 'array' })
+  question4: Array<number>;
 
   @Prop({ type: 'string' })
   question5: string;
@@ -29,8 +29,8 @@ export class Interviews {
   @Prop({ type: 'string' })
   question6: string;
 
-  @Prop({ type: 'string' })
-  question7: string;
+  @Prop({ type: 'array' })
+  question7: Array<number>;
 
   @Prop({ type: 'string' })
   question8: string;
@@ -44,8 +44,8 @@ export class Interviews {
   @Prop({ type: 'string' })
   question11: string;
 
-  @Prop({ type: 'string' })
-  question12: string;
+  @Prop({ type: 'array' })
+  question12: Array<number>;
 
   @Prop({ type: 'string' })
   question13: string;
