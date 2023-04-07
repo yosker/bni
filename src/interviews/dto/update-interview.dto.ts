@@ -1,6 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject } from 'class-validator';
+import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 import { CreateInterviewDto } from './create-interview.dto';
 
 export class UpdateInterviewDto extends PartialType(CreateInterviewDto) {
@@ -8,91 +8,91 @@ export class UpdateInterviewDto extends PartialType(CreateInterviewDto) {
     example: 'Pregunta 1.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question1: string;
 
   @ApiProperty({
     example: 'Pregunta 2.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question2: string;
 
   @ApiProperty({
     example: 'Pregunta 3.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question3: string;
 
   @ApiProperty({
     example: 'Pregunta 4.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question4: string;
 
   @ApiProperty({
     example: 'Pregunta 5.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question5: string;
 
   @ApiProperty({
     example: 'Pregunta 6.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question6: string;
 
   @ApiProperty({
     example: 'Pregunta 7.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question7: string;
 
   @ApiProperty({
     example: 'Pregunta 8.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question8: string;
 
   @ApiProperty({
     example: 'Pregunta 9.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question9: string;
 
   @ApiProperty({
     example: 'Pregunta 10.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question10: string;
 
   @ApiProperty({
     example: 'Pregunta 11.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question11: string;
 
   @ApiProperty({
     example: 'Pregunta 12.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question12: string;
 
   @ApiProperty({
     example: 'Pregunta 13.',
   })
   @IsNotEmpty()
-  @IsObject()
+  @IsString()
   question13: string;
 
   @Prop({ default: new Date() })

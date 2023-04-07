@@ -12,7 +12,7 @@ export class Interviews {
   chapterId: object;
 
   @Prop({ type: 'string' })
-  question1: object;
+  question1: string;
 
   @Prop({ type: 'string' })
   question2: string;
