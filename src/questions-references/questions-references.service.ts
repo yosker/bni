@@ -210,6 +210,10 @@ export class QuestionsReferencesService {
         updateQuestionsReferenceDto.userInterviewId,
       );
 
+      updateQuestionsReferenceDto.referenceId = ObjectId(
+        updateQuestionsReferenceDto.referenceId,
+      );
+
       const reference = await this.referenceModel.findOne({
         _id: updateQuestionsReferenceDto.referenceId,
         interviewId: updateQuestionsReferenceDto.interviewId,
