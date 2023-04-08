@@ -141,11 +141,11 @@ export class QuestionsReferencesService {
     }
   }
 
-  async findOne(userInterviewId: string, res: Response) {
+  async findOne(referenceId: string, res: Response) {
     const pipeline = [
       {
         $match: {
-          userInterviewId: ObjectId(userInterviewId),
+          referenceId: ObjectId(referenceId),
         },
       },
       {

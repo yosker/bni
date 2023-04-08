@@ -46,12 +46,9 @@ export class QuestionsReferencesController {
     return this.questionsReferencesService.findAll(res, skip, limit);
   }
 
-  @Get(':userInterviewId')
-  findOne(
-    @Param('userInterviewId') userInterviewId: string,
-    @Res() res: Response,
-  ) {
-    return this.questionsReferencesService.findOne(userInterviewId, res);
+  @Get(':referenceId')
+  findOne(@Param('referenceId') referenceId: string, @Res() res: Response) {
+    return this.questionsReferencesService.findOne(referenceId, res);
   }
 
   @Patch()
