@@ -165,6 +165,8 @@ export class QuestionsReferencesService {
           referenceId: '$referencesData._id',
           name: '$referencesData.name',
           phoneNumber: '$referencesData.phoneNumber',
+          company: '$company',
+          relationShip: '$relationShip',
           chapterId: '$referencesData.letterSent',
           question1: '$question1',
           question2: '$question2',
