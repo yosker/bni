@@ -7,13 +7,21 @@ import {
   Param,
   Res,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { QuestionsReferencesService } from './questions-references.service';
 import { CreateQuestionsReferenceDto } from './dto/create-questions-reference.dto';
 import { UpdateQuestionsReferenceDto } from './dto/update-questions-reference.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { Response } from 'express';
 import { PaginationParams } from 'src/shared/pagination/paginationParams';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard(), JwtGuard)
+@ApiTags('Questions References')
 @Controller('questions-references')
 export class QuestionsReferencesController {
   constructor(
