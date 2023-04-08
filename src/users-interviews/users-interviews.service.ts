@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUsersInterviewDto } from './dto/create-users-interview.dto';
 import { Response } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,6 +9,7 @@ import { User } from 'src/users/interfaces/users.interface';
 import { ServicesResponse } from 'src/responses/response';
 import { Users } from 'src/users/schemas/users.schema';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { UpdateUsersInterviewDto } from './dto/update-users-interview.dto';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -42,6 +43,51 @@ export class UsersInterviewsService {
       message: this.servicesResponse.message,
       result: interviewUser,
     });
+  }
+
+  async update(
+    updateUsersInterviewDto: UpdateUsersInterviewDto,
+    res: Response,
+  ) {
+    try {
+      const userInterview = await this.usersInterview.findOne({
+        userInterviewId: ObjectId(updateUsersInterviewDto.userInterviewId),
+        chapterId: ObjectId(updateUsersInterviewDto.chapterId),
+      });
+
+      if (!userInterview) {
+        throw res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(
+            new HttpException(
+              'USERS-INTERVIEWS_NOT_FOUND.',
+              HttpStatus.NOT_FOUND,
+            ),
+          );
+      }
+
+      await this.usersInterview.updateOne(
+        {
+          interviewId: updateUsersInterviewDto.chapterId,
+          userInterviewId: updateUsersInterviewDto.userInterviewId,
+        },
+        updateUsersInterviewDto,
+      );
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: updateUsersInterviewDto,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(
+          new HttpException(
+            'QUESTION-REFERENCE_NOT_FOUND.',
+            HttpStatus.NOT_FOUND,
+          ),
+        );
+    }
   }
 
   async findAll(skip = 0, limit?: number) {

@@ -7,6 +7,7 @@ import {
   Res,
   Query,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { UsersInterviewsService } from './users-interviews.service';
 import { CreateUsersInterviewDto } from './dto/create-users-interview.dto';
@@ -17,6 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { UpdateUsersInterviewDto } from './dto/update-users-interview.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -38,6 +40,14 @@ export class UsersInterviewsController {
       res,
       jwtPayload,
     );
+  }
+
+  @Patch()
+  update(
+    @Body() updateUsersInterviewDto: UpdateUsersInterviewDto,
+    @Res() res: Response,
+  ) {
+    return this.usersInterviewsService.update(updateUsersInterviewDto, res);
   }
 
   @Get()

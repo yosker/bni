@@ -44,7 +44,7 @@ export class InterviewsController {
     return this.interviewsService.findOne(id, res);
   }
 
-  @Patch('questionsReferences/:id')
+  @Patch('updateReferences/:id')
   updateQuestionsReferences(
     @Param('id') id: string,
     @Body() updateInterviewDto: UpdateInterviewDto,
