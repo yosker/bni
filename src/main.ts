@@ -29,6 +29,7 @@ async function bootstrap() {
     .addTag('Users Interviews')
     .addTag('Non Attendance')
     .addTag('References')
+    .addTag('Questions References')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentation', app, document);

@@ -17,7 +17,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { Response } from 'express';
 import { PaginationParams } from 'src/shared/pagination/paginationParams';
-import { ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
