@@ -211,7 +211,7 @@ export class QuestionsReferencesService {
       );
 
       const reference = await this.referenceModel.findOne({
-        chapterId: updateQuestionsReferenceDto.referenceId,
+        _id: updateQuestionsReferenceDto.referenceId,
         interviewId: updateQuestionsReferenceDto.interviewId,
         userInterviewId: updateQuestionsReferenceDto.userInterviewId,
       });
