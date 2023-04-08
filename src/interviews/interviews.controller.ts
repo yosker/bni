@@ -44,25 +44,12 @@ export class InterviewsController {
     return this.interviewsService.findOne(id, res);
   }
 
-  @Patch('updateReferences/:id')
-  updateQuestionsReferences(
-    @Param('id') id: string,
-    @Body() updateInterviewDto: UpdateInterviewDto,
-    @Res() res: Response,
-  ) {
-    return this.interviewsService.updateReferences(id, updateInterviewDto, res);
-  }
-
   @Patch('interviewUser/:id')
   updateInterviewUser(
     @Param('id') id: string,
     @Body() updateInterviewDto: UpdateInterviewDto,
     @Res() res: Response,
   ) {
-    return this.interviewsService.updateUserInterview(
-      id,
-      updateInterviewDto,
-      res,
-    );
+    return this.interviewsService.updateInterview(id, updateInterviewDto, res);
   }
 }
