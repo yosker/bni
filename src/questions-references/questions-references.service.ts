@@ -39,8 +39,12 @@ export class QuestionsReferencesService {
         createQuestionsReferenceDto.userInterviewId,
       );
 
+      createQuestionsReferenceDto.referenceId = ObjectId(
+        createQuestionsReferenceDto.referenceId,
+      );
+
       const reference = await this.referenceModel.findOne({
-        chapterId: createQuestionsReferenceDto.referenceId,
+        _id: createQuestionsReferenceDto.referenceId,
         interviewId: createQuestionsReferenceDto.interviewId,
         userInterviewId: createQuestionsReferenceDto.userInterviewId,
       });

@@ -1,5 +1,5 @@
 export interface IReference {
-  referenceId: object;
+  _id: object;
   chapterId: object;
   userId: object;
   interviewId: object;
