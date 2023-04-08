@@ -194,7 +194,7 @@ export class QuestionsReferencesService {
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,
-      result: questions,
+      result: questions[0] != null ? questions[0] : null,
     });
   }
 
