@@ -51,14 +51,12 @@ export class QuestionsReferencesController {
     return this.questionsReferencesService.findOne(id, res);
   }
 
-  @Patch(':id')
+  @Patch()
   update(
-    @Param('id') id: string,
     @Body() updateQuestionsReferenceDto: UpdateQuestionsReferenceDto,
     @Res() res: Response,
   ) {
     return this.questionsReferencesService.update(
-      id,
       updateQuestionsReferenceDto,
       res,
     );

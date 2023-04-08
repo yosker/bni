@@ -192,7 +192,6 @@ export class QuestionsReferencesService {
   }
 
   async update(
-    id: string,
     updateQuestionsReferenceDto: UpdateQuestionsReferenceDto,
     res: Response,
   ) {
