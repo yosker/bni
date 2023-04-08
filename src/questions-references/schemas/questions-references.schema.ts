@@ -21,6 +21,12 @@ export class QuestionsReferences {
   interviewId: object;
 
   @Prop({ type: 'string' })
+  relationShip: string;
+
+  @Prop({ type: 'string' })
+  company: string;
+
+  @Prop({ type: 'string' })
   question1: string;
 
   @Prop({ type: 'string' })
@@ -40,6 +46,9 @@ export class QuestionsReferences {
 
   @Prop({ type: 'string' })
   question7: string;
+
+  @Prop({ type: 'string' })
+  question8: string;
 
   @Prop({ default: new Date() })
   updatedAt: Date;
