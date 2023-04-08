@@ -22,6 +22,20 @@ export class CreateQuestionsReferenceDto {
   interviewId: object;
 
   @ApiProperty({
+    example: 'Relación.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  relationShip: string;
+
+  @ApiProperty({
+    example: 'Empresa.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  company: string;
+
+  @ApiProperty({
     example: 'Pregunta 1.',
   })
   @IsNotEmpty()
@@ -70,6 +84,13 @@ export class CreateQuestionsReferenceDto {
   @IsString()
   question7: string;
 
+  @ApiProperty({
+    example: 'Pregunta 8.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question8: string;
+
   @Prop({ default: new Date() })
-  updatedAt: Date;
+  createdAt: Date;
 }

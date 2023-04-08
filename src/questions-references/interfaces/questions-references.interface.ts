@@ -4,6 +4,8 @@ export interface IQuestionsReference {
   userId: object;
   interviewId: object;
   userInterviewId: object;
+  relationShip: string;
+  company: string;
   question1: string;
   question2: string;
   question3: string;
@@ -11,4 +13,5 @@ export interface IQuestionsReference {
   question5: string;
   question6: string;
   question7: string;
+  question8: string;
 }

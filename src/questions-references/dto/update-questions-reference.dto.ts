@@ -22,6 +22,18 @@ export class UpdateQuestionsReferenceDto extends PartialType(
   interviewId: object;
 
   @ApiProperty({
+    example: 'Relación.',
+  })
+  @IsString()
+  relationShip: string;
+
+  @ApiProperty({
+    example: 'Empresa.',
+  })
+  @IsString()
+  company: string;
+
+  @ApiProperty({
     example: 'Pregunta 1.',
   })
   @IsString()
@@ -62,6 +74,12 @@ export class UpdateQuestionsReferenceDto extends PartialType(
   })
   @IsString()
   question7: string;
+
+  @ApiProperty({
+    example: 'Pregunta 8.',
+  })
+  @IsString()
+  question8: string;
 
   @Prop({ default: new Date() })
   updatedAt: Date;
