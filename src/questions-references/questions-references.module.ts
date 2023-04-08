@@ -14,6 +14,10 @@ import {
 import { ServicesResponse } from 'src/responses/response';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
+import {
+  References,
+  ReferencesSchema,
+} from 'src/references/schemas/references.schema';
 
 @Module({
   imports: [
@@ -22,8 +26,10 @@ import { PaginateResult } from 'src/shared/pagination/pagination-result';
         name: QuestionsReferences.name,
         schema: QuestionsReferencesSchema,
       },
-    ]),
-    MongooseModule.forFeature([
+      {
+        name: References.name,
+        schema: ReferencesSchema,
+      },
       {
         name: Users.name,
         schema: UsersSchema,
