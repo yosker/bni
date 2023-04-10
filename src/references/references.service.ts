@@ -71,19 +71,19 @@ export class ReferencesService {
 
   async update(updateReferenceDto: UpdateReferenceDto, res: Response) {
     try {
-      await this.referenceModel.findOneAndUpdate(
+
+      await this.referenceModel.updateOne(
         {
-          chapterId: updateReferenceDto.chapterId,
-          userId: updateReferenceDto.userId,
-          interviewId: updateReferenceDto.interviewId,
-          userInterviewId: updateReferenceDto.userInterviewId,
+          _id: ObjectId(updateReferenceDto.id),
         },
-        updateReferenceDto,
+        {
+          $set: {name: updateReferenceDto.name, phoneNumber: updateReferenceDto.phoneNumber },
+        },
       );
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: updateReferenceDto,
+        result: {},
       });
     } catch (error) {
       throw res

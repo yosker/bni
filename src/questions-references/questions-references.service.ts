@@ -234,6 +234,7 @@ export class QuestionsReferencesService {
         {
           interviewId: updateQuestionsReferenceDto.interviewId,
           userInterviewId: updateQuestionsReferenceDto.userInterviewId,
+          referenceId: updateQuestionsReferenceDto.referenceId
         },
         updateQuestionsReferenceDto,
       );

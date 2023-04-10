@@ -4,24 +4,15 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { CreateReferenceDto } from './create-reference.dto';
 
 export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
-  userId: object;
-
-  chapterId: object;
 
   @ApiProperty({
-    example: 'Id de Usuario Entrevistado.',
+    example: 'Id de la referencia.',
   })
   @IsNotEmpty()
-  userInterviewId: object;
+  id: string;
 
   @ApiProperty({
-    example: 'Id de Entrevista.',
-  })
-  @IsNotEmpty()
-  interviewId: object;
-
-  @ApiProperty({
-    example: 'Nombre del Candidato.',
+    example: 'Nombre de la referencia.',
   })
   @IsNotEmpty()
   @IsString()
@@ -33,11 +24,6 @@ export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
   @IsNotEmpty()
   @IsString()
   phoneNumber: string;
-
-  @ApiProperty({
-    example: 'Email.',
-  })
-  email: string;
 
   @Prop({ default: new Date() })
   updatedAt: Date;
