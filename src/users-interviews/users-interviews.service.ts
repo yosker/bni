@@ -51,8 +51,7 @@ export class UsersInterviewsService {
   ) {
     try {
       const userInterview = await this.usersInterview.findOne({
-        userInterviewId: ObjectId(updateUsersInterviewDto.userInterviewId),
-        chapterId: ObjectId(updateUsersInterviewDto.chapterId),
+        _id: ObjectId(updateUsersInterviewDto._id),
       });
 
       if (!userInterview) {
@@ -68,15 +67,14 @@ export class UsersInterviewsService {
 
       await this.usersInterview.updateOne(
         {
-          interviewId: updateUsersInterviewDto.chapterId,
-          userInterviewId: updateUsersInterviewDto.userInterviewId,
+          _id: updateUsersInterviewDto._id,
         },
         updateUsersInterviewDto,
       );
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: updateUsersInterviewDto,
+        result: {},
       });
     } catch (error) {
       throw res
