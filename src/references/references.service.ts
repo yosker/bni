@@ -34,27 +34,27 @@ export class ReferencesService {
       createReferenceDto.userInterviewId,
     );
 
-    const reference = await this.referenceModel.findOne({
-      chapterId: createReferenceDto.chapterId,
-      userId: createReferenceDto.userId,
-      interviewId: createReferenceDto.interviewId,
-      userInterviewId: createReferenceDto.userInterviewId,
-    });
+    // const reference = await this.referenceModel.findOne({
+    //   chapterId: createReferenceDto.chapterId,
+    //   userId: createReferenceDto.userId,
+    //   interviewId: createReferenceDto.interviewId,
+    //   userInterviewId: createReferenceDto.userInterviewId,
+    // });
 
-    let interviewUser;
-    if (!reference) {
-      interviewUser = await this.referenceModel.create(createReferenceDto);
-    } else {
-      await this.referenceModel.findOneAndUpdate(
-        {
-          chapterId: createReferenceDto.chapterId,
-          userId: createReferenceDto.userId,
-          interviewId: createReferenceDto.interviewId,
-          userInterviewId: createReferenceDto.userInterviewId,
-        },
-        createReferenceDto,
-      );
-    }
+    // let interviewUser;
+    // if (!reference) {
+    const interviewUser = await this.referenceModel.create(createReferenceDto);
+    // } else {
+    //   await this.referenceModel.findOneAndUpdate(
+    //     {
+    //       chapterId: createReferenceDto.chapterId,
+    //       userId: createReferenceDto.userId,
+    //       interviewId: createReferenceDto.interviewId,
+    //       userInterviewId: createReferenceDto.userInterviewId,
+    //     },
+    //     createReferenceDto,
+    //   );
+    // }
 
     await this.usersModel.findByIdAndUpdate(
       createReferenceDto.userInterviewId,
@@ -71,13 +71,15 @@ export class ReferencesService {
 
   async update(updateReferenceDto: UpdateReferenceDto, res: Response) {
     try {
-
       await this.referenceModel.updateOne(
         {
           _id: ObjectId(updateReferenceDto.id),
         },
         {
-          $set: {name: updateReferenceDto.name, phoneNumber: updateReferenceDto.phoneNumber },
+          $set: {
+            name: updateReferenceDto.name,
+            phoneNumber: updateReferenceDto.phoneNumber,
+          },
         },
       );
       return res.status(HttpStatus.OK).json({
@@ -106,7 +108,7 @@ export class ReferencesService {
     return query;
   }
 
-  async findOne(userInterviewId: string) {
+  async findById(userInterviewId: string) {
     return this.referenceModel.find({
       userInterviewId: ObjectId(userInterviewId),
     });

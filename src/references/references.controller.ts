@@ -47,7 +47,7 @@ export class ReferencesController {
   }
 
   @Get(':userInterviewId')
-  findOne(@Param('userInterviewId') userInterviewId: string) {
-    return this.referencesService.findOne(userInterviewId);
+  findById(@Param('userInterviewId') userInterviewId: string) {
+    return this.referencesService.findById(userInterviewId);
   }
 }
