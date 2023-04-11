@@ -9,8 +9,6 @@ import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { Model } from 'mongoose';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
-
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -155,7 +153,6 @@ export class ChargesService {
             result: charge,
         });
     }
-
 
     //ENDPOINT PARA ELIMIAR UN GASTO
     async delete(id: string, res: Response): Promise<Response> {

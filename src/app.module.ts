@@ -27,6 +27,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ChargesModule } from './charges/charges.module';
 import { TreasuryReportModule } from './treasury-report/treasury-report.module';
 import { QuestionsReferencesModule } from './questions-references/questions-references.module';
+import { PasswordRecoverModule } from './password-recover/password-recover.module';
 
 
 @Module({
@@ -70,6 +71,7 @@ import { QuestionsReferencesModule } from './questions-references/questions-refe
     ChargesModule,
     TreasuryReportModule,
     QuestionsReferencesModule,
+    PasswordRecoverModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],

@@ -111,6 +111,9 @@ export class CreateUserDto {
   @IsBoolean()
   completedInterview = false;
 
+  @Prop({ default: false, required: false })
+  resetPassword:  boolean;
+
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })

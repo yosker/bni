@@ -54,6 +54,9 @@ export class Users {
   @Prop({ type: 'boolean' })
   accepted: boolean;
 
+  @Prop({ type: 'boolean', default: false, required: false })
+  resetPassword: boolean;
+
   @Prop({ type: String, required: false, default: '-' })
   invitedBy: string;
 }

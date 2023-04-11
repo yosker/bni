@@ -160,7 +160,7 @@ export class UsersService {
           amount: '',
           to: newUser.email,
         };
-        await this.sharedService.sendMailer(emailProperties);
+        //await this.sharedService.sendMailer(emailProperties);
       }
 
       if (newUser.role.toLowerCase() != 'visitante') {
@@ -202,6 +202,7 @@ export class UsersService {
       createUserDto = {
         ...createUserDto,
         idChapter: ObjectId(createUserDto.idChapter),
+        resetPassword:false
       };
       await this.usersModel.create(createUserDto);
 
