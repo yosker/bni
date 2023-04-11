@@ -7,52 +7,11 @@ export class UpdateUsersInterviewDto extends PartialType(
   CreateUsersInterviewDto,
 ) {
   @ApiProperty({
-    example: 'Id de Usuario Invitado.',
-  })
-  @IsNotEmpty()
-  userInterviewId: object;
-
-  @ApiProperty({
-    example: 'Id de Capítulo.',
+    example: '_id.',
   })
   @IsNotEmpty()
   @IsString()
-  chapterId: object;
-
-  @ApiProperty({
-    example: 'Id de Entrevista.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  interviewId: object;
-
-  @ApiProperty({
-    example: 'Nombre del Candidato.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  candidate: string;
-
-  @ApiProperty({
-    example: 'Nombre de Empresa.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  company: string;
-
-  @ApiProperty({
-    example: 'Especialidad/Giro de la Empresa.',
-  })
-  @IsNotEmpty()
-  @IsString()
-  specialty: string;
-
-  @ApiProperty({
-    example: 'Fecha de Entrevista.',
-  })
-  @IsNotEmpty()
-  @Prop({ default: new Date() })
-  dateOfInterview: Date = new Date();
+  _id: string;
 
   @ApiProperty({
     example: 'Pregunta 1.',

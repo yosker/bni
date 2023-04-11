@@ -6,7 +6,7 @@ export class CreateCommentDto {
   createdBy: object;
 
   @ApiProperty({
-    example: 'Id Usuario invitado.',
+    example: 'Id Usuario.',
   })
   @IsNotEmpty()
   userId: object;
