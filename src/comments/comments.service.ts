@@ -30,7 +30,7 @@ export class CommentsService {
       });
 
       if (comments?.length >= 5) {
-        this.userModel.findByIdAndUpdate(ObjectId(createCommentDto.userId), {
+        this.userModel.findByIdAndUpdate(ObjectId(createCommentDto.visitorId), {
           accepted: createCommentDto.accepted,
         });
       }

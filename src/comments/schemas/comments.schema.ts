@@ -9,10 +9,7 @@ export class Comments {
   createdBy: object;
 
   @Prop({ type: 'object' })
-  userId: object;
-
-  @Prop({ type: 'object' })
-  userInterviewId: object;
+  visitorId: object;
 
   @Prop({ type: 'string' })
   comment: string;
