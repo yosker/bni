@@ -29,8 +29,10 @@ export class CommentsService {
         interviewId: ObjectId(createCommentDto.interviewId),
       });
 
+      createCommentDto.visitorId = ObjectId(createCommentDto.visitorId);
+
       if (comments?.length >= 5) {
-        this.userModel.findByIdAndUpdate(ObjectId(createCommentDto.visitorId), {
+        this.userModel.findByIdAndUpdate(createCommentDto.visitorId, {
           accepted: createCommentDto.accepted,
         });
       }
