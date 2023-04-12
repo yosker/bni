@@ -63,21 +63,61 @@ export class CommentsService {
     });
   }
 
-  async findOne(userInterviewId: string, res: Response) {
-    const comment = await this.commentModel.find({
-      userInterviewId: ObjectId(userInterviewId),
-    });
+  async findByUserInterviewId(userInterviewId: string, res: Response) {
+    try {
+      const pipeline = [
+        {
+          $match: {
+            visitorId: ObjectId(userInterviewId),
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'createdBy',
+            foreignField: '_id',
+            as: 'userData',
+          },
+        },
+        {
+          $unwind: '$userData',
+        },
+        {
+          $project: {
+            nameUserCreated: {
+              $concat: ['$userData.name', ' ', '$userData.lastName'],
+            },
+            imageUrl: '$userData.imageURL',
+            attendanceDate: '$attendanceDate',
+            comment: '$comment',
+            accepted: '$accepted',
+          },
+        },
+      ];
+      const comment = await this.commentModel.aggregate(pipeline);
 
-    if (!comment)
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json(new HttpException('COMMENT_NOT_FOUND.', HttpStatus.BAD_REQUEST));
+      if (!comment)
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(
+            new HttpException('COMMENT_NOT_FOUND.', HttpStatus.BAD_REQUEST),
+          );
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: this.servicesResponse.statusCode,
-      message: this.servicesResponse.message,
-      result: comment,
-    });
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: comment,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 
   async update(
@@ -87,6 +127,7 @@ export class CommentsService {
     jwtPayload: JWTPayload,
   ) {
     updateCommentDto.createdBy = ObjectId(jwtPayload.id);
+    updateCommentDto.visitorId = ObjectId(updateCommentDto.visitorId);
     return res.status(HttpStatus.OK).json({
       statusCode: this.servicesResponse.statusCode,
       message: this.servicesResponse.message,

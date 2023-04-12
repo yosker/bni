@@ -40,11 +40,11 @@ export class CommentsController {
   }
 
   @Get(':userInterviewId')
-  findOne(
+  findByUserInterviewId(
     @Param('userInterviewId') userInterviewId: string,
     @Res() res: Response,
   ) {
-    return this.commentsService.findOne(userInterviewId, res);
+    return this.commentsService.findByUserInterviewId(userInterviewId, res);
   }
 
   @Patch(':id')
