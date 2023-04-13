@@ -18,7 +18,7 @@ export class CommentsService {
     @InjectModel(Comments.name) private readonly commentModel: Model<Comment>,
     @InjectModel(Users.name) private readonly userModel: Model<User>,
     private servicesResponse: ServicesResponse,
-  ) {}
+  ) { }
   async create(
     createCommentDto: CreateCommentDto,
     res: Response,
@@ -37,11 +37,11 @@ export class CommentsService {
         });
       }
       createCommentDto.createdBy = ObjectId(jwtPayload.id);
-      await this.commentModel.create(createCommentDto);
+      const newComment = await this.commentModel.create(createCommentDto);
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: createCommentDto,
+        result: newComment,
       });
     } catch (error) {
       throw res
@@ -126,17 +126,56 @@ export class CommentsService {
     res: Response,
     jwtPayload: JWTPayload,
   ) {
-    updateCommentDto.createdBy = ObjectId(jwtPayload.id);
-    updateCommentDto.visitorId = ObjectId(updateCommentDto.visitorId);
-    return res.status(HttpStatus.OK).json({
-      statusCode: this.servicesResponse.statusCode,
-      message: this.servicesResponse.message,
-      result: await this.commentModel.updateOne(
+    try {
+
+      updateCommentDto.createdBy = ObjectId(jwtPayload.id);
+      updateCommentDto.visitorId = ObjectId(updateCommentDto.visitorId);
+
+       await this.commentModel.updateOne(
         {
           _id: ObjectId(id),
         },
-        updateCommentDto,
-      ),
-    });
+        updateCommentDto
+      )
+    
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {}
+      });
+
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+
+  }
+
+  async findById(visitorId: string, jwtPayload: JWTPayload, res: Response) {
+    try {
+     
+      const comment = await this.commentModel.findOne({visitorId: ObjectId(visitorId),createdBy: ObjectId(jwtPayload.id) });
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: comment,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   }
 }
