@@ -12,7 +12,6 @@ import { Charges } from 'src/charges/interfaces/charges.interfaces';
 import * as moment from 'moment';
 const ObjectId = require('mongodb').ObjectId;
 
-
 @Injectable()
 export class TreasuryReportService {
 
@@ -52,7 +51,6 @@ export class TreasuryReportService {
                 );
         }
     }
-
 
     //ENDPOINT QUE REGRESA EL TOTAL DE INGRESOS ////////////////////////////////////////////////////////////////////////////////////////
     async totaIncome(jwtPayload: JWTPayload) {
@@ -132,7 +130,6 @@ export class TreasuryReportService {
                 },
             };
             return [
-
                 {
                     $match: filter
                 },

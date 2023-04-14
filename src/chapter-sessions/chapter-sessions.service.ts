@@ -64,7 +64,7 @@ export class ChapterSessionsService {
           const usersChapter = await this.usersModel.find({
             idChapter: ObjectId(chapterSessionDTO.chapterId),
             role: {
-              ne: 'Visitantes',
+              $ne: 'Visitantes',
             },
           });
 

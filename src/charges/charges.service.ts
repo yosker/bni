@@ -157,8 +157,6 @@ export class ChargesService {
     //ENDPOINT PARA ELIMIAR UN GASTO
     async delete(id: string, res: Response): Promise<Response> {
         try {
-
-
             const objDelete = await this.chargesModel.findByIdAndUpdate(
                 { _id: ObjectId(id) },
                 { status: EstatusRegister.Deleted },

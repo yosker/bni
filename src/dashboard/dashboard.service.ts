@@ -5,11 +5,16 @@ import { Model } from 'mongoose';
 import { Users } from 'src/users/schemas/users.schema';
 import { User } from 'src/users/interfaces/users.interface';
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
+import { Treasury } from 'src/treasury/interfaces/treasury.interfaces';
+import { Charges } from 'src/charges/interfaces/charges.interfaces';
+import { MembershipActivity } from 'src/membership-activities/interfaces/membership-activity.interfaces';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import * as moment from 'moment';
+import { MembershipActivities } from 'src/membership-activities/schemas/membership-activity.schema';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -20,7 +25,15 @@ export class DashboardService {
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
     private readonly servicesResponse: ServicesResponse,
-  ) {}
+    @InjectModel('Treasury')
+    private readonly treasuryModel: Model<Treasury>,
+    @InjectModel('Charges')
+    private readonly chargesModel: Model<Charges>,
+
+    @InjectModel(MembershipActivities.name)
+    private readonly membershipActivityModel: Model<MembershipActivity>,
+
+  ) { }
 
   async getFullData(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
@@ -30,13 +43,15 @@ export class DashboardService {
         totalCash: 0,
         totalAbsences: {},
         totalVisotorLastSixMonths: {},
+        totalPendingActivities: [],
       };
 
       objResult.totalNets = await this.totalNetworkers(jwtPayload);
       objResult.totalVisitors = await this.totalVistors(jwtPayload);
+      objResult.totalCash = await this.totalCash(jwtPayload);
       objResult.totalAbsences = await this.totalNetsAbsences(jwtPayload);
-      objResult.totalVisotorLastSixMonths =
-        await this.totalVistorsLastSixMonths(jwtPayload);
+      objResult.totalVisotorLastSixMonths = await this.totalVistorsLastSixMonths(jwtPayload);
+      objResult.totalPendingActivities = await this.totalPendingActivities(jwtPayload.idChapter);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -70,13 +85,24 @@ export class DashboardService {
 
   private async totalNetsResult(chapterId: string) {
     try {
+
+      const now = new Date();
+      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+
+      const filter = {
+        idChapter: ObjectId(chapterId),
+        status: EstatusRegister.Active,
+        role: { $ne: 'Visitante' },
+        createdAt: {
+          $gte: new Date(gte),
+          $lt: new Date(lte),
+        },
+      };
+
       return [
         {
-          $match: {
-            idChapter: ObjectId(chapterId),
-            status: EstatusRegister.Active,
-            role: { $ne: 'Visitante' },
-          },
+          $match: filter
         },
         { $group: { _id: null, totalNetworkers: { $sum: 1 } } },
         { $project: { _id: 0 } },
@@ -108,6 +134,11 @@ export class DashboardService {
 
   private async totalVisitorsResult(chapterId: string) {
     try {
+
+      const now = new Date();
+      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+
       return [
         {
           $match: {
@@ -115,8 +146,8 @@ export class DashboardService {
             status: EstatusRegister.Active,
             role: { $eq: 'Visitante' },
             createdAt: {
-              $gte: new Date('2023-02-12T00:00:00.000-06:00'),
-              $lte: new Date('2023-02-12T23:59:59.999-06:00'),
+              $gte: gte,
+              $lte: lte,
             },
           },
         },
@@ -147,7 +178,13 @@ export class DashboardService {
   }
 
   private async totalAbsencesResult(chapterId: string) {
+
     try {
+
+      const now = new Date();
+      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+
       return [
         {
           $lookup: {
@@ -161,13 +198,18 @@ export class DashboardService {
           $unwind: '$users',
         },
         {
-          $match: {
+          $match:
+          {
             'users.role': {
               $ne: 'Visitante',
             },
             chapterId: ObjectId(chapterId),
             attended: false,
-            status: 'Active',
+            status: EstatusRegister.Active,
+            createdAt: {
+              $gte: new Date(gte),
+              $lt: new Date(lte),
+            },
           },
         },
         {
@@ -204,15 +246,26 @@ export class DashboardService {
 
   private async totalVisitorsLastSixMonthsResult(chapterId: string) {
     try {
+
+      const now = new Date();
+      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+
+      const filter = {
+        role: {
+          $eq: 'Visitante',
+        },
+        idChapter: ObjectId(chapterId),
+        status: EstatusRegister.Active,
+        createdAt: {
+          $gte: new Date(gte),
+          $lt: new Date(lte),
+        },
+      };
+
       return [
         {
-          $match: {
-            role: {
-              $eq: 'Visitante',
-            },
-            idChapter: ObjectId(chapterId),
-            status: 'Active',
-          },
+          $match: filter
         },
         {
           $group: {
@@ -221,6 +274,113 @@ export class DashboardService {
           },
         },
       ];
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  }
+
+  //OBTENEMOS EL TOTAL DE INGRESOS DEL CAPITULO DE LOS ULTIMOS 6 MESES////////////////////////////////////////////////////////////////////
+
+  async totalCash(jwtPayload: JWTPayload) {
+    try {
+
+      const pipelineIncome = await this.totalIncomeResult(jwtPayload.idChapter);
+      const pipelineCharges = await this.totalChargesResult(jwtPayload.idChapter);
+
+      const objIncome = await this.treasuryModel.aggregate(pipelineIncome);
+      const objCharge = await this.chargesModel.aggregate(pipelineCharges);
+
+      const totalCash = objIncome[0].totalAmount - objCharge[0].totalAmount;
+      return totalCash;
+
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  }
+
+  private async totalIncomeResult(chapterId: string) {
+    try {
+
+      const now = new Date();
+      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+
+      const filter = {
+        chapterId: ObjectId(chapterId),
+        status: EstatusRegister.Active,
+        createdAt: {
+          $gte: new Date(gte),
+          $lt: new Date(lte),
+        },
+      };
+      return [
+        {
+          $match: filter
+        },
+        {
+          $group: {
+            _id: 1,
+            totalAmount: { $sum: "$payment" }
+          }
+        }
+      ];
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  }
+
+  private async totalChargesResult(chapterId: string) {
+    try {
+
+      const now = new Date();
+      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+
+      const filter = {
+        chapterId: ObjectId(chapterId),
+        status: EstatusRegister.Active,
+        createdAt: {
+          $gte: new Date(gte),
+          $lt: new Date(lte),
+        },
+      };
+      return [
+        {
+          $match: filter
+        },
+        {
+          $group: {
+            _id: 1,
+            totalAmount: { $sum: "$amount" }
+          }
+        }
+      ];
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  }
+
+  //OBTENEMOS LAS ACTIVIDADES PENDIENTES 
+  async totalPendingActivities(chapterId: string) {
+
+    try {
+      const objList = await this.membershipActivityModel.find(
+        {
+          chapterId: ObjectId(chapterId),
+          status: EstatusRegister.Active,
+          statusActivity: "Pending"
+        },
+      );
+      return objList;
+      
     } catch (err) {
       throw new HttpErrorByCode[500](
         'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
