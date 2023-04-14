@@ -83,7 +83,7 @@ export class AttendanceService {
           userId: ObjectId(attendanceDTO.userId),
           chapterId: ObjectId(jwtPayload.idChapter),
           attended: true,
-          createdAt: new Date(),
+          updatedAt: new Date(),
         };
         await this.attendanceModel.findOneAndUpdate(
           {

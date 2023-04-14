@@ -35,7 +35,7 @@ export class UsersService {
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
-  ) { }
+  ) {}
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -56,8 +56,8 @@ export class UsersService {
           $match: filter,
         },
         {
-          $sort: { createdAt: -1 }
-        }
+          $sort: { createdAt: -1 },
+        },
       ]);
 
       return res.status(HttpStatus.OK).json({
@@ -123,13 +123,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-            await this.sharedService.uploadFile(
-              dataBuffer,
-              filename,
-              '.jpg',
-              's3-bucket-users',
-            )
-          ).result
+              await this.sharedService.uploadFile(
+                dataBuffer,
+                filename,
+                '.jpg',
+                's3-bucket-users',
+              )
+            ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -160,7 +160,7 @@ export class UsersService {
           amount: '',
           to: newUser.email,
         };
-        //await this.sharedService.sendMailer(emailProperties);
+        await this.sharedService.sendMailer(emailProperties);
       }
 
       if (newUser.role.toLowerCase() != 'visitante') {
@@ -202,7 +202,7 @@ export class UsersService {
       createUserDto = {
         ...createUserDto,
         idChapter: ObjectId(createUserDto.idChapter),
-        resetPassword:false
+        resetPassword: false,
       };
       await this.usersModel.create(createUserDto);
 
@@ -298,32 +298,25 @@ export class UsersService {
     }
   }
 
-
   async updateVisitor(
     id: string,
     updateUserDto: UpdateUserDto,
-    res: Response): Promise<Response> {
-
+    res: Response,
+  ): Promise<Response> {
     try {
-
       updateUserDto = {
         ...updateUserDto,
         idChapter: ObjectId(updateUserDto.idChapter),
       };
 
-      await this.usersModel.findByIdAndUpdate(
-        ObjectId(id),
-        updateUserDto,
-      );
+      await this.usersModel.findByIdAndUpdate(ObjectId(id), updateUserDto);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
         result: {},
       });
-
-    }
-    catch (err) {
+    } catch (err) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
@@ -333,9 +326,7 @@ export class UsersService {
           ),
         );
     }
-
   }
-
 
   //ENDPOIT QUE REGRESA LA INFO GENERAL DEL USUARIO JUNTO CON UN QR PARA LA ASISTENCIA
   async findNetworkerData(
