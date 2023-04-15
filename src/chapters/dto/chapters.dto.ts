@@ -24,7 +24,6 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
     example: 'Nombre de Capítulo.',
   })
-  
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -32,7 +31,6 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
     example: 'Correo de Capítulo.',
   })
-  
   @IsNotEmpty()
   @IsString()
   email: string;

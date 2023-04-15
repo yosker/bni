@@ -5,40 +5,48 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
 import { ZoomService } from './zoom.service';
 import { CreateZoomDto } from './dto/create-zoom.dto';
 import { UpdateZoomDto } from './dto/update-zoom.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Zoom')
 @Controller('zoom')
 export class ZoomController {
   constructor(private readonly zoomService: ZoomService) {}
 
   @Post()
-  create(@Body() createZoomDto: CreateZoomDto) {
-    return this.zoomService.create(createZoomDto);
+  getUsersByMeetingId(
+    @Body() createZoomDto: CreateZoomDto,
+    @Res() res: Response,
+  ) {
+    return this.zoomService.getUsersByMeetingId(createZoomDto, res);
   }
 
-  @Get()
-  findAll() {
-    return this.zoomService.findAll();
+  @Patch(':meetingId/:chapterId')
+  setUsersByMeetingId(
+    @Param('meetingId') meetingId: string,
+    @Param('chapterId') chapterId: string,
+    @Res() res: Response,
+  ) {
+    return this.zoomService.setUsersByMeetingId(chapterId, meetingId, res);
   }
 
-  @Get(':token')
-  findOne(@Param('token') token: string) {
-    return this.zoomService.findOne(token);
+  @Get('token/:chapterId')
+  findOne(@Param('chapterId') chapterId: string, @Res() res: Response) {
+    return this.zoomService.findOne(chapterId, res);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateZoomDto: UpdateZoomDto) {
-    return this.zoomService.update(+id, updateZoomDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.zoomService.remove(+id);
+  @Patch()
+  update(@Body() updateZoomDto: UpdateZoomDto, @Res() res: Response) {
+    return this.zoomService.updateTokenChapterToken(updateZoomDto, res);
   }
 }

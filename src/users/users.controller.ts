@@ -159,17 +159,12 @@ export class UsersController {
     return this.usersService.getApplicationFile(id, res);
   }
 
-
   @Post('/editVisitorRow/:id')
   async updateVisitor(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Res() res: Response,
   ) {
-    return await this.usersService.updateVisitor(
-      id,
-      updateUserDto,
-      res,
-    );
+    return await this.usersService.updateVisitor(id, updateUserDto, res);
   }
 }

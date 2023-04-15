@@ -22,8 +22,6 @@ import { SharedService } from 'src/shared/shared.service';
         name: UsersInterviews.name,
         schema: UsersInterviewsSchema,
       },
-    ]),
-    MongooseModule.forFeature([
       {
         name: Users.name,
         schema: UsersSchema,

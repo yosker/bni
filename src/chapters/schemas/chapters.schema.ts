@@ -10,6 +10,7 @@ export const ChapterSchema = new Schema({
   sessionDate: { type: String, required: true },
   sessionSchedule: { type: String, required: true },
   sessionType: { type: String, required: true },
+  tokenChapter: { type: String, required: false },
   createdAt: {
     type: Date,
     default: new Date().toISOString(),
