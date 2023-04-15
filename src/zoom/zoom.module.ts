@@ -11,12 +11,19 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/auth/jwt.constants';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
+import { Users } from '../users/schemas/users.schema';
+import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'Chapter', schema: ChapterSchema },
+      { name: 'Attendance', schema: AttendanceSchema },
       { name: 'Users', schema: UsersSchema },
+      {
+        name: Users.name,
+        schema: UsersSchema,
+      },
     ]),
     AuthModule,
     PassportModule.register({

@@ -31,7 +31,7 @@ export class ZoomController {
     return this.zoomService.getUsersByMeetingId(createZoomDto, res);
   }
 
-  @Patch(':meetingId/:chapterId')
+  @Patch('/setUsersMeeting/:meetingId/:chapterId')
   setUsersByMeetingId(
     @Param('meetingId') meetingId: string,
     @Param('chapterId') chapterId: string,
@@ -45,8 +45,11 @@ export class ZoomController {
     return this.zoomService.findOne(chapterId, res);
   }
 
-  @Patch()
-  update(@Body() updateZoomDto: UpdateZoomDto, @Res() res: Response) {
-    return this.zoomService.updateTokenChapterToken(updateZoomDto, res);
+  @Patch('/updateTokenChapter')
+  updateTokenChapter(
+    @Body() updateZoomDto: UpdateZoomDto,
+    @Res() res: Response,
+  ) {
+    return this.zoomService.updateTokenChapter(updateZoomDto, res);
   }
 }

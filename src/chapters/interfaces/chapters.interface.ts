@@ -10,7 +10,7 @@ export interface Chapter extends Document {
   sessionDate: { type: string };
   sessionSchedule: { type: string };
   sessionType: { type: string };
-  tokenChapter: { type: string };
+  tokenChapter: string;
   createdAt: {
     type: Date;
   };

@@ -2,13 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateZoomDto } from './dto/create-zoom.dto';
 import { UpdateZoomDto } from './dto/update-zoom.dto';
 import { HttpService } from '@nestjs/axios';
-import { map } from 'rxjs';
-import { AxiosResponse } from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Chapter } from 'src/chapters/interfaces/chapters.interface';
 import { Response } from 'express';
 import { ServicesResponse } from 'src/responses/response';
+import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
+import { User } from 'src/users/interfaces/users.interface';
+import { Users } from 'src/users/schemas/users.schema';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -18,6 +19,9 @@ export class ZoomService {
     private httpService: HttpService,
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
     private servicesResponse: ServicesResponse,
+    @InjectModel(Users.name) private readonly usersModel: Model<User>,
+    @InjectModel('Attendance')
+    private readonly attendanceModel: Model<Attendance>,
   ) {}
 
   /**
@@ -28,21 +32,15 @@ export class ZoomService {
    */
   async getUsersByMeetingId(createZoomDto: CreateZoomDto, res: Response) {
     try {
-      const headers = { Authorization: `Bearer ${createZoomDto.tokenChapter}` };
-
-      const result = this.httpService
-        .get(
-          `https://api.zoom.us/v2/meetings/${createZoomDto.meetingId}/registrants`,
-          {
-            headers,
-          },
-        )
-        .pipe(map((response: AxiosResponse) => response.data));
+      const meeting = await this.getDataMeeting(
+        createZoomDto.meetingId,
+        createZoomDto.tokenChapter,
+      );
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: result,
+        result: meeting,
       });
     } catch (error) {
       throw res
@@ -79,13 +77,23 @@ export class ZoomService {
             ),
           );
       }
-      const headers = { Authorization: `Bearer ${chapter.tokenChapter}` };
 
-      const meeting = this.httpService
-        .get(`https://api.zoom.us/v2/meetings/${meetingId}/registrants`, {
-          headers,
-        })
-        .pipe(map((response: AxiosResponse) => response.data));
+      const meeting = await this.getDataMeeting(
+        meetingId,
+        chapter.tokenChapter,
+      );
+
+      meeting.registrants.forEach(async (registrant: { email: any }) => {
+        //Buscamos al usuario por su email
+        const user = await this.usersModel.findOne({
+          email: registrant.email,
+        });
+
+        if (!user) {
+          //Si no se Encuentra el Usuario, se Crea como Visitante
+        } else {
+        }
+      });
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -142,7 +150,7 @@ export class ZoomService {
    * @param res respuesta
    * @returns respuesta
    */
-  async updateTokenChapterToken(updateZoomDto: UpdateZoomDto, res: Response) {
+  async updateTokenChapter(updateZoomDto: UpdateZoomDto, res: Response) {
     try {
       const chapter = await this.validateChapterExist(
         updateZoomDto.chapterId.toString(),
@@ -206,4 +214,29 @@ export class ZoomService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  /**
+   *
+   * @param meetingId Id del Meet
+   * @param tokenChapter Token del Capítulo
+   * @returns Información del Mee
+   */
+  getDataMeeting = (meetingId: string, tokenChapter: string): Promise<any> => {
+    try {
+      const headers = { Authorization: `Bearer ${tokenChapter}` };
+
+      return new Promise((resolve) => {
+        this.httpService
+          .get(`https://api.zoom.us/v2/meetings/${meetingId}/registrants`, {
+            headers,
+          })
+          .forEach((value) => {
+            resolve(value.data);
+          });
+      });
+    } catch (error) {
+      console.log(error.message);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  };
 }
