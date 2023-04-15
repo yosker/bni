@@ -83,17 +83,24 @@ export class ZoomService {
         chapter.tokenChapter,
       );
 
-      meeting.registrants.forEach(async (registrant: { email: any }) => {
-        //Buscamos al usuario por su email
-        const user = await this.usersModel.findOne({
-          email: registrant.email,
-        });
+      meeting.registrants.forEach(
+        async (registrant: {
+          email: string;
+          first_name: string;
+          last_name: string;
+          phone: string; //TODO Agregar campos faltantes al crear el meeting
+        }) => {
+          //Buscamos al usuario por su email
+          const user = await this.usersModel.findOne({
+            email: registrant.email,
+          });
 
-        if (!user) {
-          //Si no se Encuentra el Usuario, se Crea como Visitante
-        } else {
-        }
-      });
+          if (!user) {
+            //Si no se Encuentra el Usuario, se Crea como Visitante
+          } else {
+          }
+        },
+      );
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
