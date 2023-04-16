@@ -109,8 +109,38 @@ export class ReferencesService {
   }
 
   async findById(userInterviewId: string) {
-    return this.referenceModel.find({
-      userInterviewId: ObjectId(userInterviewId),
-    });
+    return this.referenceModel.aggregate([
+      {
+        $match: {
+          userInterviewId: ObjectId(userInterviewId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userInterviewId',
+          foreignField: '_id',
+          as: 'usersData',
+        },
+      },
+      {
+        $unwind: '$usersData',
+      },
+      {
+        $project: {
+          _id: '$_id',
+          userId: '$usersData._id',
+          name: '$usersData.name',
+          lastName: '$usersData.lastName',
+          companyName: '$usersData.companyName',
+          completedInterview: '$usersData.completedInterview',
+          chapterId: '$chapterId',
+          userInterviewId: '$userInterviewId',
+          interviewId: '$interviewId',
+          phoneNumber: '$phoneNumber',
+          updatedAt: '$updatedAt',
+        },
+      },
+    ]);
   }
 }
