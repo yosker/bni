@@ -4,7 +4,7 @@ import { TreasuryReportService } from './treasury-report.service';
 import { ServicesResponse } from 'src/responses/response';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TreasurySchema } from 'src/treasury/schemas/treasury.schema';
-import { ChargesSchema } from 'src/charges/schemas/charges.schema'
+import { ChargesSchema } from 'src/charges/schemas/charges.schema';
 
 import { TreasuryModule } from 'src/treasury/treasury.module';
 import { ChargesModule } from 'src/charges/charges.module';
@@ -20,6 +20,11 @@ import { AuthModule } from 'src/auth/auth.module';
   ],
 
   controllers: [TreasuryReportController],
-  providers: [TreasuryReportService, ServicesResponse, TreasuryModule, ChargesModule]
+  providers: [
+    TreasuryReportService,
+    ServicesResponse,
+    TreasuryModule,
+    ChargesModule,
+  ],
 })
-export class TreasuryReportModule { }
+export class TreasuryReportModule {}

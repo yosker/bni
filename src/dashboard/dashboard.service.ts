@@ -32,8 +32,7 @@ export class DashboardService {
 
     @InjectModel(MembershipActivities.name)
     private readonly membershipActivityModel: Model<MembershipActivity>,
-
-  ) { }
+  ) {}
 
   async getFullData(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
@@ -50,8 +49,11 @@ export class DashboardService {
       objResult.totalVisitors = await this.totalVistors(jwtPayload);
       objResult.totalCash = await this.totalCash(jwtPayload);
       objResult.totalAbsences = await this.totalNetsAbsences(jwtPayload);
-      objResult.totalVisotorLastSixMonths = await this.totalVistorsLastSixMonths(jwtPayload);
-      objResult.totalPendingActivities = await this.totalPendingActivities(jwtPayload.idChapter);
+      objResult.totalVisotorLastSixMonths =
+        await this.totalVistorsLastSixMonths(jwtPayload);
+      objResult.totalPendingActivities = await this.totalPendingActivities(
+        jwtPayload.idChapter,
+      );
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -85,9 +87,9 @@ export class DashboardService {
 
   private async totalNetsResult(chapterId: string) {
     try {
-
       const now = new Date();
-      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte =
+        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
@@ -102,7 +104,7 @@ export class DashboardService {
 
       return [
         {
-          $match: filter
+          $match: filter,
         },
         { $group: { _id: null, totalNetworkers: { $sum: 1 } } },
         { $project: { _id: 0 } },
@@ -134,9 +136,9 @@ export class DashboardService {
 
   private async totalVisitorsResult(chapterId: string) {
     try {
-
       const now = new Date();
-      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte =
+        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
       return [
@@ -178,11 +180,10 @@ export class DashboardService {
   }
 
   private async totalAbsencesResult(chapterId: string) {
-
     try {
-
       const now = new Date();
-      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte =
+        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
       return [
@@ -198,8 +199,7 @@ export class DashboardService {
           $unwind: '$users',
         },
         {
-          $match:
-          {
+          $match: {
             'users.role': {
               $ne: 'Visitante',
             },
@@ -246,9 +246,9 @@ export class DashboardService {
 
   private async totalVisitorsLastSixMonthsResult(chapterId: string) {
     try {
-
       const now = new Date();
-      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte =
+        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
@@ -265,7 +265,7 @@ export class DashboardService {
 
       return [
         {
-          $match: filter
+          $match: filter,
         },
         {
           $group: {
@@ -285,16 +285,16 @@ export class DashboardService {
 
   async totalCash(jwtPayload: JWTPayload) {
     try {
-
       const pipelineIncome = await this.totalIncomeResult(jwtPayload.idChapter);
-      const pipelineCharges = await this.totalChargesResult(jwtPayload.idChapter);
+      const pipelineCharges = await this.totalChargesResult(
+        jwtPayload.idChapter,
+      );
 
       const objIncome = await this.treasuryModel.aggregate(pipelineIncome);
       const objCharge = await this.chargesModel.aggregate(pipelineCharges);
 
       const totalCash = objIncome[0].totalAmount - objCharge[0].totalAmount;
       return totalCash;
-
     } catch (err) {
       throw new HttpErrorByCode[500](
         'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
@@ -304,9 +304,9 @@ export class DashboardService {
 
   private async totalIncomeResult(chapterId: string) {
     try {
-
       const now = new Date();
-      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte =
+        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
@@ -319,14 +319,14 @@ export class DashboardService {
       };
       return [
         {
-          $match: filter
+          $match: filter,
         },
         {
           $group: {
             _id: 1,
-            totalAmount: { $sum: "$payment" }
-          }
-        }
+            totalAmount: { $sum: '$payment' },
+          },
+        },
       ];
     } catch (err) {
       throw new HttpErrorByCode[500](
@@ -337,9 +337,9 @@ export class DashboardService {
 
   private async totalChargesResult(chapterId: string) {
     try {
-
       const now = new Date();
-      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte =
+        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
@@ -352,14 +352,14 @@ export class DashboardService {
       };
       return [
         {
-          $match: filter
+          $match: filter,
         },
         {
           $group: {
             _id: 1,
-            totalAmount: { $sum: "$amount" }
-          }
-        }
+            totalAmount: { $sum: '$amount' },
+          },
+        },
       ];
     } catch (err) {
       throw new HttpErrorByCode[500](
@@ -368,19 +368,15 @@ export class DashboardService {
     }
   }
 
-  //OBTENEMOS LAS ACTIVIDADES PENDIENTES 
+  //OBTENEMOS LAS ACTIVIDADES PENDIENTES
   async totalPendingActivities(chapterId: string) {
-
     try {
-      const objList = await this.membershipActivityModel.find(
-        {
-          chapterId: ObjectId(chapterId),
-          status: EstatusRegister.Active,
-          statusActivity: "Pending"
-        },
-      );
+      const objList = await this.membershipActivityModel.find({
+        chapterId: ObjectId(chapterId),
+        status: EstatusRegister.Active,
+        statusActivity: 'Pending',
+      });
       return objList;
-      
     } catch (err) {
       throw new HttpErrorByCode[500](
         'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',

@@ -48,17 +48,12 @@ export class TreasuryController {
     return await this.treasusyService.findAll(jwtPayload, res);
   }
 
-  
   @Get('/deleteContribution/:id')
   async delete(
     @Param('id') id: string,
     @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
   ): Promise<Response> {
-    return await this.treasusyService.deleteRow(
-      id,
-      jwtPayload,
-      res,
-    );
+    return await this.treasusyService.deleteRow(id, jwtPayload, res);
   }
 }

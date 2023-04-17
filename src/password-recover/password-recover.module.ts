@@ -4,7 +4,7 @@ import { PasswordRecoverService } from './password-recover.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from 'src/auth/auth.module';
 import { Users, UsersSchema } from 'src/users/schemas/users.schema';
-import { UsersModule  } from 'src/users/users.module';
+import { UsersModule } from 'src/users/users.module';
 import { ServicesResponse } from 'src/responses/response';
 import { SharedService } from 'src/shared/shared.service';
 
@@ -15,11 +15,15 @@ import { SharedService } from 'src/shared/shared.service';
         name: Users.name,
         schema: UsersSchema,
       },
-     
     ]),
     AuthModule,
   ],
   controllers: [PasswordRecoverController],
-  providers: [PasswordRecoverService, UsersModule, ServicesResponse, SharedService],
+  providers: [
+    PasswordRecoverService,
+    UsersModule,
+    ServicesResponse,
+    SharedService,
+  ],
 })
 export class PasswordRecoverModule {}

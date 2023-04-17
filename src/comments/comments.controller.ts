@@ -57,13 +57,12 @@ export class CommentsController {
     return this.commentsService.update(id, updateCommentDto, res, jwtPayload);
   }
 
-  
   @Get('getComment/:visitorId')
   getCommentById(
     @Param('visitorId') visitorId: string,
     @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
   ) {
-    return this.commentsService.findById(visitorId,jwtPayload, res);
+    return this.commentsService.findById(visitorId, jwtPayload, res);
   }
 }

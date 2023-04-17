@@ -25,7 +25,7 @@ export class ZoomService {
   ) {}
 
   /**
-   * @description Obtiene los usuarios del meet
+   * @description Obtiene la Asistencia de los Usuarios del Meet
    * @param createZoomDto Objecto para creación
    * @param res respuesta
    * @returns respuesta
@@ -55,7 +55,7 @@ export class ZoomService {
   }
 
   /**
-   * @description Actualiza asistencias
+   * @description Actualiza Asistencia de los Usuarios que Ingresaron al Meet
    * @param createZoomDto Objecto para creación
    * @param res respuesta
    * @returns respuesta
@@ -89,6 +89,9 @@ export class ZoomService {
           first_name: string;
           last_name: string;
           phone: string; //TODO Agregar campos faltantes al crear el meeting
+          company: string;
+          profession: string;
+          invitedBy: string;
         }) => {
           //Buscamos al usuario por su email
           const user = await this.usersModel.findOne({
@@ -97,7 +100,23 @@ export class ZoomService {
 
           if (!user) {
             //Si no se Encuentra el Usuario, se Crea como Visitante
+            const userVisitor = {
+              idChapter: ObjectId(chapterId),
+              email: registrant.email,
+              name: registrant.first_name,
+              role: 'Visitante',
+              lastName: registrant.last_name,
+              phoneNumber: registrant.phone,
+              companyName: registrant.company,
+              profession: registrant.profession,
+              invitedBy: registrant.invitedBy,
+            };
+            await this.usersModel.create(userVisitor);
           } else {
+            //De lo contrario se le pasa asistencia
+            await this.usersModel.findByIdAndUpdate(user._id, {
+              attended: true,
+            });
           }
         },
       );
@@ -119,6 +138,12 @@ export class ZoomService {
     }
   }
 
+  /**
+   * @description Obtiene el Token del Capítulo
+   * @param chapterId Id de Capítulo
+   * @param res token del Capítulo
+   * @returns token
+   */
   async findOne(chapterId: string, res: Response) {
     try {
       const chapter = await this.validateChapterExist(chapterId);
@@ -229,21 +254,15 @@ export class ZoomService {
    * @returns Información del Mee
    */
   getDataMeeting = (meetingId: string, tokenChapter: string): Promise<any> => {
-    try {
-      const headers = { Authorization: `Bearer ${tokenChapter}` };
-
-      return new Promise((resolve) => {
-        this.httpService
-          .get(`https://api.zoom.us/v2/meetings/${meetingId}/registrants`, {
-            headers,
-          })
-          .forEach((value) => {
-            resolve(value.data);
-          });
-      });
-    } catch (error) {
-      console.log(error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const headers = { Authorization: `Bearer ${tokenChapter}` };
+    return new Promise((resolve) => {
+      this.httpService
+        .get(`https://api.zoom.us/v2/meetings/${meetingId}/registrants`, {
+          headers,
+        })
+        .forEach((value) => {
+          resolve(value.data);
+        });
+    });
   };
 }
