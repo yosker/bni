@@ -113,10 +113,18 @@ export class ZoomService {
             };
             await this.usersModel.create(userVisitor);
           } else {
-            //De lo contrario se le pasa asistencia
-            await this.usersModel.findByIdAndUpdate(user._id, {
-              attended: true,
-            });
+            if (user.role.toLowerCase() !== 'visitante') {
+              //De lo contrario se le pasa asistencia
+              await this.attendanceModel.findOne(
+                {
+                  userId: ObjectId(user._id),
+                  chapterId: ObjectId(chapterId),
+                },
+                {
+                  attended: true,
+                },
+              );
+            }
           }
         },
       );
