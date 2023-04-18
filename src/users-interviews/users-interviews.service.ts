@@ -50,8 +50,16 @@ export class UsersInterviewsService {
     res: Response,
   ) {
     try {
+      updateUsersInterviewDto.userInterviewId = ObjectId(
+        updateUsersInterviewDto.userInterviewId,
+      );
+      updateUsersInterviewDto.interviewId = ObjectId(
+        updateUsersInterviewDto.interviewId,
+      );
+      updateUsersInterviewDto._id = ObjectId(updateUsersInterviewDto._id);
+
       const userInterview = await this.usersInterview.findOne({
-        _id: ObjectId(updateUsersInterviewDto._id),
+        _id: updateUsersInterviewDto._id,
       });
 
       if (!userInterview) {
