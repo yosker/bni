@@ -7,6 +7,7 @@ import { Chapter } from 'src/chapters/interfaces/chapters.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
+
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -62,7 +63,6 @@ export class MenuService {
   }
 
   async administratorMenu(chapter: any, objUser: any) {
-
     let lastName = objUser.lastName == undefined ? '' : objUser.lastName;
     const menu = {
       perfil: {
@@ -74,7 +74,6 @@ export class MenuService {
         nombreCompania: chapter,
       },
       modulos: [
-
         {
           nombre: 'Capítulo',
           estilo: 'settings',
@@ -87,7 +86,6 @@ export class MenuService {
               ordenModulo: 1,
               estilo: '',
             },
-          
           ],
         },
 
@@ -127,86 +125,90 @@ export class MenuService {
           ],
         },
         {
-          nombre: "Cuentas de correo",
-          estilo: "contact_mail",
+          nombre: 'Cuentas de correo',
+          estilo: 'contact_mail',
           ordenModulo: 3,
           subModulos: [
-              {
-                  idSubModulo: 4,
-                  nombre: "Cuentas de correo",
-                  urlPagina: "emailaccounts.html",
-                  ordenModulo: 1,
-                  estilo: ""
-              }]
+            {
+              idSubModulo: 4,
+              nombre: 'Cuentas de correo',
+              urlPagina: 'emailaccounts.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
         },
         {
-          nombre: "Periodos de prueba",
-          estilo: "engineering",
+          nombre: 'Periodos de prueba',
+          estilo: 'engineering',
           ordenModulo: 4,
           subModulos: [
-              {
-                  idSubModulo: 5,
-                  nombre: "Periodo de pruebas",
-                  urlPagina: "evaluationperiod.html",
-                  ordenModulo: 1,
-                  estilo: ""
-              }]
+            {
+              idSubModulo: 5,
+              nombre: 'Periodo de pruebas',
+              urlPagina: 'evaluationperiod.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
         },
         {
-          nombre: "Actividad membresías",
-          estilo: "checklist",
+          nombre: 'Actividad membresías',
+          estilo: 'checklist',
           ordenModulo: 5,
           subModulos: [
-              {
-                  idSubModulo: 6,
-                  nombre: "Asignar actividad",
-                  urlPagina: "activities.html",
-                  ordenModulo: 1,
-                  estilo: ""
-              }]
+            {
+              idSubModulo: 6,
+              nombre: 'Asignar actividad',
+              urlPagina: 'activities.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
         },
-       
+
         {
-          nombre: "Carta por faltas",
-          estilo: "outgoing_mail",
+          nombre: 'Carta por faltas',
+          estilo: 'outgoing_mail',
           ordenModulo: 6,
           subModulos: [
-              {
-                  idSubModulo: 7,
-                  nombre: "Carta por faltas",
-                  urlPagina: "absencesform.html",
-                  ordenModulo: 1,
-                  estilo: ""
-              }]
+            {
+              idSubModulo: 7,
+              nombre: 'Carta por faltas',
+              urlPagina: 'absencesform.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
         },
         {
-          nombre: "Tesorería",
-          estilo: "payments",
+          nombre: 'Tesorería',
+          estilo: 'payments',
           ordenModulo: 7,
           subModulos: [
-              {
-                  idSubModulo: 8,
-                  nombre: "Aportaciones",
-                  urlPagina: "contributionList.html",
-                  ordenModulo: 1,
-                  estilo: ""
-              },
-              {
-                idSubModulo: 9,
-                nombre: "Gastos",
-                urlPagina: "chargesList.html",
-                ordenModulo: 2,
-                estilo: ""
+            {
+              idSubModulo: 8,
+              nombre: 'Aportaciones',
+              urlPagina: 'contributionList.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+            {
+              idSubModulo: 9,
+              nombre: 'Gastos',
+              urlPagina: 'chargesList.html',
+              ordenModulo: 2,
+              estilo: '',
             },
             {
               idSubModulo: 10,
-              nombre: "Ingresos - Egresos",
-              urlPagina: "report.html",
+              nombre: 'Ingresos - Egresos',
+              urlPagina: 'report.html',
               ordenModulo: 2,
-              estilo: ""
-          }
-            ]
-        }
+              estilo: '',
+            },
+          ],
+        },
       ],
       notificaciones: [],
     };
@@ -229,8 +231,6 @@ export class MenuService {
           estilo: 'contact_page',
           ordenModulo: 1,
           subModulos: [
-           
-
             {
               idSubModulo: 1,
               nombre: 'Agregar Networker',
@@ -262,35 +262,33 @@ export class MenuService {
           ],
         },
         {
-          nombre: "Periodos de prueba",
-          estilo: "engineering",
+          nombre: 'Periodos de prueba',
+          estilo: 'engineering',
           ordenModulo: 4,
           subModulos: [
-              {
-                  idSubModulo: 5,
-                  nombre: "Periodo de pruebas",
-                  urlPagina: "evaluationperiod.html",
-                  ordenModulo: 1,
-                  estilo: ""
-              }]
+            {
+              idSubModulo: 5,
+              nombre: 'Periodo de pruebas',
+              urlPagina: 'evaluationperiod.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
         },
         {
-          nombre: "Trabajo membresías",
-          estilo: "checklist",
+          nombre: 'Trabajo membresías',
+          estilo: 'checklist',
           ordenModulo: 6,
           subModulos: [
-              {
-                  idSubModulo: 7,
-                  nombre: "Actividades membresías",
-                  urlPagina: "activitiesform.html",
-                  ordenModulo: 1,
-                  estilo: ""
-              }]
+            {
+              idSubModulo: 7,
+              nombre: 'Actividades membresías',
+              urlPagina: 'activitiesform.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
         },
-
-
-
-
       ],
       notificaciones: [],
     };

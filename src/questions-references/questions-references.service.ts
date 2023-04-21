@@ -203,6 +203,10 @@ export class QuestionsReferencesService {
     res: Response,
   ) {
     try {
+      updateQuestionsReferenceDto._id = ObjectId(
+        updateQuestionsReferenceDto._id,
+      );
+
       updateQuestionsReferenceDto.interviewId = ObjectId(
         updateQuestionsReferenceDto.interviewId,
       );
@@ -214,13 +218,11 @@ export class QuestionsReferencesService {
         updateQuestionsReferenceDto.referenceId,
       );
 
-      const reference = await this.referenceModel.findOne({
-        _id: updateQuestionsReferenceDto.referenceId,
-        interviewId: updateQuestionsReferenceDto.interviewId,
-        userInterviewId: updateQuestionsReferenceDto.userInterviewId,
+      const qReference = await this.questionsReferenceModel.findOne({
+        _id: updateQuestionsReferenceDto._id,
       });
 
-      if (!reference) {
+      if (!qReference) {
         throw res
           .status(HttpStatus.BAD_REQUEST)
           .json(
@@ -232,9 +234,7 @@ export class QuestionsReferencesService {
       }
       await this.questionsReferenceModel.updateOne(
         {
-          interviewId: updateQuestionsReferenceDto.interviewId,
-          userInterviewId: updateQuestionsReferenceDto.userInterviewId,
-          referenceId: updateQuestionsReferenceDto.referenceId
+          _id: updateQuestionsReferenceDto._id,
         },
         updateQuestionsReferenceDto,
       );

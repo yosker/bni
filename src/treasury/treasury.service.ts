@@ -20,7 +20,7 @@ export class TreasuryService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private readonly servicesResponse: ServicesResponse,
     private readonly sharedService: SharedService,
-  ) { }
+  ) {}
 
   //ENDPOINT PARA GUARDAR UNA APORTACIÓN
   async create(
@@ -32,7 +32,7 @@ export class TreasuryService {
     try {
       treasuryDTO.userId = ObjectId(treasuryDTO.userId);
       treasuryDTO.chapterId = ObjectId(jwtPayload.idChapter);
-   
+
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const findUser = await this.usersModel.findOne({
         _id: ObjectId(treasuryDTO.userId),
@@ -46,7 +46,7 @@ export class TreasuryService {
         userId: ObjectId(treasuryDTO.userId),
         monthYear: treasuryDTO.monthYear,
         status: EstatusRegister.Active,
-        chapterId: ObjectId(jwtPayload.idChapter)
+        chapterId: ObjectId(jwtPayload.idChapter),
       });
 
       if (findPayment == null) {
@@ -132,19 +132,15 @@ export class TreasuryService {
     }
   }
 
-  //ENDPOINT QUE REGRESA UN LISTADO GENERAL DE TODAS LAS APORTACIONES 
-  async findAll(
-    jwtPayload: JWTPayload,
-    res: Response,
-  ): Promise<Response> {
+  //ENDPOINT QUE REGRESA UN LISTADO GENERAL DE TODAS LAS APORTACIONES
+  async findAll(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
-
       const payments = await this.treasuryModel.aggregate([
         {
           $match: {
             chapterId: ObjectId(jwtPayload.idChapter),
-            status: 'Active'
-          }
+            status: 'Active',
+          },
         },
         {
           $lookup: {
@@ -152,25 +148,25 @@ export class TreasuryService {
             localField: 'userId',
             foreignField: '_id',
             as: 'users',
-          }
+          },
         },
         {
-          $unwind: '$users'
+          $unwind: '$users',
         },
         {
           $project: {
             userId: '$users._id',
-            name: { $concat: ["$users.name", " ", "$users.lastName"] },
+            name: { $concat: ['$users.name', ' ', '$users.lastName'] },
             email: '$users.email',
             companyName: '$users.companyName',
             ammount: '$payment',
             monthYear: '$monthYear',
             paymentDate: '$createdAt',
-          }
+          },
         },
         {
-          $sort: { createdAt : -1 }    
-        }
+          $sort: { createdAt: -1 },
+        },
       ]);
 
       return res.status(HttpStatus.OK).json({

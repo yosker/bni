@@ -5,7 +5,7 @@ import { ServicesResponse } from 'src/responses/response';
 import { Users, UsersSchema } from 'src/users/schemas/users.schema';
 import { UsersModule } from 'src/users/users.module';
 import { DashboardController } from './dashboard.controller';
-import { DashboardService } from './dashboard.service'
+import { DashboardService } from './dashboard.service';
 import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
 import { TreasurySchema } from 'src/treasury/schemas/treasury.schema';
 import { ChargesSchema } from 'src/charges/schemas/charges.schema';
@@ -19,7 +19,6 @@ import {
 @Module({
   imports: [
     MongooseModule.forFeature([
-
       {
         name: Users.name,
         schema: UsersSchema,
@@ -33,6 +32,13 @@ import {
   ],
 
   controllers: [DashboardController],
-  providers: [DashboardService, ServicesResponse, UsersModule, TreasuryModule, ChargesModule, MembershipActivitiesModule]
+  providers: [
+    DashboardService,
+    ServicesResponse,
+    UsersModule,
+    TreasuryModule,
+    ChargesModule,
+    MembershipActivitiesModule,
+  ],
 })
-export class DashboardModule { }
+export class DashboardModule {}

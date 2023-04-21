@@ -6,8 +6,8 @@ export const ChargesSchema = new Schema({
   userId: { type: Object, required: true },
   concept: { type: String, required: true },
   urlFile: { type: String, required: false },
-  amount: {  type: Number,required: true },
-    createdAt: {
+  amount: { type: Number, required: true },
+  createdAt: {
     type: Date,
     default: new Date().toISOString(),
     required: false,

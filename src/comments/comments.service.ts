@@ -18,7 +18,7 @@ export class CommentsService {
     @InjectModel(Comments.name) private readonly commentModel: Model<Comment>,
     @InjectModel(Users.name) private readonly userModel: Model<User>,
     private servicesResponse: ServicesResponse,
-  ) { }
+  ) {}
   async create(
     createCommentDto: CreateCommentDto,
     res: Response,
@@ -127,23 +127,21 @@ export class CommentsService {
     jwtPayload: JWTPayload,
   ) {
     try {
-
       updateCommentDto.createdBy = ObjectId(jwtPayload.id);
       updateCommentDto.visitorId = ObjectId(updateCommentDto.visitorId);
 
-       await this.commentModel.updateOne(
+      await this.commentModel.updateOne(
         {
           _id: ObjectId(id),
         },
-        updateCommentDto
-      )
-    
+        updateCommentDto,
+      );
+
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: {}
+        result: {},
       });
-
     } catch (error) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -154,13 +152,14 @@ export class CommentsService {
           ),
         );
     }
-
   }
 
   async findById(visitorId: string, jwtPayload: JWTPayload, res: Response) {
     try {
-     
-      const comment = await this.commentModel.findOne({visitorId: ObjectId(visitorId),createdBy: ObjectId(jwtPayload.id) });
+      const comment = await this.commentModel.findOne({
+        visitorId: ObjectId(visitorId),
+        createdBy: ObjectId(jwtPayload.id),
+      });
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,

@@ -6,7 +6,6 @@ export type MembershipActivitiesDocument = MembershipActivities & Document;
 
 @Schema()
 export class MembershipActivities {
-
   @Prop({ type: 'object' })
   chapterId: object;
 
@@ -27,13 +26,13 @@ export class MembershipActivities {
 
   @Prop({ type: 'string' })
   concatDate: string;
-  
+
   @Prop({ type: 'string' })
   activity: string;
 
   @Prop({ type: 'string' })
   comments: string;
-  
+
   @Prop({ type: 'string' })
   statusActivity: string;
 

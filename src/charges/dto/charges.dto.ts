@@ -1,13 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Prop } from '@nestjs/mongoose';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { now } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class ChargesDTO extends PartialType(RegisterAuthDto) {
- 
   chapterId: object;
   userId: object;
 
@@ -24,7 +23,7 @@ export class ChargesDTO extends PartialType(RegisterAuthDto) {
   amount: number;
 
   urlFile: string;
-  
+
   @Prop({ default: now(), required: false })
   createdAt?: Date;
 

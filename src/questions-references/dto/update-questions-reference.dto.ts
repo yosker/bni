@@ -1,24 +1,30 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateQuestionsReferenceDto } from './create-questions-reference.dto';
-import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Prop } from '@nestjs/mongoose';
 
-export class UpdateQuestionsReferenceDto extends PartialType(
-  CreateQuestionsReferenceDto,
-) {
+export class UpdateQuestionsReferenceDto {
+  @ApiProperty({
+    example: 'Id de Registro.',
+  })
+  @IsNotEmpty()
+  _id: object;
+
   @ApiProperty({
     example: 'Id de Referencia.',
   })
+  @IsNotEmpty()
   referenceId: object;
 
   @ApiProperty({
     example: 'Id de Usuario Entrevistado.',
   })
+  @IsNotEmpty()
   userInterviewId: object;
 
   @ApiProperty({
     example: 'Id de Entrevista.',
   })
+  @IsNotEmpty()
   interviewId: object;
 
   @ApiProperty({
