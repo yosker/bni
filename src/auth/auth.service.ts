@@ -87,6 +87,7 @@ export class AuthService {
           imageURL: 1,
           role: 1,
           password: 1,
+          resetPassword:1
         },
       );
       if (!findUser)

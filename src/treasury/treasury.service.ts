@@ -72,7 +72,7 @@ export class TreasuryService {
             password: '',
           };
 
-          //await this.sharedService.sendEmail(emailProperties);
+          await this.sharedService.sendMailer(emailProperties);
         }
       } else {
         return res.status(200).json({

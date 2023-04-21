@@ -88,7 +88,7 @@ export class ChaptersService {
       const newUser = await this.usersModel.create(createUserDto);
 
       if (newChapter != null && newUser != null)
-        await this.sharedService.sendMailer(emailProperties);
+       await this.sharedService.sendMailer(emailProperties);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,

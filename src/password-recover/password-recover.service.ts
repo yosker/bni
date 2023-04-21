@@ -8,16 +8,18 @@ import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { Response } from 'express';
 import { hash } from 'bcrypt';
+import { Chapter } from 'src/chapters/interfaces/chapters.interface';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
-
+const ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class PasswordRecoverService {
-   
-
     constructor(
         @InjectModel(Users.name) private readonly usersModel: Model<User>,
         private readonly servicesResponse: ServicesResponse,
         private readonly sharedService: SharedService,
+        @InjectModel('Chapters')
+        private readonly chapterModel: Model<Chapter>,
     ) { }
 
     async getNewPassword(email: string, res: Response): Promise<Response> {
@@ -25,17 +27,27 @@ export class PasswordRecoverService {
             const user = await this.usersModel.findOne({
                 email: email,
             });
-
             if (user) {
-               
-                await this.usersModel.updateOne(
-                    { email: email }, { resetPassword: false },
-                );
-                
                 //GENERAMOS UNA NUEVA CONTRASEÑA TEMPORAL 
-                const pass = await this.sharedService.passwordGenerator(6);
-                const plainToHash = await hash(pass, 10);
+                const password = await this.sharedService.passwordGenerator(6);
+                const plainToHash = await hash(password, 10);
 
+                await this.usersModel.updateOne(
+                    { email: email }, { resetPassword: false, password: plainToHash },
+                );
+                //ENVIO DE CORREO CON CONPROBANTE DE APORTACIÓN
+                const emailProperties = {
+                    email: email,
+                    from: 'meeting.reporter@outlook.com',
+                    name: '',
+                    template: 'temporalPassword',
+                    subject: 'Contraseña Temporal',
+                    urlPlatform: '',
+                    amount: '',
+                    password: password,
+                };
+                console.log('password...', password);
+                await this.sharedService.sendEmail(emailProperties);
             } else {
                 return res.status(HttpStatus.OK).json({
                     statusCode: 204,
@@ -43,7 +55,6 @@ export class PasswordRecoverService {
                     result: {},
                 });
             }
-
 
             return res.status(HttpStatus.OK).json({
                 statusCode: this.servicesResponse.statusCode,
@@ -62,9 +73,38 @@ export class PasswordRecoverService {
         }
     }
 
+    async updatePassword(
+        newPass: string,
+        jwtPayload: JWTPayload,
+        res: Response): Promise<Response> {
+        try {
 
-}
-function hash(pass: any, arg1: number) {
-    throw new Error('Function not implemented.');
+         const passTest =  await this.sharedService.passwordGenerator(6)
+
+            const newPassword = newPass.toString(); 
+
+            const plainToHash = await hash(newPassword, 10);
+
+            await this.usersModel.updateOne(
+                { _id: ObjectId(jwtPayload.id) }, { resetPassword: true, password: plainToHash.toString() },
+            )
+            return res.status(HttpStatus.OK).json({
+                statusCode: this.servicesResponse.statusCode,
+                message: this.servicesResponse.message,
+                result: {},
+            });
+        } catch (err) {
+console.log('errrr...',err);
+            throw res
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .json(
+                    new HttpException(
+                        'INTERNAL_SERVER_ERROR.',
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                    ),
+                );
+        }
+
+    }
 }
 

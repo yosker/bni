@@ -9,13 +9,13 @@ import { ServicesResponse } from 'src/responses/response';
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: process.env.EMAIL_HOST,
-        port: parseInt(process.env.EMAIL_PORT),
-        secure: false,
-        service: 'Outlook365',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
+          host: 'smtp.office365.com', //process.env.EMAIL_HOST,
+          port: 587, //parseInt(process.env.EMAIL_PORT),
+          secure: false,
+          service: 'Outlook365',
+          auth: {
+            user: 'meeting.reporter@outlook.com', //process.env.EMAIL_USER,
+            pass: 'adminReporter2023', //process.env.EMAIL_PASS,
         },
       },
       template: {

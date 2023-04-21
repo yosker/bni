@@ -172,7 +172,7 @@ export class SharedService {
       mailTransport.sendMail(
         {
           from: emailProperties.emailConfig,
-          to: 'yosk_13@msn.com',
+          to: emailProperties.to,
           replyTo: emailProperties.emailConfig,
           subject: emailProperties.subject,
           text: emailProperties.template,

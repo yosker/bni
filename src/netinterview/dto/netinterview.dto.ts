@@ -87,6 +87,13 @@ export class NetinterviewDTO {
   question6: string;
 
   @ApiProperty({
+    example: 'Pregunta 7.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  question7: string;
+
+  @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })
   @Prop({ default: new Date() })

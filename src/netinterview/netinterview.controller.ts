@@ -52,4 +52,16 @@ export class NetinterviewController {
     ) {
         return this.netinterviewService.update(netinterviewDTO,interviewId, jwtPayload, res);
     }
+
+    @Get('/createpdf/:interviewId')
+    async pdf( @Param('interviewId') interviewId: string, @Res() res: Response) :Promise<void>{
+        const buffer = await this.netinterviewService.createFile(interviewId); 
+
+        res.set({
+            'Content-Type':'application/pdf',
+            'Content-Disposition':'attachment; filename-example.pdf',
+            'Content-Length':buffer.length,
+        })
+        res.end(buffer);
+    }
 }

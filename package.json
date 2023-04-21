@@ -51,6 +51,8 @@
     "nodemailer-express-handlebars": "^6.1.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
+    "pdfkit": "^0.13.0",
+    "pdfkit-table": "^0.1.99",
     "qrcode": "^1.5.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
