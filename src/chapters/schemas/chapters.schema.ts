@@ -11,6 +11,7 @@ export const ChapterSchema = new Schema({
   sessionSchedule: { type: String, required: true },
   sessionType: { type: String, required: true },
   tokenChapter: { type: String, required: false },
+  meetingId: { type: String, required: false },
   createdAt: {
     type: Date,
     default: new Date().toISOString(),

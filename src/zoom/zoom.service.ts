@@ -240,6 +240,7 @@ export class ZoomService {
           _id: ObjectId(chapterId),
         },
         {
+          meetingId: 1,
           tokenChapter: 1,
         },
       );
