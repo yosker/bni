@@ -7,6 +7,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
+  meetingId: string;
+
   @ApiProperty({
     example: 'País de Capítulo.',
   })

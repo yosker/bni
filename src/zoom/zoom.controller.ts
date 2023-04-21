@@ -31,13 +31,12 @@ export class ZoomController {
     return this.zoomService.getUsersByMeetingId(createZoomDto, res);
   }
 
-  @Patch('/setUsersMeeting/:meetingId/:chapterId')
+  @Patch('/setUsersMeeting/:chapterId')
   setUsersByMeetingId(
-    @Param('meetingId') meetingId: string,
     @Param('chapterId') chapterId: string,
     @Res() res: Response,
   ) {
-    return this.zoomService.setUsersByMeetingId(chapterId, meetingId, res);
+    return this.zoomService.setUsersByMeetingId(chapterId, res);
   }
 
   @Get('token/:chapterId')

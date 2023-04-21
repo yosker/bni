@@ -60,11 +60,7 @@ export class ZoomService {
    * @param res respuesta
    * @returns respuesta
    */
-  async setUsersByMeetingId(
-    chapterId: string,
-    meetingId: string,
-    res: Response,
-  ) {
+  async setUsersByMeetingId(chapterId: string, res: Response) {
     try {
       const chapter = await this.validateChapterExist(chapterId);
       if (!chapter) {
@@ -79,7 +75,7 @@ export class ZoomService {
       }
 
       const meeting = await this.getDataMeeting(
-        meetingId,
+        chapter.meetingId,
         chapter.tokenChapter,
       );
 

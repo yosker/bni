@@ -2,6 +2,7 @@ import { Document } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 export interface Chapter extends Document {
   _id: { type: object };
+  meetingId: string;
   country: { type: string };
   region: { type: string };
   name: { type: string };
