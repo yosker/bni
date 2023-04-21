@@ -130,8 +130,7 @@ export class ReferencesService {
         $project: {
           _id: '$_id',
           userId: '$usersData._id',
-          name: '$usersData.name',
-          lastName: '$usersData.lastName',
+          name: '$name',
           companyName: '$usersData.companyName',
           completedInterview: '$usersData.completedInterview',
           chapterId: '$chapterId',
