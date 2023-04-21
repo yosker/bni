@@ -8,7 +8,7 @@ export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
     example: 'Id de la referencia.',
   })
   @IsNotEmpty()
-  id: string;
+  id: object;
 
   @ApiProperty({
     example: 'Nombre de la referencia.',
