@@ -256,7 +256,7 @@ export class AttendanceService {
               $concat: [
                 {
                   $toString: {
-                    $hour: { date: '$createdAt', timezone: '+1800' },
+                    $hour: { date: '$createdAt', timezone: '+1900' },
                   },
                 },
                 ':',
