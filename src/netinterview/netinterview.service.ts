@@ -145,9 +145,7 @@ export class NetinterviewService {
           autoFirstPage: false,
         })
 
-        let pageNumber = 0;
         doc.on('pageAdded', () => {
-          pageNumber++;
 
           doc.image(join(process.cwd(), 'src/assets/logo.png'), 20, 15, { width: 67 })
           doc.moveTo(50, 55)

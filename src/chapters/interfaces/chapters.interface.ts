@@ -2,7 +2,7 @@ import { Document } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 export interface Chapter extends Document {
   _id: { type: object };
-  meetingId: string;
+
   country: { type: string };
   region: { type: string };
   name: { type: string };
@@ -12,7 +12,8 @@ export interface Chapter extends Document {
   sessionSchedule: { type: string };
   sessionType: { type: string };
   tokenChapter: string;
-  createdAt: {
+  meetingId: string;
+   createdAt: {
     type: Date;
   };
   status: { type: string; default: EstatusRegister.Active; required: false };

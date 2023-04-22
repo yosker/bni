@@ -8,13 +8,17 @@ import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
-import * as moment from 'moment';
+// import * as moment from 'moment';
 
 const ObjectId = require('mongodb').ObjectId;
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
+import * as geoip from 'geoip-lite';
+import * as moment from 'moment-timezone';
+
+
 
 @Injectable()
 export class AttendanceService {
@@ -30,11 +34,16 @@ export class AttendanceService {
 
   //ENDPOINT PARA ALMACENAR EL PASE DE LISTA DE LOS USUARIOS
   async update(
+    request: any,
     attendanceDTO: AttendanceDTO,
     res: Response,
     jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
+
+      const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+      const geo = geoip.lookup(ip);
+      
       //VALIDAMOS QUE EL USUARIO EXISTA EN BASE DE DATOS
       const existUser = await this.usersModel.findOne({
         _id: ObjectId(attendanceDTO.userId),
@@ -83,7 +92,7 @@ export class AttendanceService {
           userId: ObjectId(attendanceDTO.userId),
           chapterId: ObjectId(jwtPayload.idChapter),
           attended: true,
-          updatedAt: new Date(),
+          updatedAt: new Date().toISOString(),
         };
         await this.attendanceModel.findOneAndUpdate(
           {

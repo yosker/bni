@@ -86,6 +86,13 @@ export class MenuService {
               ordenModulo: 1,
               estilo: '',
             },
+            {
+              idSubModulo: 1,
+              nombre: 'Usuarios Sesión Online',
+              urlPagina: 'onlineUsersform.html',
+              ordenModulo: 2,
+              estilo: '',
+            },
           ],
         },
 

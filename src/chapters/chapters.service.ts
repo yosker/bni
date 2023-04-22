@@ -128,6 +128,8 @@ export class ChaptersService {
             password: createChapterDTO.password,
             sessionDate: createChapterDTO.sessionDate,
             sessionType: createChapterDTO.sessionType,
+            tokenChapter: createChapterDTO.tokenChapter,
+            meetingId: createChapterDTO.meetingId,
           },
         },
       );

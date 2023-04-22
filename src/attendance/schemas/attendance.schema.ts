@@ -14,5 +14,6 @@ export const AttendanceSchema = new Schema({
     default: new Date().toISOString(),
     required: false,
   },
+  updatedAt:  { type: String, required: false },
   status: { type: String, default: EstatusRegister.Active, required: false },
 });

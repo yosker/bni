@@ -7,6 +7,7 @@ import {
   Param,
   Res,
   Query,
+  Req
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { AttendanceDTO } from './dto/attendance.dto';
@@ -30,8 +31,9 @@ export class AttendanceController {
     @Body() attendanceDTO: AttendanceDTO,
     @Res() res: Response,
     @Auth() jwtPayload: JWTPayload,
+    @Req() req,
   ) {
-    return await this.attendanceService.update(attendanceDTO, res, jwtPayload);
+    return await this.attendanceService.update(req, attendanceDTO, res, jwtPayload);
   }
 
   @Get('/visitors/:chapterId/:sessionDate')

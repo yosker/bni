@@ -7,7 +7,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
-  meetingId: string;
+ 
 
   @ApiProperty({
     example: 'País de Capítulo.',
@@ -60,6 +60,18 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   @IsNotEmpty()
   @IsString()
   sessionType: string;
+
+  @ApiProperty({
+    example: 'Token del capítulo.',
+  })
+  @IsString()
+  tokenChapter: string;
+
+  @ApiProperty({
+    example: 'Id del meeting de la sesión.',
+  })
+  @IsString()
+  meetingId: string;
 
   @Prop({ default: now() })
   createdAt: Date;

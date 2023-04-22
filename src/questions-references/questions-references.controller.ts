@@ -61,4 +61,17 @@ export class QuestionsReferencesController {
       res,
     );
   }
+
+  
+  @Get('/createpdf/:id')
+  async pdf(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    const buffer = await this.questionsReferencesService.createFile(id);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename-example.pdf',
+      'Content-Length': buffer.length,
+    })
+    res.end(buffer);
+  }
 }
