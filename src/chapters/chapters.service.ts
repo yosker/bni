@@ -124,7 +124,7 @@ export class ChaptersService {
         {
           $set: {
             name: createChapterDTO.name,
-            chapterEmail: createChapterDTO.email,
+            email: createChapterDTO.email,
             password: createChapterDTO.password,
             sessionDate: createChapterDTO.sessionDate,
             sessionType: createChapterDTO.sessionType,

@@ -150,8 +150,8 @@ export class SharedService {
         secure: false,
         service: 'Outlook365',
         auth: {
-          user: emailProperties.emailConfig,
-          pass: emailProperties.password,
+          user: emailProperties.emailConfigAut,
+          pass: emailProperties.passwordAut,
         },
       };
 
@@ -171,12 +171,14 @@ export class SharedService {
 
       mailTransport.sendMail(
         {
-          from: emailProperties.emailConfig,
+          from: emailProperties.emailConfigAut,
           to: emailProperties.to,
-          replyTo: emailProperties.emailConfig,
+          replyTo: emailProperties.emailConfigAut,
           subject: emailProperties.subject,
           text: emailProperties.template,
           template: emailProperties.template,
+          user: emailProperties.user, 
+          pass: emailProperties.pass,
           context: {
             objMail: emailProperties,
           },

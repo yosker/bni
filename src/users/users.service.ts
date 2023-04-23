@@ -151,11 +151,13 @@ export class UsersService {
         const chapter = await this.chapterModel.findById(newUser.idChapter);
         // OBJETO PARA EL CORREO
         const emailProperties = {
-          emailConfig: chapter.email,
-          password: chapter.password,
-          name: newUser.name + ' ' + newUser.lastName,
+          emailConfigAut: chapter.email,
+          passwordAut: chapter.password,
           template: process.env.NETWORKERS_WELCOME_TEMPLATE,
           subject: process.env.SUBJECT_CHAPTER_WELCOME,
+          name: newUser.name + ' ' + newUser.lastName,
+          user: newUser.email, 
+          pass: pass,
           urlPlatform: url,
           amount: '',
           to: newUser.email,
@@ -374,9 +376,7 @@ export class UsersService {
     const { result } = this.servicesResponse;
 
     try {
-      await this.usersModel.findByIdAndUpdate(ObjectId(userId), {
-        status: EstatusRegister.Deleted,
-      });
+      await this.usersModel.deleteOne({_id: ObjectId(userId)});
 
       await this.deleteUserSessions(userId, chapterId);
 
@@ -547,14 +547,10 @@ export class UsersService {
 
   private async deleteUserSessions(userId: string, chapterId: string) {
     try {
-      const date = new Date().toISOString().substring(0, 10);
+    
       await this.attendanceModel.deleteMany({
         userId: ObjectId(userId),
         chapterId: ObjectId(chapterId),
-        attended: false,
-        createdAt: {
-          $gte: date,
-        },
       });
     } catch {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');

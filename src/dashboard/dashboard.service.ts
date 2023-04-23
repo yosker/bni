@@ -32,7 +32,7 @@ export class DashboardService {
 
     @InjectModel(MembershipActivities.name)
     private readonly membershipActivityModel: Model<MembershipActivity>,
-  ) {}
+  ) { }
 
   async getFullData(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
@@ -293,7 +293,10 @@ export class DashboardService {
       const objIncome = await this.treasuryModel.aggregate(pipelineIncome);
       const objCharge = await this.chargesModel.aggregate(pipelineCharges);
 
-      const totalCash = objIncome[0].totalAmount - objCharge[0].totalAmount;
+      let totalCash = 0;
+      if (objIncome.length > 0 || objCharge.length > 0) {
+        totalCash = objIncome[0].totalAmount - objCharge[0].totalAmount;
+      }
       return totalCash;
     } catch (err) {
       throw new HttpErrorByCode[500](

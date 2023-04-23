@@ -106,7 +106,7 @@ export class AuthService {
       const payload = {
         idChapter: findUser.idChapter,
         id: findUser._id,
-        name: findUser.name,
+        name: findUser.name +' '+ findUser.lastName,
         role: findUser.role,
         email: email,
         language: 'esMX',
