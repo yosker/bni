@@ -10,6 +10,8 @@ import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
+import { Chapter } from 'src/chapters/interfaces/chapters.interface';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -20,7 +22,8 @@ export class TreasuryService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private readonly servicesResponse: ServicesResponse,
     private readonly sharedService: SharedService,
-  ) {}
+    @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
+  ) { }
 
   //ENDPOINT PARA GUARDAR UNA APORTACIÓN
   async create(
@@ -59,20 +62,7 @@ export class TreasuryService {
 
         if (paymentCreated != null) {
           //ENVIO DE CORREO CON CONPROBANTE DE APORTACIÓN
-          const emailProperties = {
-            email: findUser.email,
-            name: findUser.name + ' ' + findUser.lastName,
-            template: process.env.RECEIPT_TEMPLATE,
-            subject: process.env.SUBJECT_RECEIPT,
-            urlPlatform: '',
-            amount:
-              treasuryDTO.payment.toString() +
-              ' pesos de ' +
-              treasuryDTO.monthYear,
-            password: '',
-          };
-
-          await this.sharedService.sendMailer(emailProperties);
+          await this.sendEmail(findUser, jwtPayload.idChapter, treasuryDTO.payment.toString(), treasuryDTO.monthYear);
         }
       } else {
         return res.status(200).json({
@@ -95,6 +85,33 @@ export class TreasuryService {
             HttpStatus.INTERNAL_SERVER_ERROR,
           ),
         );
+    }
+  }
+
+  async sendEmail(objUser: any, chapterId: string, totalAmount: string, paidMonth: string) {
+
+    try {
+
+      const chapter = await this.chapterModel.findById(chapterId);
+      // OBJETO PARA EL CORREO
+      const emailProperties = {
+        emailConfigAut: chapter.email,
+        passwordAut: chapter.password,
+        template: process.env.RECEIPT_TEMPLATE,
+        subject: process.env.SUBJECT_RECEIPT,
+        amount: totalAmount + ' pesos del mes de ' + paidMonth,
+        name: objUser.name + ' ' + objUser.lastName,
+        to: objUser.email,
+        user:'',
+        pass:'',
+        urlPlatform: '',
+      };
+      await this.sharedService.sendMailer(emailProperties,false);
+
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
     }
   }
 

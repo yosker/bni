@@ -209,7 +209,7 @@ export class MenuService {
             },
             {
               idSubModulo: 10,
-              nombre: 'Ingresos - Egresos',
+              nombre: 'Ingresos - Gastos',
               urlPagina: 'report.html',
               ordenModulo: 2,
               estilo: '',

@@ -76,12 +76,13 @@ export class AttendanceController {
     );
   }
 
-  @Get('/updateLetter/:id')
+  @Get('/updateLetter/:id/:attendanceNumber')
   async updatLetterSend(
     @Param('id') id: string,
+    @Param('attendanceNumber') attendanceNumber: number,
     @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
   ) {
-    return await this.attendanceService.sendLetter(id, jwtPayload, res);
+    return await this.attendanceService.sendLetter(id,attendanceNumber, jwtPayload, res);
   }
 }

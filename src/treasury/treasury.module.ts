@@ -8,6 +8,7 @@ import { ServicesResponse } from 'src/responses/response';
 import { Users, UsersSchema } from 'src/users/schemas/users.schema';
 import { UsersModule } from 'src/users/users.module';
 import { SharedService } from 'src/shared/shared.service';
+import { ChapterSchema } from 'src/chapters/schemas/chapters.schema';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SharedService } from 'src/shared/shared.service';
         name: Users.name,
         schema: UsersSchema,
       },
+      { name: 'Chapter', schema: ChapterSchema },
     ]),
     AuthModule,
   ],

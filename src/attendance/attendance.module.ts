@@ -10,6 +10,8 @@ import { UsersModule } from 'src/users/users.module';
 import { ChapterSessionsModule } from 'src/chapter-sessions/chapter-sessions.module';
 import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessions.schema';
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
+import { ChapterSchema } from 'src/chapters/schemas/chapters.schema';
+import { SharedService } from 'src/shared/shared.service';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -19,6 +21,7 @@ import { PaginateResult } from 'src/shared/pagination/pagination-result';
         schema: UsersSchema,
       },
       { name: 'ChapterSession', schema: ChapterSessionSchema },
+      { name: 'Chapter', schema: ChapterSchema },
     ]),
     AuthModule,
   ],
@@ -29,6 +32,7 @@ import { PaginateResult } from 'src/shared/pagination/pagination-result';
     UsersModule,
     ChapterSessionsModule,
     PaginateResult,
+    SharedService
   ],
 })
 export class AttendanceModule {}

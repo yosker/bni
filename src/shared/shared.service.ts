@@ -8,6 +8,7 @@ const hbs = require('nodemailer-express-handlebars');
 const nodemailer = require('nodemailer');
 const generateSafeId = require('generate-safe-id');
 import { join } from 'path';
+import { bool } from 'aws-sdk/clients/redshiftdata';
 
 @Injectable()
 export class SharedService {
@@ -24,7 +25,7 @@ export class SharedService {
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
-  ) {}
+  ) { }
 
   /**
    * @description Genera un password aleatorio
@@ -138,11 +139,11 @@ export class SharedService {
         const includePage = arrPresident.includes(page);
         response = includePage ? true : false;
       }
-    } catch (err) {}
+    } catch (err) { }
     return response;
   }
 
-  async sendMailer(emailProperties: any) {
+  async sendMailer(emailProperties: any, attachment: bool) {
     try {
       const transport: any = {
         host: process.env.EMAIL_HOST,
@@ -169,20 +170,32 @@ export class SharedService {
       // use a template file with nodemailer
       mailTransport.use('compile', hbs(handlebarOptions));
 
-      mailTransport.sendMail(
-        {
-          from: emailProperties.emailConfigAut,
-          to: emailProperties.to,
-          replyTo: emailProperties.emailConfigAut,
-          subject: emailProperties.subject,
-          text: emailProperties.template,
-          template: emailProperties.template,
-          user: emailProperties.user, 
-          pass: emailProperties.pass,
-          context: {
-            objMail: emailProperties,
-          },
+      const attachmentProperties = [];
+      if (attachment) {
+         const obj = {
+          filename: 'carta.pdf',
+          contentDisposition: "attachment",
+          content: (Buffer.from(emailProperties.file)),
+        }
+        attachmentProperties.push(obj);
+      }
+
+      let emailOptions = {
+        from: emailProperties.emailConfigAut,
+        to: emailProperties.to,
+        replyTo: emailProperties.emailConfigAut,
+        subject: emailProperties.subject,
+        text: emailProperties.template,
+        template: emailProperties.template,
+        user: emailProperties.user,
+        pass: emailProperties.pass,
+        attachments: attachmentProperties,
+        context: {
+          objMail: emailProperties,
         },
+      }
+
+      mailTransport.sendMail(emailOptions,
         function (error: any) {
           if (error) {
             console.log(error);

@@ -137,21 +137,23 @@ export class DashboardService {
   private async totalVisitorsResult(chapterId: string) {
     try {
       const now = new Date();
-      const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
+      const filter = {
+        role: {
+          $eq: 'Visitante',
+        },
+        idChapter: ObjectId(chapterId),
+        status: EstatusRegister.Active,
+        createdAt: {
+          $gte: new Date(gte),
+          $lt: new Date(lte),
+        },
+      };
       return [
         {
-          $match: {
-            idChapter: ObjectId(chapterId),
-            status: EstatusRegister.Active,
-            role: { $eq: 'Visitante' },
-            createdAt: {
-              $gte: gte,
-              $lte: lte,
-            },
-          },
+          $match: filter,
         },
         { $group: { _id: null, totalVisitors: { $sum: 1 } } },
         { $project: { _id: 0 } },
@@ -247,8 +249,7 @@ export class DashboardService {
   private async totalVisitorsLastSixMonthsResult(chapterId: string) {
     try {
       const now = new Date();
-      const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {

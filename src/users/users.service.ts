@@ -162,7 +162,7 @@ export class UsersService {
           amount: '',
           to: newUser.email,
         };
-        await this.sharedService.sendMailer(emailProperties);
+        await this.sharedService.sendMailer(emailProperties,false);
       }
 
       if (newUser.role.toLowerCase() != 'visitante') {
@@ -446,30 +446,28 @@ export class UsersService {
           );
 
       let s3Response = '';
-
       const now = new Date();
-      if (filename != 'default') {
-        s3Response = await (
-          await this.sharedService.uploadFile(
-            dataBuffer,
-            now.getTime() + '_' + filename,
-            '',
-            's3-bucket-users',
-          )
-        ).result.toString();
-        await this.sharedService.deleteObjectFromS3(
-          's3-bucket-users',
-          req.urlFile,
-        );
-      } else {
-        if (req.deleteFile == 1) {
-          await this.sharedService.deleteObjectFromS3(
-            's3-bucket-users',
-            req.urlFile,
-          );
-        } else {
-          s3Response = req.urlFile;
-        }
+      
+      // ESCENARIO 1 SE GUARDA CON ARCHIVO 
+      // ESCENARIO 2 SE GUARDA SIN ARCHIVO 
+      // ESCENARIO 3 SE EDITA CON EL MISMO ARCHIVO
+      // ESCENARIO 4 SE EDITA SIN ARCHIVO 
+      // ESCENARIO 5 SE EDITA ELIMINANDO EL ARCHIVO 
+      // ESCENARIO 6 SE EDITA CON OTRO ARCHIVO Y SE ELIMINA EL QUE TENIA  
+      
+      if (req.scenario == 1){
+        s3Response = await(await this.sharedService.uploadFile(dataBuffer,  now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
+      }
+      if (req.scenario == 3){
+        s3Response = req.urlFile;
+      }
+      if (req.scenario == 5){
+        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+        s3Response = '';
+      }
+      if (req.scenario == 6){
+        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+        s3Response = await(await this.sharedService.uploadFile(dataBuffer,  now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
       }
 
       await this.usersModel.updateOne(
