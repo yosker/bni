@@ -15,7 +15,7 @@ import { SharedService } from 'src/shared/shared.service';
 import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessions.schema';
 import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
 import { ChapterSchema } from 'src/chapters/schemas/chapters.schema';
-
+import { UsersInterviewsSchema } from 'src/users-interviews/schemas/interviews.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -30,6 +30,7 @@ import { ChapterSchema } from 'src/chapters/schemas/chapters.schema';
       { name: 'ChapterSession', schema: ChapterSessionSchema },
       { name: 'Attendance', schema: AttendanceSchema },
       { name: 'Chapter', schema: ChapterSchema },
+      { name: 'UsersInterview', schema: UsersInterviewsSchema},
     ]),
     AuthModule,
     PassportModule.register({

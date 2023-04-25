@@ -55,6 +55,9 @@ export class UsersInterviews {
 
   @Prop({ type: 'string' })
   question13: string;
+  
+  @Prop({ default: new Date() })
+  dateOfInterview: Date;
 }
 
 export const UsersInterviewsSchema =

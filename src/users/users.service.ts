@@ -19,8 +19,12 @@ import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
 import { Chapter } from 'src/chapters/interfaces/chapters.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersInterview } from 'src/users-interviews/interfaces/users-interview.interface';
 
+import { join } from 'path';
+import moment from 'moment';
 const ObjectId = require('mongodb').ObjectId;
+const PDFDocument = require('pdfkit-table');
 
 @Injectable()
 export class UsersService {
@@ -35,7 +39,8 @@ export class UsersService {
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
-  ) {}
+    @InjectModel('UsersInterview') private readonly usersInterviewModel: Model<UsersInterview>,
+  ) { }
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -123,13 +128,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-              await this.sharedService.uploadFile(
-                dataBuffer,
-                filename,
-                '.jpg',
-                's3-bucket-users',
-              )
-            ).result
+            await this.sharedService.uploadFile(
+              dataBuffer,
+              filename,
+              '.jpg',
+              's3-bucket-users',
+            )
+          ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -156,13 +161,13 @@ export class UsersService {
           template: process.env.NETWORKERS_WELCOME_TEMPLATE,
           subject: process.env.SUBJECT_CHAPTER_WELCOME,
           name: newUser.name + ' ' + newUser.lastName,
-          user: newUser.email, 
+          user: newUser.email,
           pass: pass,
           urlPlatform: url,
           amount: '',
           to: newUser.email,
         };
-        await this.sharedService.sendMailer(emailProperties,false);
+        await this.sharedService.sendMailer(emailProperties, false);
       }
 
       if (newUser.role.toLowerCase() != 'visitante') {
@@ -376,7 +381,7 @@ export class UsersService {
     const { result } = this.servicesResponse;
 
     try {
-      await this.usersModel.deleteOne({_id: ObjectId(userId)});
+      await this.usersModel.deleteOne({ _id: ObjectId(userId) });
 
       await this.deleteUserSessions(userId, chapterId);
 
@@ -447,27 +452,27 @@ export class UsersService {
 
       let s3Response = '';
       const now = new Date();
-      
+
       // ESCENARIO 1 SE GUARDA CON ARCHIVO 
       // ESCENARIO 2 SE GUARDA SIN ARCHIVO 
       // ESCENARIO 3 SE EDITA CON EL MISMO ARCHIVO
       // ESCENARIO 4 SE EDITA SIN ARCHIVO 
       // ESCENARIO 5 SE EDITA ELIMINANDO EL ARCHIVO 
       // ESCENARIO 6 SE EDITA CON OTRO ARCHIVO Y SE ELIMINA EL QUE TENIA  
-      
-      if (req.scenario == 1){
-        s3Response = await(await this.sharedService.uploadFile(dataBuffer,  now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
+
+      if (req.scenario == 1) {
+        s3Response = await (await this.sharedService.uploadFile(dataBuffer, now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
       }
-      if (req.scenario == 3){
+      if (req.scenario == 3) {
         s3Response = req.urlFile;
       }
-      if (req.scenario == 5){
+      if (req.scenario == 5) {
         await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
         s3Response = '';
       }
-      if (req.scenario == 6){
+      if (req.scenario == 6) {
         await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
-        s3Response = await(await this.sharedService.uploadFile(dataBuffer,  now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
+        s3Response = await (await this.sharedService.uploadFile(dataBuffer, now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
       }
 
       await this.usersModel.updateOne(
@@ -545,7 +550,7 @@ export class UsersService {
 
   private async deleteUserSessions(userId: string, chapterId: string) {
     try {
-    
+
       await this.attendanceModel.deleteMany({
         userId: ObjectId(userId),
         chapterId: ObjectId(chapterId),
@@ -554,4 +559,380 @@ export class UsersService {
       throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
     }
   }
+
+  //ENDPOINT PARA EXPORTAR LA ENTREVISTA A PDF 
+
+  public async createFile(userInterviewId: string): Promise<Buffer> {
+
+    try {
+      
+      const pipeline: any = await this.resultQuery(userInterviewId);
+      const objInterview = await this.usersInterviewModel.aggregate(pipeline);
+
+      const pdfBuffer: Buffer = await new Promise(resolve => {
+        const doc = new PDFDocument({
+          size: "LETTER",
+          bufferPages: true,
+          autoFirstPage: false,
+        })
+        doc.on('pageAdded', () => {
+
+          doc.image(join(process.cwd(), 'src/assets/logo.png'), 20, 15, { width: 67 })
+          doc.moveTo(50, 55)
+
+          let bottom = doc.page.margins.bottom;
+          doc.page.margins.bottom = 0;
+          doc.image(join(process.cwd(), 'src/assets/footer.png'), (doc.page.width - (-165)) * 0.5, doc.page.height - 105, { width: 200 })
+          doc.page.margins.bottom = bottom;
+        })
+
+        doc.addPage();
+
+        doc.text('', 0, 60);
+        doc.font('Helvetica-Bold').fontSize(12);
+        doc.text(`Entrevista Candidatos`, {
+          width: doc.page.width,
+          align: 'center'
+        });
+        
+        const dateInterview = objInterview[0].dateOfInterview;
+        const table = {
+          headers: ['', ''],
+          rows: [
+            [`Fecha:${ dateInterview }`, `Hora Fin:${objInterview[0].finalDate}`],
+            [`Nombre: ${objInterview[0].interviwedName}`, `Empresa: ${ objInterview[0].companyName}`],
+            [`5. Especialidad / Giro: ${objInterview[0].profession}`, ``]],
+          options: {
+            divider: {
+              header: { disabled: false, width: 0.5, opacity: 0.5 },
+              vertical: { disabled: false, width: 1, opacity: 0.5 },
+            },
+          }
+        }
+        doc.moveDown();
+        doc.table(table, { columnSize: [150, 300] });
+
+        //PREGUNTA 1 
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text('1. ¿Qué fue lo que más te gustó de la junta?', {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question1}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 2
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text('2. ¿Por qué?', {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question2}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 3 
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text('3. ¿Por qué crees que BNI puede ser benéfico para ti y para tu negocio?', {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question3}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 4
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text('4. ¿Sabes para qué estamos aquí? ¿Sabes lo que es una entrevista en BNI? Sin importar quién realice la entrevista, no podrá aceptar la solicitud, si no tiene la certeza de que:', {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`a.- Eres un gran profesional. OK`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`b.- Entiendes perfectamente los compromisos. OK`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`c.-Puedes cumplir con los mismos. OK`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 5
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text('¿Estás cómodo con esto? ', {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question5}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 6
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text('En caso de ser aceptado. ¿Estás en posibilidad de pagar tu membresía de inmediato? ', {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question6}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 7
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`5. Los compromisos y explicación.`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`a.- Asistencia-Puntualidad. OK`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`b.- Capacitación. OK`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`c.- Aportación-Participación. OK`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`d.- Lista 40 contactos. OK`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 6
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`6. ¿Hay algún motivo por el cual no puedas cumplir esto? `, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question8}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 7
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`7. ¿Cuál es tu Producto estrella? `, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question9}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 8
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`8. ¿Quién podría ser un buen cliente / Conector para ti? `, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question10}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        
+        //PREGUNTA 9
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`9. ¿Cómo podría iniciar una conversación sobre ti?  `, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question11}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        //PREGUNTA 10
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`10. Del 1 al 10 Valora el compromiso de los demás miembros del capítulo, en relación a:`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`Asistencia / Puntualidad: ${objInterview[0].question12[0]} `, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`Capacitación:  ${objInterview[0].question12[1]}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`Aportación-Participación:  ${objInterview[0].question12[2]}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`Lista 40 contactos:  ${objInterview[0].question12[3]}`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+         //PREGUNTA 11
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`11. En caso de ser trabajador por cuenta ajena, la empresa ha de estar enterada y conforme con los compromisos y los tiempos de cada uno`, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(9);
+        doc.text(`${objInterview[0].question13} `, {
+          width: doc.page.width - 115,
+          align: 'left'
+        });
+
+        doc.moveDown();
+        const table1 = {
+          headers: ['', ''],
+          rows: [
+            [`Entrevistador`, `Entrevistado`],
+            [`${objInterview[0].interviwer}`, `${objInterview[0].interviwed}`]],
+          options: {
+            divider: {
+              header: { disabled: false, width: 0.5, opacity: 0.5 },
+              vertical: { disabled: false, width: 1, opacity: 0.5 },
+            },
+          }
+        }
+        doc.moveDown();
+        doc.table(table1, { columnSize: [150, 300] });
+
+
+        const buffer = []
+        doc.on('data', buffer.push.bind(buffer))
+        doc.on('end', () => {
+          const data = Buffer.concat(buffer)
+          resolve(data)
+        })
+        doc.end();
+      })
+      return pdfBuffer;
+
+    } catch (err) {
+      console.log('err...', err);
+    }
+  }
+
+
+  private async resultQuery(userInterviewId: string) {
+    try {
+      return [
+        {
+          $match: { userInterviewId: ObjectId(userInterviewId) }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userInterviewId',
+            foreignField: '_id',
+            as: 'users',
+          }
+        },
+        {
+          $unwind: '$users'
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userInterview',
+          }
+        },
+        {
+          $unwind: '$userInterview'
+        },
+        {
+          $project: {
+            dateOfInterview: { $dateToString: { format: "%Y-%m-%d", date: '$dateOfInterview' } },
+            finalDate: '$dateOfInterview',
+            interviwedName: { $toUpper: { $concat: ['$users.name', ' ', '$users.lastName'] } },
+            profession: '$users.profession',
+            companyName: '$users.companyName',
+            question1: '$question1',
+            question2: '$question2',
+            question3: '$question3',
+            question4: '$question4',
+            question5: '$question5',
+            question6: '$question6',
+            question7: '$question7',
+            question8: '$question8',
+            question9: '$question9',
+            question10: '$question10',
+            question11: '$question11',
+            question12: '$question12',
+            question13: '$question13',
+            interviwer: { $toUpper: { $concat: ['$userInterview.name', ' ', '$userInterview.lastName'] } },
+            interviwed: { $toUpper: { $concat: ['$users.name', ' ', '$users.lastName'] } }
+          }
+        }
+      ];
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  }
+
 }
