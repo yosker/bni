@@ -22,6 +22,8 @@ import { PaginationParams } from 'src/shared/pagination/paginationParams';
 import { LocalTimeInterceptor } from 'src/shared/utils/local-time-stamp/local-time.interceptor';
 import { LocalTime } from 'src/shared/utils/local-time-stamp/local-time.decorator';
 
+@LocalTime()
+@UseInterceptors(LocalTimeInterceptor)
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Attendance')
@@ -30,8 +32,6 @@ export class AttendanceController {
   constructor(private attendanceService: AttendanceService) {}
 
   @Post('/update')
-  @LocalTime()
-  @UseInterceptors(LocalTimeInterceptor)
   async update(
     @Body() attendanceDTO: AttendanceDTO,
     @Res() res: Response,
