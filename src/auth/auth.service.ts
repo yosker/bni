@@ -87,7 +87,7 @@ export class AuthService {
           imageURL: 1,
           role: 1,
           password: 1,
-          resetPassword:1
+          resetPassword: 1,
         },
       );
       if (!findUser)
@@ -106,7 +106,7 @@ export class AuthService {
       const payload = {
         idChapter: findUser.idChapter,
         id: findUser._id,
-        name: findUser.name +' '+ findUser.lastName,
+        name: findUser.name + ' ' + findUser.lastName,
         role: findUser.role,
         email: email,
         language: 'esMX',
