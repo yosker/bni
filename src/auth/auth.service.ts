@@ -9,6 +9,7 @@ import { Users } from 'src/users/schemas/users.schema';
 import { JwtService } from '@nestjs/jwt';
 import { ServicesResponse } from '../responses/response';
 import { Response } from 'express';
+import * as moment from 'moment-timezone';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -110,6 +111,7 @@ export class AuthService {
         role: findUser.role,
         email: email,
         language: 'esMX',
+        localTime: moment().toISOString(),
       };
 
       const token = this.jwtService.sign(payload);

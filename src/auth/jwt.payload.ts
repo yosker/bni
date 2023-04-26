@@ -5,4 +5,5 @@ export interface JWTPayload {
   role: string;
   language: string;
   idChapter: string;
+  localTime: string;
 }
