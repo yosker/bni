@@ -7,7 +7,6 @@ import {
   Param,
   Res,
   Query,
-  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
@@ -58,11 +57,13 @@ export class AttendanceController {
     @Param('chapterId') chapterId: string,
     @Param('sessionDate') sessionDate: string,
     @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
   ) {
     return await this.attendanceService.NetworkersList(
       chapterId,
       sessionDate,
       res,
+      jwtPayload,
     );
   }
 

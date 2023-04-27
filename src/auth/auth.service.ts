@@ -10,6 +10,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ServicesResponse } from '../responses/response';
 import { Response } from 'express';
 import * as moment from 'moment-timezone';
+import { IpService } from 'src/shared/utils/ip/ip.service';
+
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -19,6 +21,7 @@ export class AuthService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     private jwtService: JwtService,
     private readonly servicesResponse: ServicesResponse,
+    private readonly ipService: IpService,
   ) {}
 
   /**
@@ -82,6 +85,7 @@ export class AuthService {
     const { email, password } = loginAuthDto;
 
     try {
+      const timeZone = await this.ipService.getTimeZone(ip);
       const findUser = await this.usersModel.findOne(
         { email },
         {
@@ -116,7 +120,7 @@ export class AuthService {
         email,
         language: 'esMX',
         localTime: moment().toISOString(),
-        ip,
+        timeZone,
       };
 
       const token = this.jwtService.sign(payload);

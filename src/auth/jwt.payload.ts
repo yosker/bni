@@ -6,5 +6,5 @@ export interface JWTPayload {
   language: string;
   idChapter: string;
   localTime: string;
-  ip: string;
+  timeZone: string;
 }

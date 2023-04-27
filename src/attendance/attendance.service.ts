@@ -10,16 +10,16 @@ import { Users } from 'src/users/schemas/users.schema';
 import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
 import { Chapter } from 'src/chapters/interfaces/chapters.interface';
 import { SharedService } from 'src/shared/shared.service';
-import { join } from 'path';
-// import * as moment from 'moment';
-
-const ObjectId = require('mongodb').ObjectId;
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
 import * as moment from 'moment-timezone';
+import { join } from 'path';
+
+const ObjectId = require('mongodb').ObjectId;
 const PDFDocument = require('pdfkit-table');
+
 @Injectable()
 export class AttendanceService {
   constructor(
@@ -103,6 +103,7 @@ export class AttendanceService {
           currentDate,
           attendanceDTO.userId.toString(),
           1,
+          jwtPayload.timeZone,
         );
         const userData = await this.attendanceModel.aggregate(pipeline);
 
@@ -183,6 +184,7 @@ export class AttendanceService {
     chapterId: string,
     sessionDate: string,
     res: Response,
+    jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
       const pipeline = await this.AttendanceResult(
@@ -190,6 +192,7 @@ export class AttendanceService {
         sessionDate,
         ObjectId(0),
         0,
+        jwtPayload.timeZone,
       );
 
       const userData = await this.attendanceModel.aggregate(pipeline);
@@ -217,6 +220,7 @@ export class AttendanceService {
     attendaceDate: string,
     userId: string,
     queryType: number,
+    timeZone: string,
   ) {
     try {
       const filter = {
@@ -259,15 +263,11 @@ export class AttendanceService {
             attendanceDate: '$attendanceDate',
             createdAt: '$createdAt',
             attendanceHour: {
-              $concat: [
-                {
-                  $toString: {
-                    $hour: { date: '$createdAt', timezone: '+1900' },
-                  },
-                },
-                ':',
-                { $toString: { $minute: '$createdAt' } },
-              ],
+              $dateToString: {
+                format: '%H:%M:%S',
+                date: '$createdAt',
+                timezone: timeZone, // aquí indicamos la zona horaria deseada
+              },
             },
             companyName: '$userData.companyName',
             profession: '$userData.profession',
@@ -446,7 +446,7 @@ export class AttendanceService {
           });
           doc.moveTo(50, 55);
 
-          let bottom = doc.page.margins.bottom;
+          const bottom = doc.page.margins.bottom;
           doc.page.margins.bottom = 0;
           doc.image(
             join(process.cwd(), 'src/assets/footer.png'),

@@ -8,6 +8,7 @@ import { jwtConstants } from './jwt.constants';
 import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { ServicesResponse } from 'src/responses/response';
+import { IpService } from 'src/shared/utils/ip/ip.service';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { ServicesResponse } from 'src/responses/response';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, ServicesResponse],
+  providers: [AuthService, JwtStrategy, ServicesResponse, IpService],
   exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}
