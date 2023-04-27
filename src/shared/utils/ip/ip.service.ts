@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import requestIp from 'request-ip';
 import axios from 'axios';
 import * as moment from 'moment-timezone';
 
@@ -15,10 +14,6 @@ export class IpService {
       console.log(error);
       throw new Error('Error fetching local time');
     }
-  }
-
-  getClientIp(req): string {
-    return requestIp.getClientIp(req);
   }
 
   async getTimeZone(ip: string): Promise<string> {
