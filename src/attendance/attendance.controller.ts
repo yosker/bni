@@ -7,7 +7,8 @@ import {
   Param,
   Res,
   Query,
-  Req
+  Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { AttendanceDTO } from './dto/attendance.dto';
@@ -18,7 +19,11 @@ import { Response } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { PaginationParams } from 'src/shared/pagination/paginationParams';
+import { LocalTimeInterceptor } from 'src/shared/utils/local-time-stamp/local-time.interceptor';
+import { LocalTime } from 'src/shared/utils/local-time-stamp/local-time.decorator';
 
+@LocalTime()
+@UseInterceptors(LocalTimeInterceptor)
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Attendance')
@@ -31,9 +36,8 @@ export class AttendanceController {
     @Body() attendanceDTO: AttendanceDTO,
     @Res() res: Response,
     @Auth() jwtPayload: JWTPayload,
-    @Req() req,
   ) {
-    return await this.attendanceService.update(req, attendanceDTO, res, jwtPayload);
+    return await this.attendanceService.update(attendanceDTO, res, jwtPayload);
   }
 
   @Get('/visitors/:chapterId/:sessionDate')
@@ -83,6 +87,11 @@ export class AttendanceController {
     @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
   ) {
-    return await this.attendanceService.sendLetter(id,attendanceNumber, jwtPayload, res);
+    return await this.attendanceService.sendLetter(
+      id,
+      attendanceNumber,
+      jwtPayload,
+      res,
+    );
   }
 }

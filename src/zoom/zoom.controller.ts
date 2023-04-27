@@ -51,4 +51,9 @@ export class ZoomController {
   ) {
     return this.zoomService.updateTokenChapter(updateZoomDto, res);
   }
+
+  @Get('meetings/:chapterId')
+  getMeetings(@Param('chapterId') chapterId: string, @Res() res: Response) {
+    return this.zoomService.getMeetings(chapterId, res);
+  }
 }

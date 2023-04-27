@@ -35,7 +35,7 @@ export class ZoomService {
       const meeting = await this.getDataMeeting(
         createZoomDto.meetingId,
         createZoomDto.tokenChapter,
-      );
+      ).catch(console.error);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -46,10 +46,7 @@ export class ZoomService {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
-          new HttpException(
-            'INTERNAL_SERVER_ERROR.',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          ),
+          new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR),
         );
     }
   }
@@ -131,14 +128,9 @@ export class ZoomService {
         result: meeting,
       });
     } catch (error) {
-      throw res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(
-          new HttpException(
-            'INTERNAL_SERVER_ERROR.',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          ),
-        );
+      throw res.json(
+        new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR),
+      );
     }
   }
 
@@ -171,10 +163,7 @@ export class ZoomService {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
-          new HttpException(
-            'INTERNAL_SERVER_ERROR.',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          ),
+          new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR),
         );
     }
   }
@@ -220,10 +209,7 @@ export class ZoomService {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
-          new HttpException(
-            'INTERNAL_SERVER_ERROR.',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          ),
+          new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR),
         );
     }
   }
@@ -252,21 +238,81 @@ export class ZoomService {
     }
   }
 
+  async getMeetings(chapterId: string, res: Response) {
+    try {
+      const chapter = await this.validateChapterExist(chapterId);
+      if (!chapter) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(
+            new HttpException(
+              'CHAPTER_TOKEN_NOT_FOUND.',
+              HttpStatus.BAD_REQUEST,
+            ),
+          );
+      }
+
+      const meetings = await this.getMeetingsList(chapter.tokenChapter);
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: meetings,
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR),
+        );
+    }
+  }
+
   /**
-   *
+   * @description Obtiene la información de la sesión enviada
    * @param meetingId Id del Meet
    * @param tokenChapter Token del Capítulo
    * @returns Información del Mee
    */
   getDataMeeting = (meetingId: string, tokenChapter: string): Promise<any> => {
     const headers = { Authorization: `Bearer ${tokenChapter}` };
-    return new Promise((resolve) => {
+    return new Promise((resolve, rejected) => {
       this.httpService
         .get(`https://api.zoom.us/v2/meetings/${meetingId}/registrants`, {
           headers,
         })
         .forEach((value) => {
-          resolve(value.data);
+          resolve(value?.data);
+        })
+        .catch((error) => {
+          // Manejar el error de la solicitud
+          rejected(`No se encuentra la sesión enviada, ${error.message}`);
+        });
+    });
+  };
+
+  /**
+   * @description Obtiene las sesiones dadas de alta por el usuario
+   * @param tokenChapter Token del Capítulo
+   * @returns Información del Mee
+   */
+  getMeetingsList = (tokenChapter: string): Promise<any> => {
+    const headers = { Authorization: `Bearer ${tokenChapter}` };
+    return new Promise((resolve, rejected) => {
+      this.httpService
+        .get(
+          `https://api.zoom.us/v2/users/${
+            process.env.ZOOM_USER_ID ?? 'jMOMCXLpRM6SuzoBtyyIQQ'
+          }/meetings`,
+          {
+            headers,
+          },
+        )
+        .forEach((value) => {
+          resolve(value?.data);
+        })
+        .catch((error) => {
+          // Manejar el error de la solicitud
+          rejected(`No se encuentra la sesión enviada, ${error.message}`);
         });
     });
   };
