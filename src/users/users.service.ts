@@ -22,7 +22,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersInterview } from 'src/users-interviews/interfaces/users-interview.interface';
 
 import { join } from 'path';
-import moment from 'moment';
+import * as moment from 'moment-timezone';
+// import moment from 'moment';
 const ObjectId = require('mongodb').ObjectId;
 const PDFDocument = require('pdfkit-table');
 
@@ -565,7 +566,7 @@ export class UsersService {
   public async createFile(userInterviewId: string): Promise<Buffer> {
 
     try {
-      
+
       const pipeline: any = await this.resultQuery(userInterviewId);
       const objInterview = await this.usersInterviewModel.aggregate(pipeline);
 
@@ -594,13 +595,13 @@ export class UsersService {
           width: doc.page.width,
           align: 'center'
         });
-        
+
         const dateInterview = objInterview[0].dateOfInterview;
         const table = {
           headers: ['', ''],
           rows: [
-            [`Fecha:${ dateInterview }`, `Hora Fin:${objInterview[0].finalDate}`],
-            [`Nombre: ${objInterview[0].interviwedName}`, `Empresa: ${ objInterview[0].companyName}`],
+            [`Fecha:${dateInterview}`, `Hora Fin:${objInterview[0].finalDate}`],
+            [`Nombre: ${objInterview[0].interviwedName}`, `Empresa: ${objInterview[0].companyName}`],
             [`5. Especialidad / Giro: ${objInterview[0].profession}`, ``]],
           options: {
             divider: {
@@ -781,7 +782,7 @@ export class UsersService {
           width: doc.page.width - 115,
           align: 'left'
         });
-        
+
         //PREGUNTA 9
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(9);
@@ -828,7 +829,7 @@ export class UsersService {
           align: 'left'
         });
 
-         //PREGUNTA 11
+        //PREGUNTA 11
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`11. En caso de ser trabajador por cuenta ajena, la empresa ha de estar enterada y conforme con los compromisos y los tiempos de cada uno`, {
@@ -873,7 +874,6 @@ export class UsersService {
       console.log('err...', err);
     }
   }
-
 
   private async resultQuery(userInterviewId: string) {
     try {
@@ -935,4 +935,351 @@ export class UsersService {
     }
   }
 
+
+
+
+
+
+  //ENDPOINT PARA ARMAR LA CARTA Y ENVIAR POR CORREO. TAMBIÉN SE EDITA EL ESTATUS A CARTA ENVIADA 
+
+  async sendAcceptedLetter(
+    id: string,
+    res: Response,
+  ): Promise<Response> {
+    try {
+      await this.usersModel.updateOne(
+        {
+          _id: ObjectId(id),
+
+        },
+        {
+          letterSent: true,
+        },
+      );
+
+      const pipeline: any = await this.resultQueryLetter(id);
+      const objUser = await this.usersModel.aggregate(pipeline);
+      //CREAMOS EL ARCHIVO 
+      const pdfBuffer = await this.createAcceptedPdfFile(objUser);
+      //ENVIAMOS EL CORREO CON LA CARTA ADJUNTA
+      await this.sendEmail(objUser, pdfBuffer);
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  };
+
+  async sendEmail(objUser: any, pdfBuffer: any) {
+
+    try {
+      const chapter = await this.chapterModel.findById(objUser[0].idChapter);
+
+      const emailProperties = {
+        emailConfigAut: chapter.email,
+        passwordAut: chapter.password,
+        template: 'empty',
+        subject: 'Carta de aceptación',
+        amount: '',
+        name: '',
+        to: objUser[0].email,
+        user: '',
+        pass: '',
+        urlPlatform: '',
+        file: pdfBuffer
+      };
+      await this.sharedService.sendMailer(emailProperties, true);
+
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  };
+
+  async createAcceptedPdfFile(objUser: any) {
+
+    try {
+
+      let arrEmails = '';
+      objUser[0].emailAccounts.forEach(async (obj) => {
+        if (obj.status == 'Active' && (obj.acceptedAccount == 'Ambos' || obj.acceptedAccount == 'Acepetado')) {
+          arrEmails = obj.email + ', ' + arrEmails;
+        }
+      });
+      const pdfBuffer: Buffer = await new Promise(resolve => {
+        const doc = new PDFDocument({
+          size: "LETTER",
+          bufferPages: true,
+          autoFirstPage: false,
+        })
+
+        doc.on('pageAdded', () => {
+
+          doc.image(join(process.cwd(), 'src/assets/logo.png'), 20, 15, { width: 67 })
+          doc.moveTo(50, 55)
+
+          let bottom = doc.page.margins.bottom;
+          doc.page.margins.bottom = 0;
+
+          doc.image(join(process.cwd(), 'src/assets/footer.png'), (doc.page.width - (-165)) * 0.5, doc.page.height - 105, { width: 200 })
+          doc.page.margins.bottom = bottom;
+        })
+
+        doc.addPage();
+        doc.text('', 0, 50);
+
+        const currentDate = moment().format('DD-MM-YYYY');
+        doc.text('', 80, 80);
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`Fecha: ${currentDate}`, {
+          width: doc.page.width - 125,
+          align: 'right'
+        });
+
+        doc.moveDown();
+        doc.moveDown();
+        doc.text(`Estimado ${objUser[0].interviwedName}`, {
+          width: doc.page.width,
+          align: 'left'
+        });
+
+        const startText = `El presente además de saludarte, es para informarte que tu solicitud de INGRESO en nuestro Capítulo BNI ${objUser[0].chapterName}, ha sido ACEPTADA, con el giro de ${objUser[0].profession} `;
+        doc.moveDown();
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.fillColor('black')
+          .text(startText.slice(0, 72), {
+            width: doc.page.width - 125,
+            align: 'justify',
+            continued: true
+          })
+
+        doc.font('Helvetica-Bold').fontSize(11)
+          .text(startText.slice(72, 80), {  //ingreso
+            continued: true,
+          })
+
+          .fillColor('black')
+        doc.font('Times-Roman').fontSize(11)
+          .text(startText.slice(80, 100), {
+            continued: true,
+          });
+
+        doc.font('Helvetica-Bold').fontSize(11)//BNI Alianza Empresarial
+          .text(startText.slice(100, 124), {
+            continued: true,
+          })
+
+          .fillColor('black')
+        doc.font('Times-Roman').fontSize(11)
+          .text(startText.slice(124, 133), {
+            continued: true,
+          });
+
+        doc.font('Helvetica-Bold').fontSize(11)//ACEPTADA
+          .text(startText.slice(133, 142), {
+            continued: true,
+          })
+
+          .fillColor('black')
+        doc.font('Times-Roman').fontSize(11)
+          .text(startText.slice(142, 158), {
+            continued: true,
+          });
+
+        doc.font('Helvetica-Bold').fontSize(11)//giro
+          .text(startText.slice(158, 178), {
+            continued: false,
+            link: null
+          })
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`Estamos seguros que a partir de tu incorporación contaremos con tu compromiso para el cumplimiento de políticas de BNI y lograr nuestro objetivo de “Ganar Dando”.`, {
+          width: doc.page.width - 125,
+          align: 'justify'
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`Las cuotas vigentes desde febrero 2021 son las siguientes:`, {
+          width: doc.page.width - 125,
+          align: 'justify'
+        });
+
+        const table = {
+          headers: ['', ''],
+          rows: [
+            [`Membresía 1 año:`, `$11,900.00`],
+            [`Membresía 2 años:`, `$19,900.00`],
+          ],
+          options: {
+            divider: {
+              header: { disabled: true, width: 0, opacity: 0.0 },
+              vertical: { disabled: true, width: 0, opacity: 0.5 },
+              horizontal: { disabled: true, width: 0.5, opacity: 0.5 },
+            },
+            hideHeader: true,
+          }
+        }
+        doc.moveDown();
+        doc.table(table, { columnSize: [150, 200] });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`Contamos con las siguientes formas de pago:`, {
+          width: doc.page.width - 125,
+          align: 'justify'
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.list([
+          'BBVA Bancomer a nombre de Mexlion Networks, S.A. de C.V.',
+        ], {
+          bulletIndent: 20,
+          textIndent: 20,
+          width: doc.page.width - 125,
+          align: 'justify',
+          listType: 'bullet',
+          bulletRadius: 2,
+        });
+
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`       Cuenta: 0191 788 744`, {
+          width: doc.page.width - 125,
+          align: 'justify'
+        });
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`       Clabe: 0121 8000 1917 887 443`, {
+          width: doc.page.width - 125,
+          align: 'justify'
+        });
+
+        doc.list([
+          'En línea con Tarjeta de Crédito a través de Pay Pal http://www.pagosenlineabni.com',
+          'Billpocket'
+        ], {
+          bulletIndent: 20,
+          textIndent: 20,
+          width: doc.page.width - 125,
+          align: 'justify',
+          listType: 'bullet',
+          bulletRadius: 2,
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`Te solicitamos que una vez realizado el pago, envíes copia del comprobante de pago a los siguientes correos: ${arrEmails} para el control interno del capítulo, a más tardar el día 24 de abril de 2023, vigencia de esta carta de aceptación.`, {
+          width: doc.page.width - 125,
+          align: 'justify'
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`Las políticas de BNI establecen que sólo se permite a una persona por especialidad, motivo por el cual, hasta no completar el proceso de inscripción y pago de membresía, la especialidad para la cual aplicaste seguirá abierta en el capítulo.`, {
+          width: doc.page.width - 125,
+          align: 'justify'
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`Nuevamente muchas gracias por su interés de participar en BNI.`, {
+          width: doc.page.width - 125,
+          align: 'justify'
+        });
+
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(10);
+        doc.text('Atentamente,', {
+          width: doc.page.width,
+          align: 'left'
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(10);
+        doc.text('El Comité de Membresías', {
+          width: doc.page.width,
+          align: 'left'
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(10);
+        doc.text('BNI Alianza Empresarial', {
+          width: doc.page.width,
+          align: 'left'
+        });
+
+        const buffer = []
+        doc.on('data', buffer.push.bind(buffer))
+        doc.on('end', () => {
+          const data = Buffer.concat(buffer)
+          resolve(data)
+        })
+        doc.end();
+      });
+      return pdfBuffer;
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  };
+
+  private async resultQueryLetter(userInterviewId: string) {
+    try {
+      return [
+        {
+          $match: { _id: ObjectId(userInterviewId) }
+        },
+        {
+          $lookup: {
+            from: 'chapters',
+            localField: 'idChapter',
+            foreignField: '_id',
+            as: 'users',
+          }
+        },
+        {
+          $unwind: '$users'
+        },
+        {
+          $lookup: {
+            from: 'emailaccounts',
+            localField: 'idChapter', //arriba -> attendances
+            foreignField: 'chapterId',
+            as: 'emailaccounts',
+          }
+        },
+        {
+          $project: {
+
+            interviwedName: { $toUpper: { $concat: ['$name', ' ', '$lastName'] } },
+            profession: '$profession',
+            companyName: '$companyName',
+            chapterName: '$users.name',
+            emailAccounts: '$emailaccounts',
+            email: '$email',
+            idChapter: '$idChapter'
+          }
+        }
+      ];
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  }
 }

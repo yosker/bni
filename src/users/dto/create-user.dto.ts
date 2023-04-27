@@ -112,8 +112,11 @@ export class CreateUserDto {
   completedInterview = false;
 
   @Prop({ default: false, required: false })
-  resetPassword:  boolean;
+  resetPassword: boolean;
 
+  @Prop({ default: false, required: false })
+  letterSent: boolean;
+  
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })

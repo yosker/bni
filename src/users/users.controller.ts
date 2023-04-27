@@ -179,4 +179,11 @@ export class UsersController {
     })
     res.end(buffer);
   }
+
+  @Get('/sendLetter/:InterviwedId')
+  async sendLetter(
+    @Param('InterviwedId') InterviwedId: string, @Res() res: Response
+  ) {
+    return await this.usersService.sendAcceptedLetter(InterviwedId,res);
+  }
 }

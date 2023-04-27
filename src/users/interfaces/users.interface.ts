@@ -17,5 +17,6 @@ export interface User extends Document {
   completedInterview: boolean;
   invitedBy: string;
   resetPassword:  boolean;
+  letterSent:  boolean;
   accepted: boolean;
 }
