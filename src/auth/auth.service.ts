@@ -74,7 +74,11 @@ export class AuthService {
    * @param loginAuthDto
    * @returns user-token
    */
-  async login(loginAuthDto: LoginAuthDto, res: Response): Promise<Response> {
+  async login(
+    loginAuthDto: LoginAuthDto,
+    res: Response,
+    ip: string,
+  ): Promise<Response> {
     const { email, password } = loginAuthDto;
 
     try {
@@ -109,9 +113,10 @@ export class AuthService {
         id: findUser._id,
         name: findUser.name + ' ' + findUser.lastName,
         role: findUser.role,
-        email: email,
+        email,
         language: 'esMX',
         localTime: moment().toISOString(),
+        ip,
       };
 
       const token = this.jwtService.sign(payload);

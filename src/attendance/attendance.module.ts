@@ -12,6 +12,8 @@ import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessio
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
 import { ChapterSchema } from 'src/chapters/schemas/chapters.schema';
 import { SharedService } from 'src/shared/shared.service';
+import { DateService } from 'src/shared/utils/local-time-stamp/date.service';
+import { IpService } from 'src/shared/utils/ip/ip.service';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -32,7 +34,8 @@ import { SharedService } from 'src/shared/shared.service';
     UsersModule,
     ChapterSessionsModule,
     PaginateResult,
-    SharedService
+    SharedService,
+    IpService,
   ],
 })
 export class AttendanceModule {}
