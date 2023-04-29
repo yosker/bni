@@ -8,7 +8,7 @@ export interface Chapter extends Document {
   name: { type: string };
   email: { type: string };
   password: { type: string };
-  sessionDate: { type: string };
+  attendanceDate: { type: string };
   sessionSchedule: { type: string };
   sessionType: { type: string };
   tokenChapter: string;
