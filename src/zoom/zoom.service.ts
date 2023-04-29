@@ -10,8 +10,9 @@ import { ServicesResponse } from 'src/responses/response';
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
-import { IpService } from 'src/shared/utils/ip/ip.service';
+import { JWTPayload } from 'src/auth/jwt.payload';
 
+const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -20,7 +21,6 @@ export class ZoomService {
     private httpService: HttpService,
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
     private servicesResponse: ServicesResponse,
-    private readonly ipService: IpService,
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
@@ -59,7 +59,11 @@ export class ZoomService {
    * @param res respuesta
    * @returns respuesta
    */
-  async setUsersByMeetingId(chapterId: string, res: Response) {
+  async setUsersByMeetingId(
+    chapterId: string,
+    jwtPayload: JWTPayload,
+    res: Response,
+  ) {
     try {
       const chapter = await this.validateChapterExist(chapterId);
       if (!chapter) {
@@ -86,56 +90,53 @@ export class ZoomService {
           );
       }
 
-      // const nuedata = this.ipService.getLocalTime(
-      //   '138.186.31.209',
-      //   meeting.registrants[0].create_time,
-      // );
+      for (let index = 0; index < meeting.registrants.length; index++) {
+        const registrant = meeting.registrants[index];
+        //Buscamos al usuario por su email
+        const user = await this.usersModel.findOne({
+          email: registrant.email,
+          idChapter: ObjectId(chapterId),
+        });
 
-      await meeting.registrants.forEach(
-        async (registrant: {
-          email: string;
-          first_name: string;
-          last_name: string;
-          phone: string; //TODO Agregar campos faltantes al crear el meeting
-          company: string;
-          profession: string;
-          invitedBy: string;
-        }) => {
-          //Buscamos al usuario por su email
-          const user = await this.usersModel.findOne({
+        const leaveTime = moment
+          .utc(registrant.create_time)
+          .tz(jwtPayload.timeZone)
+          .format();
+
+        if (!user) {
+          //Si no se Encuentra el Usuario, se Crea como Visitante
+          const userVisitor = {
+            idChapter: ObjectId(chapterId),
             email: registrant.email,
-          });
+            name: registrant.first_name,
+            role: 'Visitante',
+            lastName: registrant.last_name,
+            phoneNumber: registrant.phone,
+            companyName: registrant.company,
+            profession: registrant.profession,
+            invitedBy: registrant.invitedBy,
+            updatedAt: leaveTime,
+          };
+          await this.usersModel.create(userVisitor);
+        } else {
+          if (user.role.toLowerCase() !== 'visitante') {
+            //De lo contrario se le pasa asistencia
+            const dateAttendance = moment().format('YYYY-MM-DD');
 
-          if (!user) {
-            //Si no se Encuentra el Usuario, se Crea como Visitante
-            const userVisitor = {
-              idChapter: ObjectId(chapterId),
-              email: registrant.email,
-              name: registrant.first_name,
-              role: 'Visitante',
-              lastName: registrant.last_name,
-              phoneNumber: registrant.phone,
-              companyName: registrant.company,
-              profession: registrant.profession,
-              invitedBy: registrant.invitedBy,
-            };
-            await this.usersModel.create(userVisitor);
-          } else {
-            if (user.role.toLowerCase() !== 'visitante') {
-              //De lo contrario se le pasa asistencia
-              await this.attendanceModel.findOneAndUpdate(
-                {
-                  userId: ObjectId(user._id),
-                  chapterId: ObjectId(chapterId),
-                },
-                {
-                  attended: true,
-                },
-              );
-            }
+            await this.attendanceModel.findOneAndUpdate(
+              {
+                userId: ObjectId(user._id),
+                chapterId: ObjectId(chapterId),
+                attendanceDate: dateAttendance,
+              },
+              {
+                attended: true,
+                updatedAt: leaveTime,
+              },
+            );
           }
-        },
-      );
+        }
+      }
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -236,15 +237,9 @@ export class ZoomService {
    */
   async validateChapterExist(chapterId: string) {
     try {
-      const chapter = await this.chapterModel.findOne(
-        {
-          _id: ObjectId(chapterId),
-        },
-        {
-          meetingId: 1,
-          tokenChapter: 1,
-        },
-      );
+      const chapter = await this.chapterModel.findOne({
+        _id: ObjectId(chapterId),
+      });
       if (!chapter) return false;
       return chapter;
     } catch (error) {

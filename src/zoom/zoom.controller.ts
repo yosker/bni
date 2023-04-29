@@ -7,6 +7,7 @@ import {
   Param,
   Res,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ZoomService } from './zoom.service';
 import { CreateZoomDto } from './dto/create-zoom.dto';
@@ -15,7 +16,13 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { JWTPayload } from 'src/auth/jwt.payload';
+import { LocalTime } from 'src/shared/utils/local-time-stamp/local-time.decorator';
+import { LocalTimeInterceptor } from 'src/shared/utils/local-time-stamp/local-time.interceptor';
 
+@LocalTime()
+@UseInterceptors(LocalTimeInterceptor)
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
 @ApiTags('Zoom')
@@ -34,9 +41,10 @@ export class ZoomController {
   @Patch('/setUsersMeeting/:chapterId')
   setUsersByMeetingId(
     @Param('chapterId') chapterId: string,
+    @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
   ) {
-    return this.zoomService.setUsersByMeetingId(chapterId, res);
+    return this.zoomService.setUsersByMeetingId(chapterId, jwtPayload, res);
   }
 
   @Get('token/:chapterId')
