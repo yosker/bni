@@ -10,6 +10,7 @@ import { ServicesResponse } from 'src/responses/response';
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
+import { IpService } from 'src/shared/utils/ip/ip.service';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -19,6 +20,7 @@ export class ZoomService {
     private httpService: HttpService,
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
     private servicesResponse: ServicesResponse,
+    private readonly ipService: IpService,
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
@@ -71,12 +73,25 @@ export class ZoomService {
           );
       }
 
-      const meeting = await this.getDataMeeting(
+      const meeting: any = await this.getDataMeeting(
         chapter.meetingId,
         chapter.tokenChapter,
       );
 
-      meeting.registrants.forEach(
+      if (!meeting) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(
+            new HttpException('SESSION_NOT_FOUND.', HttpStatus.BAD_REQUEST),
+          );
+      }
+
+      // const nuedata = this.ipService.getLocalTime(
+      //   '138.186.31.209',
+      //   meeting.registrants[0].create_time,
+      // );
+
+      await meeting.registrants.forEach(
         async (registrant: {
           email: string;
           first_name: string;
@@ -108,7 +123,7 @@ export class ZoomService {
           } else {
             if (user.role.toLowerCase() !== 'visitante') {
               //De lo contrario se le pasa asistencia
-              await this.attendanceModel.findOne(
+              await this.attendanceModel.findOneAndUpdate(
                 {
                   userId: ObjectId(user._id),
                   chapterId: ObjectId(chapterId),

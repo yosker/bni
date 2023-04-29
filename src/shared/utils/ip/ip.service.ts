@@ -9,6 +9,7 @@ export class IpService {
       const response = await axios.get(`http://worldtimeapi.org/api/ip/${ip}`);
       const { timezone } = response.data;
       const mexicoCityTime = moment.tz(dateTime, timezone).toDate();
+
       return mexicoCityTime;
     } catch (error) {
       console.log(error);
