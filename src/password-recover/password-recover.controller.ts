@@ -15,15 +15,15 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiBearerAuth()
+
 @ApiTags('password-recover')
 @Controller('password-recover')
 export class PasswordRecoverController {
   constructor(private passwordRecoverService: PasswordRecoverService) { }
 
-  @Get('/:email')
-  async getNetworkers(
-    @Param('email') email: string,
+  @Post('/sendNewPassword')
+  async sendTemporalPassword(
+    @Body() email: string,
     @Res() res: Response,
   ) {
     return await this.passwordRecoverService.getNewPassword(

@@ -936,14 +936,11 @@ export class UsersService {
   }
 
 
-
-
-
-
   //ENDPOINT PARA ARMAR LA CARTA Y ENVIAR POR CORREO. TAMBIÉN SE EDITA EL ESTATUS A CARTA ENVIADA 
 
-  async sendAcceptedLetter(
+  async sendLetter(
     id: string,
+    type: string,
     res: Response,
   ): Promise<Response> {
     try {
@@ -960,9 +957,9 @@ export class UsersService {
       const pipeline: any = await this.resultQueryLetter(id);
       const objUser = await this.usersModel.aggregate(pipeline);
       //CREAMOS EL ARCHIVO 
-      const pdfBuffer = await this.createAcceptedPdfFile(objUser);
+      const pdfBuffer = type == 'aceptacion' ? await this.createAcceptedPdfFile(objUser) : await this.createDeniedPdfFile(objUser);
       //ENVIAMOS EL CORREO CON LA CARTA ADJUNTA
-      await this.sendEmail(objUser, pdfBuffer);
+      await this.sendEmail(objUser, type, pdfBuffer);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -981,16 +978,17 @@ export class UsersService {
     }
   };
 
-  async sendEmail(objUser: any, pdfBuffer: any) {
+  async sendEmail(objUser: any,type: string, pdfBuffer: any) {
 
     try {
       const chapter = await this.chapterModel.findById(objUser[0].idChapter);
+      const subject = type =='aceptacion' ? 'Carta de aceptación' : 'Carta de no aceptación';
 
       const emailProperties = {
         emailConfigAut: chapter.email,
         passwordAut: chapter.password,
         template: 'empty',
-        subject: 'Carta de aceptación',
+        subject: subject,
         amount: '',
         name: '',
         to: objUser[0].email,
@@ -1182,7 +1180,7 @@ export class UsersService {
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(11);
-        doc.text(`Te solicitamos que una vez realizado el pago, envíes copia del comprobante de pago a los siguientes correos: ${arrEmails} para el control interno del capítulo, a más tardar el día 24 de abril de 2023, vigencia de esta carta de aceptación.`, {
+        doc.text(`Te solicitamos que una vez realizado el pago, envíes copia del comprobante de pago a los siguientes correos: ${arrEmails} para el control interno del capítulo, en los proximos 4 días hábiles, vigencia de esta carta de aceptación.`, {
           width: doc.page.width - 125,
           align: 'justify'
         });
@@ -1281,5 +1279,146 @@ export class UsersService {
         'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
       );
     }
-  }
+  };
+
+  async createDeniedPdfFile(objUser: any) {
+
+    try {
+
+      let arrEmails = '';
+      objUser[0].emailAccounts.forEach(async (obj) => {
+        if (obj.status == 'Active' && obj.acceptedAccount == 'Rechazado') {
+          arrEmails = obj.email + ', ' + arrEmails;
+        }
+      });
+      const pdfBuffer: Buffer = await new Promise(resolve => {
+        const doc = new PDFDocument({
+          size: "LETTER",
+          bufferPages: true,
+          autoFirstPage: false,
+        })
+
+        doc.on('pageAdded', () => {
+
+          doc.image(join(process.cwd(), 'src/assets/logo.png'), 20, 15, { width: 67 })
+          doc.moveTo(50, 55)
+
+          let bottom = doc.page.margins.bottom;
+          doc.page.margins.bottom = 0;
+
+          doc.image(join(process.cwd(), 'src/assets/footer.png'), (doc.page.width - (-165)) * 0.5, doc.page.height - 105, { width: 200 })
+          doc.page.margins.bottom = bottom;
+        })
+
+        doc.addPage();
+        doc.text('', 80, 80);
+        doc.font('Helvetica-Bold').fontSize(11);
+        doc.text(
+          `Carta de Control #1 — Conflicto con la clasificación`,
+          {
+            width: doc.page.width,
+            align: 'left',
+          },
+        );
+        doc.moveDown();
+        const currentDate = moment().format('DD-MM-YYYY');
+        doc.font('Helvetica-Bold').fontSize(9);
+        doc.text(`Fecha: ${currentDate}`, {
+          width: doc.page.width - 125,
+          align: 'right'
+        });
+    
+        doc.text(`Estimado ${objUser[0].interviwedName}`, {
+          width: doc.page.width,
+          align: 'left'
+        });
+
+        doc.moveDown();
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(
+          ` Agradecemos su interés en unirse a nuestro Capítulo de BNI®. El Comité de Membresías revisó su Solicitud de Membresía y ha decidido regresarle su solicitud y cuotas. Nosotros determinamos que su clasificación de negocio entra en conflicto con la de un miembro actual y como la política de BNI® sólo permite a una persona por clasificación profesional, no podemos aceptar su solicitud.
+          `,
+          {
+            width: doc.page.width - 125,
+            align: 'justify',
+          },
+        );
+       
+    
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(
+          `Guardaremos sus datos para contactarlo en caso de que la clasificación llegue a estar disponible. Si desea ser considerado para otro Capítulo de BNI®, por favor póngase en contacto con la Oficina Regional de BNI®`,
+          {
+            width: doc.page.width - 125,
+            align: 'justify',
+          },
+        );
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(11);
+        doc.text(`De nuevo, gracias por su interés en BNI®.`,
+          {
+            width: doc.page.width - 125,
+            align: 'justify',
+          },
+        );
+
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(10);
+        doc.text('Atentamente,', {
+          width: doc.page.width,
+          align: 'left'
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(10);
+        doc.text('El Comité de Membresías', {
+          width: doc.page.width,
+          align: 'left',
+        });
+
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(10);
+        doc.text(`Capítulo BNI® ${objUser[0].chapterName}`, {
+          width: doc.page.width,
+          align: 'left',
+        });
+
+        doc.moveDown();
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(10);
+        doc.text('CC: Presidente del Capítulo', {
+          width: doc.page.width,
+          align: 'left',
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(10);
+        doc.text('Oficina Regional de BNI®', {
+          width: doc.page.width,
+          align: 'left',
+        });
+        doc.moveDown();
+        doc.font('Times-Roman').fontSize(10);
+        doc.text('Director /Director Consultor de BNI®', {
+          width: doc.page.width,
+          align: 'left',
+        });
+
+        const buffer = []
+        doc.on('data', buffer.push.bind(buffer))
+        doc.on('end', () => {
+          const data = Buffer.concat(buffer)
+          resolve(data)
+        })
+        doc.end();
+      });
+      return pdfBuffer;
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  };
+
 }
