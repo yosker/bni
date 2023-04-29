@@ -13,6 +13,7 @@ import { jwtConstants } from 'src/auth/jwt.constants';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
 import { Users } from '../users/schemas/users.schema';
 import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
+import { IpService } from 'src/shared/utils/ip/ip.service';
 
 @Module({
   imports: [
@@ -36,7 +37,13 @@ import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
     HttpModule,
   ],
   controllers: [ZoomController],
-  providers: [ZoomService, HttpModule, ServicesResponse, JwtStrategy],
+  providers: [
+    ZoomService,
+    HttpModule,
+    ServicesResponse,
+    JwtStrategy,
+    IpService,
+  ],
   exports: [JwtStrategy, PassportModule],
 })
 export class ZoomModule {}
