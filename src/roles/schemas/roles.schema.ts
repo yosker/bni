@@ -1,6 +1,8 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+const moment = require('moment-timezone');
+
 export type RolesDocument = Roles & Document;
 
 @Schema()
@@ -14,8 +16,8 @@ export class Roles {
   @Prop({ type: 'string' })
   status: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: moment().toISOString() })
+  createdAt: string;
 }
 
 export const RolesSchema = SchemaFactory.createForClass(Roles);

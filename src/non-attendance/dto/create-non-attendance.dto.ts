@@ -4,6 +4,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { now } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
+const moment = require('moment-timezone');
+
 export class CreateNonAttendanceDto {
   chapterId: object;
 
@@ -27,8 +29,8 @@ export class CreateNonAttendanceDto {
   @Prop({ default: '', required: false })
   attendanceDate: string;
 
-  @Prop({ default: now(), required: false })
-  createdAt?: Date;
+  @Prop({ default: moment().toISOString(), required: false })
+  createdAt?: string;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

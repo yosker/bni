@@ -1,6 +1,8 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+const moment = require('moment-timezone');
+
 export type ReferencesDocument = References & Document;
 
 @Schema()
@@ -35,8 +37,8 @@ export class References {
   @Prop({ type: 'string' })
   email: string;
 
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: moment().toISOString() })
+  updatedAt: string;
 }
 
 export const ReferencesSchema = SchemaFactory.createForClass(References);

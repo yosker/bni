@@ -2,6 +2,8 @@ import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
+const moment = require('moment-timezone');
+
 export class CreateCommentDto {
   createdBy: object;
 
@@ -29,6 +31,6 @@ export class CreateCommentDto {
   @IsBoolean()
   accepted: boolean;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: moment().toISOString() })
+  createdAt: string;
 }

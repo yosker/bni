@@ -17,6 +17,6 @@ export interface Netinterview extends Document {
   question5: { type: string };
   question6: { type: string };
   question7: { type: string };
-  createdAt: { type: Date };
+  createdAt: { type: string };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

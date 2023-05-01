@@ -6,6 +6,6 @@ export interface NonAttendance extends Document {
   userId: { type: object };
   attendanceType: { type: string };
   attendanceDate: { type: string; default: ''; required: false };
-  createdAt: { type: Date };
+  createdAt: { type: string };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

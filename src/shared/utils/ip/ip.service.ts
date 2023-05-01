@@ -4,13 +4,11 @@ import * as moment from 'moment-timezone';
 
 @Injectable()
 export class IpService {
-  async getLocalTime(ip: string, dateTime: string): Promise<Date> {
+  async getLocalTime(ip: string, dateTime: string): Promise<string> {
     try {
       const response = await axios.get(`http://worldtimeapi.org/api/ip/${ip}`);
       const { timezone } = response.data;
-      const mexicoCityTime = moment.tz(dateTime, timezone).toDate();
-
-      return mexicoCityTime;
+      return moment.tz(dateTime, timezone).toISOString();
     } catch (error) {
       console.log(error);
       throw new Error('Error fetching local time');

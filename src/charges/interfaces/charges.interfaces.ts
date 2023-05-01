@@ -8,6 +8,6 @@ export interface Charges extends Document {
   concept: { type: string  };
   amount: { type: integer };
   urlFile: { type: string  };
-  createdAt: { type: Date };
+  createdAt: { type: string };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

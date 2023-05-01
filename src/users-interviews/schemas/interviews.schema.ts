@@ -1,6 +1,8 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+const moment = require('moment-timezone');
+
 export type InterviewsDocument = UsersInterviews & Document;
 
 @Schema()
@@ -55,9 +57,9 @@ export class UsersInterviews {
 
   @Prop({ type: 'string' })
   question13: string;
-  
-  @Prop({ default: new Date() })
-  dateOfInterview: Date;
+
+  @Prop({ default: moment().toISOString() })
+  dateOfInterview: string;
 }
 
 export const UsersInterviewsSchema =

@@ -14,11 +14,11 @@ import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
-import * as moment from 'moment-timezone';
 import { join } from 'path';
 
 const ObjectId = require('mongodb').ObjectId;
 const PDFDocument = require('pdfkit-table');
+const moment = require('moment-timezone');
 
 @Injectable()
 export class AttendanceService {
@@ -89,7 +89,7 @@ export class AttendanceService {
           userId: ObjectId(attendanceDTO.userId),
           chapterId: ObjectId(jwtPayload.idChapter),
           attended: true,
-          updatedAt: new Date().toISOString(),
+          updatedAt: moment().toISOString(),
         };
         await this.attendanceModel.findOneAndUpdate(
           {
@@ -319,7 +319,7 @@ export class AttendanceService {
     skip: number,
     limit: number,
   ) {
-    const now = new Date();
+    const now = moment().toISOString();
     const lte = moment(now).toISOString();
     const filter = {
       chapterId: ObjectId(chapterId),

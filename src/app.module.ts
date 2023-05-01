@@ -21,7 +21,6 @@ import { NonAttendanceModule } from './non-attendance/non-attendance.module';
 import { MembershipActivitiesModule } from './membership-activities/membership-activities.module';
 import { EvaluationPeriodModule } from './evaluation-period/evaluation-period.module';
 import { UsersInterviewsModule } from './users-interviews/users-interviews.module';
-import { LettersModule } from './letters/letters.module';
 import { ReferencesModule } from './references/references.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ChargesModule } from './charges/charges.module';
@@ -66,7 +65,6 @@ import { ZoomModule } from './zoom/zoom.module';
     MembershipActivitiesModule,
     EvaluationPeriodModule,
     UsersInterviewsModule,
-    LettersModule,
     ReferencesModule,
     DashboardModule,
     ChargesModule,

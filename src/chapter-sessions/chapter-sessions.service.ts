@@ -13,6 +13,7 @@ import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
 import { JWTPayload } from 'src/auth/jwt.payload';
 
+const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -49,7 +50,7 @@ export class ChapterSessionsService {
 
       if (findSession == null) {
         const dateString = chapterSessionDTO.sessionDate;
-        const dateObject = new Date(dateString);
+        const dateObject = moment(dateString);
 
         // TODO: Se agregan 6 horas por la zona horaria MX, revisar en caso de cambiar de país
         chapterSessionDTO.sessionChapterDate = moment(dateObject)
@@ -76,7 +77,7 @@ export class ChapterSessionsService {
               attended: false,
               attendanceType: AttendanceType.OnSite,
               attendanceDate: chapterSessionDTO.sessionDate,
-              createdAt: new Date().toISOString(),
+              createdAt: moment().toISOString(),
             };
             await this.attendanceModel.create(attendance);
           });

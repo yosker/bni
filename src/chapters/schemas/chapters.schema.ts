@@ -1,6 +1,8 @@
 import { Schema } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
+const moment = require('moment-timezone');
+
 export const ChapterSchema = new Schema({
   country: { type: String, required: true },
   region: { type: String, required: true },
@@ -14,8 +16,8 @@ export const ChapterSchema = new Schema({
   tokenChapter: { type: String, required: false },
   meetingId: { type: String, required: false },
   createdAt: {
-    type: Date,
-    default: new Date().toISOString(),
+    type: String,
+    default: moment().toISOString(),
   },
   status: { type: String, default: EstatusRegister.Active, required: false },
 });

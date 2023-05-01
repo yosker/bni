@@ -1,4 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
+
+const moment = require('moment-timezone');
 export class CreateZoomDto {
   meetingId: string;
 
@@ -6,6 +8,6 @@ export class CreateZoomDto {
 
   tokenChapter: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: moment().toISOString() })
+  createdAt: string;
 }

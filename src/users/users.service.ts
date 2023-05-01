@@ -20,10 +20,10 @@ import { AttendanceType } from 'src/shared/enums/attendance.enum';
 import { Chapter } from 'src/chapters/interfaces/chapters.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersInterview } from 'src/users-interviews/interfaces/users-interview.interface';
-
 import { join } from 'path';
-import * as moment from 'moment-timezone';
-// import moment from 'moment';
+
+
+const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
 const PDFDocument = require('pdfkit-table');
 
@@ -40,8 +40,9 @@ export class UsersService {
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
-    @InjectModel('UsersInterview') private readonly usersInterviewModel: Model<UsersInterview>,
-  ) { }
+    @InjectModel('UsersInterview')
+    private readonly usersInterviewModel: Model<UsersInterview>,
+  ) {}
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -129,13 +130,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-            await this.sharedService.uploadFile(
-              dataBuffer,
-              filename,
-              '.jpg',
-              's3-bucket-users',
-            )
-          ).result
+              await this.sharedService.uploadFile(
+                dataBuffer,
+                filename,
+                '.jpg',
+                's3-bucket-users',
+              )
+            ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -454,26 +455,46 @@ export class UsersService {
       let s3Response = '';
       const now = new Date();
 
-      // ESCENARIO 1 SE GUARDA CON ARCHIVO 
-      // ESCENARIO 2 SE GUARDA SIN ARCHIVO 
+      // ESCENARIO 1 SE GUARDA CON ARCHIVO
+      // ESCENARIO 2 SE GUARDA SIN ARCHIVO
       // ESCENARIO 3 SE EDITA CON EL MISMO ARCHIVO
-      // ESCENARIO 4 SE EDITA SIN ARCHIVO 
-      // ESCENARIO 5 SE EDITA ELIMINANDO EL ARCHIVO 
-      // ESCENARIO 6 SE EDITA CON OTRO ARCHIVO Y SE ELIMINA EL QUE TENIA  
+      // ESCENARIO 4 SE EDITA SIN ARCHIVO
+      // ESCENARIO 5 SE EDITA ELIMINANDO EL ARCHIVO
+      // ESCENARIO 6 SE EDITA CON OTRO ARCHIVO Y SE ELIMINA EL QUE TENIA
 
       if (req.scenario == 1) {
-        s3Response = await (await this.sharedService.uploadFile(dataBuffer, now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            now.getTime() + '_' + filename,
+            '',
+            's3-bucket-users',
+          )
+        ).result.toString();
       }
       if (req.scenario == 3) {
         s3Response = req.urlFile;
       }
       if (req.scenario == 5) {
-        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
+        await this.sharedService.deleteObjectFromS3(
+          's3-bucket-users',
+          req.urlFile,
+        );
         s3Response = '';
       }
       if (req.scenario == 6) {
-        await this.sharedService.deleteObjectFromS3('s3-bucket-users', req.urlFile);
-        s3Response = await (await this.sharedService.uploadFile(dataBuffer, now.getTime() + '_' + filename, '', 's3-bucket-users')).result.toString();
+        await this.sharedService.deleteObjectFromS3(
+          's3-bucket-users',
+          req.urlFile,
+        );
+        s3Response = await (
+          await this.sharedService.uploadFile(
+            dataBuffer,
+            now.getTime() + '_' + filename,
+            '',
+            's3-bucket-users',
+          )
+        ).result.toString();
       }
 
       await this.usersModel.updateOne(
@@ -528,7 +549,7 @@ export class UsersService {
     try {
       const chapterSessions = await this.chapterSessionModel.find({
         sessionChapterDate: {
-          $gte: new Date().toISOString(),
+          $gte: moment().toISOString(),
         },
       });
 
@@ -540,7 +561,7 @@ export class UsersService {
           attended: false,
           attendanceType: AttendanceType.OnSite,
           attendanceDate: session.sessionDate,
-          createdAt: new Date().toISOString(),
+          createdAt: moment().toISOString(),
         };
         await this.attendanceModel.create(attendance);
       });
@@ -551,7 +572,6 @@ export class UsersService {
 
   private async deleteUserSessions(userId: string, chapterId: string) {
     try {
-
       await this.attendanceModel.deleteMany({
         userId: ObjectId(userId),
         chapterId: ObjectId(chapterId),
@@ -561,31 +581,35 @@ export class UsersService {
     }
   }
 
-  //ENDPOINT PARA EXPORTAR LA ENTREVISTA A PDF 
+  //ENDPOINT PARA EXPORTAR LA ENTREVISTA A PDF
 
   public async createFile(userInterviewId: string): Promise<Buffer> {
-
     try {
-
       const pipeline: any = await this.resultQuery(userInterviewId);
       const objInterview = await this.usersInterviewModel.aggregate(pipeline);
 
-      const pdfBuffer: Buffer = await new Promise(resolve => {
+      const pdfBuffer: Buffer = await new Promise((resolve) => {
         const doc = new PDFDocument({
-          size: "LETTER",
+          size: 'LETTER',
           bufferPages: true,
           autoFirstPage: false,
-        })
+        });
         doc.on('pageAdded', () => {
-
-          doc.image(join(process.cwd(), 'src/assets/logo.png'), 20, 15, { width: 67 })
-          doc.moveTo(50, 55)
+          doc.image(join(process.cwd(), 'src/assets/logo.png'), 20, 15, {
+            width: 67,
+          });
+          doc.moveTo(50, 55);
 
           let bottom = doc.page.margins.bottom;
           doc.page.margins.bottom = 0;
-          doc.image(join(process.cwd(), 'src/assets/footer.png'), (doc.page.width - (-165)) * 0.5, doc.page.height - 105, { width: 200 })
+          doc.image(
+            join(process.cwd(), 'src/assets/footer.png'),
+            (doc.page.width - -165) * 0.5,
+            doc.page.height - 105,
+            { width: 200 },
+          );
           doc.page.margins.bottom = bottom;
-        })
+        });
 
         doc.addPage();
 
@@ -593,7 +617,7 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(12);
         doc.text(`Entrevista Candidatos`, {
           width: doc.page.width,
-          align: 'center'
+          align: 'center',
         });
 
         const dateInterview = objInterview[0].dateOfInterview;
@@ -601,30 +625,34 @@ export class UsersService {
           headers: ['', ''],
           rows: [
             [`Fecha:${dateInterview}`, `Hora Fin:${objInterview[0].finalDate}`],
-            [`Nombre: ${objInterview[0].interviwedName}`, `Empresa: ${objInterview[0].companyName}`],
-            [`5. Especialidad / Giro: ${objInterview[0].profession}`, ``]],
+            [
+              `Nombre: ${objInterview[0].interviwedName}`,
+              `Empresa: ${objInterview[0].companyName}`,
+            ],
+            [`5. Especialidad / Giro: ${objInterview[0].profession}`, ``],
+          ],
           options: {
             divider: {
               header: { disabled: false, width: 0.5, opacity: 0.5 },
               vertical: { disabled: false, width: 1, opacity: 0.5 },
             },
-          }
-        }
+          },
+        };
         doc.moveDown();
         doc.table(table, { columnSize: [150, 300] });
 
-        //PREGUNTA 1 
+        //PREGUNTA 1
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text('1. ¿Qué fue lo que más te gustó de la junta?', {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question1}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 2
@@ -632,53 +660,59 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text('2. ¿Por qué?', {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question2}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
-        //PREGUNTA 3 
+        //PREGUNTA 3
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(9);
-        doc.text('3. ¿Por qué crees que BNI puede ser benéfico para ti y para tu negocio?', {
-          width: doc.page.width - 115,
-          align: 'left'
-        });
+        doc.text(
+          '3. ¿Por qué crees que BNI puede ser benéfico para ti y para tu negocio?',
+          {
+            width: doc.page.width - 115,
+            align: 'left',
+          },
+        );
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question3}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 4
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(9);
-        doc.text('4. ¿Sabes para qué estamos aquí? ¿Sabes lo que es una entrevista en BNI? Sin importar quién realice la entrevista, no podrá aceptar la solicitud, si no tiene la certeza de que:', {
-          width: doc.page.width - 115,
-          align: 'left'
-        });
+        doc.text(
+          '4. ¿Sabes para qué estamos aquí? ¿Sabes lo que es una entrevista en BNI? Sin importar quién realice la entrevista, no podrá aceptar la solicitud, si no tiene la certeza de que:',
+          {
+            width: doc.page.width - 115,
+            align: 'left',
+          },
+        );
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`a.- Eres un gran profesional. OK`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`b.- Entiendes perfectamente los compromisos. OK`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`c.-Puedes cumplir con los mismos. OK`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 5
@@ -686,27 +720,30 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text('¿Estás cómodo con esto? ', {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question5}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 6
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(9);
-        doc.text('En caso de ser aceptado. ¿Estás en posibilidad de pagar tu membresía de inmediato? ', {
-          width: doc.page.width - 115,
-          align: 'left'
-        });
+        doc.text(
+          'En caso de ser aceptado. ¿Estás en posibilidad de pagar tu membresía de inmediato? ',
+          {
+            width: doc.page.width - 115,
+            align: 'left',
+          },
+        );
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question6}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 7
@@ -714,31 +751,31 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`5. Los compromisos y explicación.`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`a.- Asistencia-Puntualidad. OK`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`b.- Capacitación. OK`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`c.- Aportación-Participación. OK`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`d.- Lista 40 contactos. OK`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 6
@@ -746,13 +783,13 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`6. ¿Hay algún motivo por el cual no puedas cumplir esto? `, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question8}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 7
@@ -760,13 +797,13 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`7. ¿Cuál es tu Producto estrella? `, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question9}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 8
@@ -774,13 +811,13 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`8. ¿Quién podría ser un buen cliente / Conector para ti? `, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question10}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 9
@@ -788,59 +825,71 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`9. ¿Cómo podría iniciar una conversación sobre ti?  `, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question11}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 10
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(9);
-        doc.text(`10. Del 1 al 10 Valora el compromiso de los demás miembros del capítulo, en relación a:`, {
-          width: doc.page.width - 115,
-          align: 'left'
-        });
+        doc.text(
+          `10. Del 1 al 10 Valora el compromiso de los demás miembros del capítulo, en relación a:`,
+          {
+            width: doc.page.width - 115,
+            align: 'left',
+          },
+        );
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
-        doc.text(`Asistencia / Puntualidad: ${objInterview[0].question12[0]} `, {
-          width: doc.page.width - 115,
-          align: 'left'
-        });
+        doc.text(
+          `Asistencia / Puntualidad: ${objInterview[0].question12[0]} `,
+          {
+            width: doc.page.width - 115,
+            align: 'left',
+          },
+        );
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`Capacitación:  ${objInterview[0].question12[1]}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
-        doc.text(`Aportación-Participación:  ${objInterview[0].question12[2]}`, {
-          width: doc.page.width - 115,
-          align: 'left'
-        });
+        doc.text(
+          `Aportación-Participación:  ${objInterview[0].question12[2]}`,
+          {
+            width: doc.page.width - 115,
+            align: 'left',
+          },
+        );
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`Lista 40 contactos:  ${objInterview[0].question12[3]}`, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         //PREGUNTA 11
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(9);
-        doc.text(`11. En caso de ser trabajador por cuenta ajena, la empresa ha de estar enterada y conforme con los compromisos y los tiempos de cada uno`, {
-          width: doc.page.width - 115,
-          align: 'left'
-        });
+        doc.text(
+          `11. En caso de ser trabajador por cuenta ajena, la empresa ha de estar enterada y conforme con los compromisos y los tiempos de cada uno`,
+          {
+            width: doc.page.width - 115,
+            align: 'left',
+          },
+        );
         doc.moveDown();
         doc.font('Times-Roman').fontSize(9);
         doc.text(`${objInterview[0].question13} `, {
           width: doc.page.width - 115,
-          align: 'left'
+          align: 'left',
         });
 
         doc.moveDown();
@@ -848,28 +897,27 @@ export class UsersService {
           headers: ['', ''],
           rows: [
             [`Entrevistador`, `Entrevistado`],
-            [`${objInterview[0].interviwer}`, `${objInterview[0].interviwed}`]],
+            [`${objInterview[0].interviwer}`, `${objInterview[0].interviwed}`],
+          ],
           options: {
             divider: {
               header: { disabled: false, width: 0.5, opacity: 0.5 },
               vertical: { disabled: false, width: 1, opacity: 0.5 },
             },
-          }
-        }
+          },
+        };
         doc.moveDown();
         doc.table(table1, { columnSize: [150, 300] });
 
-
-        const buffer = []
-        doc.on('data', buffer.push.bind(buffer))
+        const buffer = [];
+        doc.on('data', buffer.push.bind(buffer));
         doc.on('end', () => {
-          const data = Buffer.concat(buffer)
-          resolve(data)
-        })
+          const data = Buffer.concat(buffer);
+          resolve(data);
+        });
         doc.end();
-      })
+      });
       return pdfBuffer;
-
     } catch (err) {
       console.log('err...', err);
     }
@@ -879,7 +927,7 @@ export class UsersService {
     try {
       return [
         {
-          $match: { userInterviewId: ObjectId(userInterviewId) }
+          $match: { userInterviewId: ObjectId(userInterviewId) },
         },
         {
           $lookup: {
@@ -887,10 +935,10 @@ export class UsersService {
             localField: 'userInterviewId',
             foreignField: '_id',
             as: 'users',
-          }
+          },
         },
         {
-          $unwind: '$users'
+          $unwind: '$users',
         },
         {
           $lookup: {
@@ -898,16 +946,20 @@ export class UsersService {
             localField: 'userId',
             foreignField: '_id',
             as: 'userInterview',
-          }
+          },
         },
         {
-          $unwind: '$userInterview'
+          $unwind: '$userInterview',
         },
         {
           $project: {
-            dateOfInterview: { $dateToString: { format: "%Y-%m-%d", date: '$dateOfInterview' } },
+            dateOfInterview: {
+              $dateToString: { format: '%Y-%m-%d', date: '$dateOfInterview' },
+            },
             finalDate: '$dateOfInterview',
-            interviwedName: { $toUpper: { $concat: ['$users.name', ' ', '$users.lastName'] } },
+            interviwedName: {
+              $toUpper: { $concat: ['$users.name', ' ', '$users.lastName'] },
+            },
             profession: '$users.profession',
             companyName: '$users.companyName',
             question1: '$question1',
@@ -923,10 +975,20 @@ export class UsersService {
             question11: '$question11',
             question12: '$question12',
             question13: '$question13',
-            interviwer: { $toUpper: { $concat: ['$userInterview.name', ' ', '$userInterview.lastName'] } },
-            interviwed: { $toUpper: { $concat: ['$users.name', ' ', '$users.lastName'] } }
-          }
-        }
+            interviwer: {
+              $toUpper: {
+                $concat: [
+                  '$userInterview.name',
+                  ' ',
+                  '$userInterview.lastName',
+                ],
+              },
+            },
+            interviwed: {
+              $toUpper: { $concat: ['$users.name', ' ', '$users.lastName'] },
+            },
+          },
+        },
       ];
     } catch (err) {
       throw new HttpErrorByCode[500](
@@ -935,22 +997,13 @@ export class UsersService {
     }
   }
 
+  //ENDPOINT PARA ARMAR LA CARTA Y ENVIAR POR CORREO. TAMBIÉN SE EDITA EL ESTATUS A CARTA ENVIADA
 
-
-
-
-
-  //ENDPOINT PARA ARMAR LA CARTA Y ENVIAR POR CORREO. TAMBIÉN SE EDITA EL ESTATUS A CARTA ENVIADA 
-
-  async sendAcceptedLetter(
-    id: string,
-    res: Response,
-  ): Promise<Response> {
+  async sendAcceptedLetter(id: string, res: Response): Promise<Response> {
     try {
       await this.usersModel.updateOne(
         {
           _id: ObjectId(id),
-
         },
         {
           letterSent: true,
@@ -959,7 +1012,7 @@ export class UsersService {
 
       const pipeline: any = await this.resultQueryLetter(id);
       const objUser = await this.usersModel.aggregate(pipeline);
-      //CREAMOS EL ARCHIVO 
+      //CREAMOS EL ARCHIVO
       const pdfBuffer = await this.createAcceptedPdfFile(objUser);
       //ENVIAMOS EL CORREO CON LA CARTA ADJUNTA
       await this.sendEmail(objUser, pdfBuffer);
@@ -979,10 +1032,9 @@ export class UsersService {
           ),
         );
     }
-  };
+  }
 
   async sendEmail(objUser: any, pdfBuffer: any) {
-
     try {
       const chapter = await this.chapterModel.findById(objUser[0].idChapter);
 
@@ -997,45 +1049,51 @@ export class UsersService {
         user: '',
         pass: '',
         urlPlatform: '',
-        file: pdfBuffer
+        file: pdfBuffer,
       };
       await this.sharedService.sendMailer(emailProperties, true);
-
     } catch (err) {
       throw new HttpErrorByCode[500](
         'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
       );
     }
-  };
+  }
 
   async createAcceptedPdfFile(objUser: any) {
-
     try {
-
       let arrEmails = '';
       objUser[0].emailAccounts.forEach(async (obj) => {
-        if (obj.status == 'Active' && (obj.acceptedAccount == 'Ambos' || obj.acceptedAccount == 'Acepetado')) {
+        if (
+          obj.status == 'Active' &&
+          (obj.acceptedAccount == 'Ambos' || obj.acceptedAccount == 'Acepetado')
+        ) {
           arrEmails = obj.email + ', ' + arrEmails;
         }
       });
-      const pdfBuffer: Buffer = await new Promise(resolve => {
+      const pdfBuffer: Buffer = await new Promise((resolve) => {
         const doc = new PDFDocument({
-          size: "LETTER",
+          size: 'LETTER',
           bufferPages: true,
           autoFirstPage: false,
-        })
+        });
 
         doc.on('pageAdded', () => {
-
-          doc.image(join(process.cwd(), 'src/assets/logo.png'), 20, 15, { width: 67 })
-          doc.moveTo(50, 55)
+          doc.image(join(process.cwd(), 'src/assets/logo.png'), 20, 15, {
+            width: 67,
+          });
+          doc.moveTo(50, 55);
 
           let bottom = doc.page.margins.bottom;
           doc.page.margins.bottom = 0;
 
-          doc.image(join(process.cwd(), 'src/assets/footer.png'), (doc.page.width - (-165)) * 0.5, doc.page.height - 105, { width: 200 })
+          doc.image(
+            join(process.cwd(), 'src/assets/footer.png'),
+            (doc.page.width - -165) * 0.5,
+            doc.page.height - 105,
+            { width: 200 },
+          );
           doc.page.margins.bottom = bottom;
-        })
+        });
 
         doc.addPage();
         doc.text('', 0, 50);
@@ -1045,78 +1103,86 @@ export class UsersService {
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`Fecha: ${currentDate}`, {
           width: doc.page.width - 125,
-          align: 'right'
+          align: 'right',
         });
 
         doc.moveDown();
         doc.moveDown();
         doc.text(`Estimado ${objUser[0].interviwedName}`, {
           width: doc.page.width,
-          align: 'left'
+          align: 'left',
         });
 
         const startText = `El presente además de saludarte, es para informarte que tu solicitud de INGRESO en nuestro Capítulo BNI ${objUser[0].chapterName}, ha sido ACEPTADA, con el giro de ${objUser[0].profession} `;
         doc.moveDown();
         doc.moveDown();
         doc.font('Times-Roman').fontSize(11);
-        doc.fillColor('black')
-          .text(startText.slice(0, 72), {
-            width: doc.page.width - 125,
-            align: 'justify',
-            continued: true
-          })
+        doc.fillColor('black').text(startText.slice(0, 72), {
+          width: doc.page.width - 125,
+          align: 'justify',
+          continued: true,
+        });
 
-        doc.font('Helvetica-Bold').fontSize(11)
-          .text(startText.slice(72, 80), {  //ingreso
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(11)
+          .text(startText.slice(72, 80), {
+            //ingreso
             continued: true,
           })
 
-          .fillColor('black')
-        doc.font('Times-Roman').fontSize(11)
-          .text(startText.slice(80, 100), {
-            continued: true,
-          });
+          .fillColor('black');
+        doc.font('Times-Roman').fontSize(11).text(startText.slice(80, 100), {
+          continued: true,
+        });
 
-        doc.font('Helvetica-Bold').fontSize(11)//BNI Alianza Empresarial
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(11) //BNI Alianza Empresarial
           .text(startText.slice(100, 124), {
             continued: true,
           })
 
-          .fillColor('black')
-        doc.font('Times-Roman').fontSize(11)
-          .text(startText.slice(124, 133), {
-            continued: true,
-          });
+          .fillColor('black');
+        doc.font('Times-Roman').fontSize(11).text(startText.slice(124, 133), {
+          continued: true,
+        });
 
-        doc.font('Helvetica-Bold').fontSize(11)//ACEPTADA
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(11) //ACEPTADA
           .text(startText.slice(133, 142), {
             continued: true,
           })
 
-          .fillColor('black')
-        doc.font('Times-Roman').fontSize(11)
-          .text(startText.slice(142, 158), {
-            continued: true,
-          });
+          .fillColor('black');
+        doc.font('Times-Roman').fontSize(11).text(startText.slice(142, 158), {
+          continued: true,
+        });
 
-        doc.font('Helvetica-Bold').fontSize(11)//giro
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(11) //giro
           .text(startText.slice(158, 178), {
             continued: false,
-            link: null
-          })
+            link: null,
+          });
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(11);
-        doc.text(`Estamos seguros que a partir de tu incorporación contaremos con tu compromiso para el cumplimiento de políticas de BNI y lograr nuestro objetivo de “Ganar Dando”.`, {
-          width: doc.page.width - 125,
-          align: 'justify'
-        });
+        doc.text(
+          `Estamos seguros que a partir de tu incorporación contaremos con tu compromiso para el cumplimiento de políticas de BNI y lograr nuestro objetivo de “Ganar Dando”.`,
+          {
+            width: doc.page.width - 125,
+            align: 'justify',
+          },
+        );
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(11);
         doc.text(`Las cuotas vigentes desde febrero 2021 son las siguientes:`, {
           width: doc.page.width - 125,
-          align: 'justify'
+          align: 'justify',
         });
 
         const table = {
@@ -1132,8 +1198,8 @@ export class UsersService {
               horizontal: { disabled: true, width: 0.5, opacity: 0.5 },
             },
             hideHeader: true,
-          }
-        }
+          },
+        };
         doc.moveDown();
         doc.table(table, { columnSize: [150, 200] });
 
@@ -1141,14 +1207,12 @@ export class UsersService {
         doc.font('Times-Roman').fontSize(11);
         doc.text(`Contamos con las siguientes formas de pago:`, {
           width: doc.page.width - 125,
-          align: 'justify'
+          align: 'justify',
         });
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(11);
-        doc.list([
-          'BBVA Bancomer a nombre de Mexlion Networks, S.A. de C.V.',
-        ], {
+        doc.list(['BBVA Bancomer a nombre de Mexlion Networks, S.A. de C.V.'], {
           bulletIndent: 20,
           textIndent: 20,
           width: doc.page.width - 125,
@@ -1160,74 +1224,86 @@ export class UsersService {
         doc.font('Times-Roman').fontSize(11);
         doc.text(`       Cuenta: 0191 788 744`, {
           width: doc.page.width - 125,
-          align: 'justify'
+          align: 'justify',
         });
         doc.font('Times-Roman').fontSize(11);
         doc.text(`       Clabe: 0121 8000 1917 887 443`, {
           width: doc.page.width - 125,
-          align: 'justify'
-        });
-
-        doc.list([
-          'En línea con Tarjeta de Crédito a través de Pay Pal http://www.pagosenlineabni.com',
-          'Billpocket'
-        ], {
-          bulletIndent: 20,
-          textIndent: 20,
-          width: doc.page.width - 125,
           align: 'justify',
-          listType: 'bullet',
-          bulletRadius: 2,
         });
+
+        doc.list(
+          [
+            'En línea con Tarjeta de Crédito a través de Pay Pal http://www.pagosenlineabni.com',
+            'Billpocket',
+          ],
+          {
+            bulletIndent: 20,
+            textIndent: 20,
+            width: doc.page.width - 125,
+            align: 'justify',
+            listType: 'bullet',
+            bulletRadius: 2,
+          },
+        );
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(11);
-        doc.text(`Te solicitamos que una vez realizado el pago, envíes copia del comprobante de pago a los siguientes correos: ${arrEmails} para el control interno del capítulo, a más tardar el día 24 de abril de 2023, vigencia de esta carta de aceptación.`, {
-          width: doc.page.width - 125,
-          align: 'justify'
-        });
+        doc.text(
+          `Te solicitamos que una vez realizado el pago, envíes copia del comprobante de pago a los siguientes correos: ${arrEmails} para el control interno del capítulo, a más tardar el día 24 de abril de 2023, vigencia de esta carta de aceptación.`,
+          {
+            width: doc.page.width - 125,
+            align: 'justify',
+          },
+        );
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(11);
-        doc.text(`Las políticas de BNI establecen que sólo se permite a una persona por especialidad, motivo por el cual, hasta no completar el proceso de inscripción y pago de membresía, la especialidad para la cual aplicaste seguirá abierta en el capítulo.`, {
-          width: doc.page.width - 125,
-          align: 'justify'
-        });
+        doc.text(
+          `Las políticas de BNI establecen que sólo se permite a una persona por especialidad, motivo por el cual, hasta no completar el proceso de inscripción y pago de membresía, la especialidad para la cual aplicaste seguirá abierta en el capítulo.`,
+          {
+            width: doc.page.width - 125,
+            align: 'justify',
+          },
+        );
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(11);
-        doc.text(`Nuevamente muchas gracias por su interés de participar en BNI.`, {
-          width: doc.page.width - 125,
-          align: 'justify'
-        });
+        doc.text(
+          `Nuevamente muchas gracias por su interés de participar en BNI.`,
+          {
+            width: doc.page.width - 125,
+            align: 'justify',
+          },
+        );
 
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(10);
         doc.text('Atentamente,', {
           width: doc.page.width,
-          align: 'left'
+          align: 'left',
         });
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(10);
         doc.text('El Comité de Membresías', {
           width: doc.page.width,
-          align: 'left'
+          align: 'left',
         });
 
         doc.moveDown();
         doc.font('Times-Roman').fontSize(10);
         doc.text('BNI Alianza Empresarial', {
           width: doc.page.width,
-          align: 'left'
+          align: 'left',
         });
 
-        const buffer = []
-        doc.on('data', buffer.push.bind(buffer))
+        const buffer = [];
+        doc.on('data', buffer.push.bind(buffer));
         doc.on('end', () => {
-          const data = Buffer.concat(buffer)
-          resolve(data)
-        })
+          const data = Buffer.concat(buffer);
+          resolve(data);
+        });
         doc.end();
       });
       return pdfBuffer;
@@ -1236,13 +1312,13 @@ export class UsersService {
         'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
       );
     }
-  };
+  }
 
   private async resultQueryLetter(userInterviewId: string) {
     try {
       return [
         {
-          $match: { _id: ObjectId(userInterviewId) }
+          $match: { _id: ObjectId(userInterviewId) },
         },
         {
           $lookup: {
@@ -1250,10 +1326,10 @@ export class UsersService {
             localField: 'idChapter',
             foreignField: '_id',
             as: 'users',
-          }
+          },
         },
         {
-          $unwind: '$users'
+          $unwind: '$users',
         },
         {
           $lookup: {
@@ -1261,20 +1337,21 @@ export class UsersService {
             localField: 'idChapter', //arriba -> attendances
             foreignField: 'chapterId',
             as: 'emailaccounts',
-          }
+          },
         },
         {
           $project: {
-
-            interviwedName: { $toUpper: { $concat: ['$name', ' ', '$lastName'] } },
+            interviwedName: {
+              $toUpper: { $concat: ['$name', ' ', '$lastName'] },
+            },
             profession: '$profession',
             companyName: '$companyName',
             chapterName: '$users.name',
             emailAccounts: '$emailaccounts',
             email: '$email',
-            idChapter: '$idChapter'
-          }
-        }
+            idChapter: '$idChapter',
+          },
+        },
       ];
     } catch (err) {
       throw new HttpErrorByCode[500](

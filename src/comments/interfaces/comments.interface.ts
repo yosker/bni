@@ -5,5 +5,5 @@ export interface Comment extends Document {
   visitorId: object;
   comment: string;
   accepted: boolean;
-  createdAt: Date;
+  createdAt: string;
 }

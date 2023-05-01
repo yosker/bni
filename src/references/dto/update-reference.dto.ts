@@ -3,6 +3,8 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { CreateReferenceDto } from './create-reference.dto';
 
+const moment = require('moment-timezone');
+
 export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
   @ApiProperty({
     example: 'Id de la referencia.',
@@ -24,6 +26,6 @@ export class UpdateReferenceDto extends PartialType(CreateReferenceDto) {
   @IsString()
   phoneNumber: string;
 
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: moment().toISOString() })
+  updatedAt: string;
 }

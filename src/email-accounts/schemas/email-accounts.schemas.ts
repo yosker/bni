@@ -2,6 +2,8 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
+const moment = require('moment-timezone');
+
 export type EmailAccountsDocument = EmailAccounts & Document;
 
 @Schema()
@@ -24,8 +26,8 @@ export class EmailAccounts {
   @Prop({ type: 'string', default: EstatusRegister.Active })
   status: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: moment().toISOString() })
+  createdAt: string;
 }
 
 export const EmailAccountsSchema = SchemaFactory.createForClass(EmailAccounts);

@@ -7,6 +7,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { Commitments } from '../interfaces/commitments.interface';
 
+const moment = require('moment-timezone');
+
 export class EvaluationPeriodDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
 
@@ -50,8 +52,8 @@ export class EvaluationPeriodDTO extends PartialType(RegisterAuthDto) {
   @IsNotEmpty()
   commitments: Commitments;
 
-  @Prop({ default: now(), required: false })
-  createdAt?: Date;
+  @Prop({ default: moment().toISOString(), required: false })
+  createdAt?: string;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

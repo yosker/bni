@@ -3,6 +3,8 @@ import { CreateZoomDto } from './create-zoom.dto';
 import { Prop } from '@nestjs/mongoose';
 import { IsNotEmpty } from 'class-validator';
 
+const moment = require('moment-timezone');
+
 export class UpdateZoomDto extends PartialType(CreateZoomDto) {
   @IsNotEmpty()
   chapterId: object;
@@ -10,6 +12,6 @@ export class UpdateZoomDto extends PartialType(CreateZoomDto) {
   @IsNotEmpty()
   tokenChapter: string;
 
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: moment().toISOString() })
+  updatedAt: string;
 }

@@ -2,6 +2,8 @@ import { Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
+const moment = require('moment-timezone');
+
 export class CreateUsersInterviewDto {
   userId: object;
 
@@ -44,8 +46,8 @@ export class CreateUsersInterviewDto {
     example: 'Fecha de Entrevista.',
   })
   @IsNotEmpty()
-  @Prop({ default: new Date() })
-  dateOfInterview: Date = new Date();
+  @Prop({ default: moment().toISOString() })
+  dateOfInterview: string;
 
   @ApiProperty({
     example: 'Pregunta 1.',
@@ -138,6 +140,6 @@ export class CreateUsersInterviewDto {
   @IsString()
   question13: string;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: moment().toISOString() })
+  createdAt: string;
 }

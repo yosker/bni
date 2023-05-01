@@ -3,6 +3,8 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 import { CreateUsersInterviewDto } from './create-users-interview.dto';
 
+const moment = require('moment-timezone');
+
 export class UpdateUsersInterviewDto extends PartialType(
   CreateUsersInterviewDto,
 ) {
@@ -103,6 +105,7 @@ export class UpdateUsersInterviewDto extends PartialType(
   @IsNotEmpty()
   @IsString()
   question13: string;
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+
+  @Prop({ default: moment().toISOString() })
+  updatedAt: string;
 }

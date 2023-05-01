@@ -101,7 +101,7 @@ export class ZoomService {
         const leaveTime = moment
           .utc(registrant.create_time)
           .tz(jwtPayload.timeZone)
-          .format();
+          .toISOString();
 
         if (!user) {
           //Si no se Encuentra el Usuario, se Crea como Visitante
@@ -122,6 +122,9 @@ export class ZoomService {
           if (user.role.toLowerCase() !== 'visitante') {
             //De lo contrario se le pasa asistencia
             const dateAttendance = moment().format('YYYY-MM-DD');
+
+            console.log(user.email);
+            console.log(registrant.email);
 
             await this.attendanceModel.findOneAndUpdate(
               {
