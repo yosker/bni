@@ -22,10 +22,10 @@ export class PasswordRecoverService {
     private readonly chapterModel: Model<Chapter>,
   ) {}
 
-  async getNewPassword(email: string, res: Response): Promise<Response> {
+  async getNewPassword(obj: any, res: Response): Promise<Response> {
     try {
       const user = await this.usersModel.findOne({
-        email: email,
+        email: obj.email,
       });
       if (user) {
         //GENERAMOS UNA NUEVA CONTRASEÑA TEMPORAL
@@ -33,12 +33,12 @@ export class PasswordRecoverService {
         const plainToHash = await hash(password, 10);
 
         await this.usersModel.updateOne(
-          { email: email },
+          { email:  obj.email },
           { resetPassword: false, password: plainToHash },
         );
         //ENVIO DE CORREO CON CONPROBANTE DE APORTACIÓN
         const emailProperties = {
-          email: email,
+          email:  obj.email,
           from: 'meeting.reporter@outlook.com',
           name: '',
           template: 'temporalPassword',

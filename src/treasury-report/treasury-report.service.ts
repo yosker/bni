@@ -12,7 +12,7 @@ import { Charges } from 'src/charges/interfaces/charges.interfaces';
 
 const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
- 
+
 @Injectable()
 export class TreasuryReportService {
   constructor(
@@ -25,7 +25,7 @@ export class TreasuryReportService {
 
   async getFullData(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
-      let objResult = {
+      const objResult = {
         totalIncomeGraph: {},
         totalChargesGraph: {},
       };
