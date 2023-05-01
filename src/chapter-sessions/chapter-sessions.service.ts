@@ -5,7 +5,6 @@ import { ChapterSessionDTO } from './dto/chapterSessions.dto';
 import { ChapterSession } from './interfaces/chapterSessions.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
-import * as moment from 'moment';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';

@@ -13,7 +13,6 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
-import * as moment from 'moment';
 import { MembershipActivities } from 'src/membership-activities/schemas/membership-activity.schema';
 
 const ObjectId = require('mongodb').ObjectId;
@@ -37,7 +36,7 @@ export class DashboardService {
 
   async getFullData(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
-      let objResult = {
+      const objResult = {
         totalNets: 0,
         totalVisitors: 0,
         totalCash: 0,
@@ -246,8 +245,7 @@ export class DashboardService {
 
   private async totalVisitorsLastSixMonthsResult(chapterId: string) {
     try {
-      const gte =
-        moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
@@ -306,8 +304,8 @@ export class DashboardService {
 
   private async totalIncomeResult(chapterId: string) {
     try {
-      const now = moment();
- .toISOString()     const gte =
+      const now = moment().toISOString();
+      const gte =
         moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
@@ -339,8 +337,8 @@ export class DashboardService {
 
   private async totalChargesResult(chapterId: string) {
     try {
-      const now = moment();
- .toISOString()     const gte =
+      const now = moment().toISOString();
+      const gte =
         moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
 
