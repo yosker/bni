@@ -42,10 +42,6 @@ export class CreateUsersInterviewDto {
   @IsString()
   specialty: string;
 
-  @ApiProperty({
-    example: 'Fecha de Entrevista.',
-  })
-  @IsNotEmpty()
   @Prop({ default: moment().toISOString() })
   dateOfInterview: string;
 
