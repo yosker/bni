@@ -5,6 +5,8 @@ import { now } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { CreateMembershipActivityDto } from './create-membership-activity.dto';
 
+const moment = require('moment-timezone');
+
 export class UpdateMembershipActivityDto extends PartialType(
   CreateMembershipActivityDto,
 ) {
@@ -30,8 +32,8 @@ export class UpdateMembershipActivityDto extends PartialType(
   @Prop({ default: '', required: true })
   endDate: string;
 
-  @Prop({ default: now(), required: false })
-  updatedAt?: Date;
+  @Prop({ default: moment().toISOString(), required: false })
+  updatedAt?: string;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

@@ -12,6 +12,6 @@ export interface MembershipActivity extends Document {
   comments: { type: string; required: false };
   fileUrl?: { type: string; };
   statusActivity: { type: string; required: false };
-  createdAt: { type: Date };
+  createdAt: { type: string };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

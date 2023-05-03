@@ -8,6 +8,9 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
+
+const moment = require('moment-timezone');
+
 export class CreateUserDto {
   @ApiProperty({
     example: 'Id del Capítulo.',
@@ -100,7 +103,6 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'Solicitud Completada.',
   })
-
   @Prop({ default: '', required: false })
   completedApplication: string;
 
@@ -116,10 +118,10 @@ export class CreateUserDto {
 
   @Prop({ default: false, required: false })
   letterSent: boolean;
-  
+
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: moment().toISOString() })
+  createdAt: string;
 }

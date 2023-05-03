@@ -6,6 +6,8 @@ import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
+const moment = require('moment-timezone');
+
 export class CreateEmailAccountsDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
 
@@ -27,8 +29,8 @@ export class CreateEmailAccountsDTO extends PartialType(RegisterAuthDto) {
   @IsNotEmpty()
   email: string;
 
-  @Prop({ default: now(), required: false })
-  createdAt?: Date;
+  @Prop({ default: moment().toISOString(), required: false })
+  createdAt?: string;
 
   @Prop({ default: EstatusRegister.Active })
   status?: string;

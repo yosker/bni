@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Prop } from '@nestjs/mongoose';
 
+const moment = require('moment-timezone');
+
 export class UpdateQuestionsReferenceDto {
   @ApiProperty({
     example: 'Id de Registro.',
@@ -87,6 +89,6 @@ export class UpdateQuestionsReferenceDto {
   @IsString()
   question8: string;
 
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: moment().toISOString() })
+  updatedAt: string;
 }

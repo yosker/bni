@@ -1,6 +1,8 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+const moment = require('moment-timezone');
+
 export type CommentsDocument = Comments & Document;
 
 @Schema()
@@ -17,11 +19,11 @@ export class Comments {
   @Prop({ type: 'boolean' })
   accepted: boolean;
 
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: moment().toISOString() })
+  createdAt: string;
 
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: moment().toISOString() })
+  updatedAt: string;
 }
 
 export const CommentsSchema = SchemaFactory.createForClass(Comments);

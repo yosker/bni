@@ -2,6 +2,8 @@ import { IsNotEmpty, IsString, IsEmail, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Prop } from '@nestjs/mongoose';
 
+const moment = require('moment-timezone');
+
 export class UpdateUserDto {
   @IsNotEmpty()
   idChapter: object;
@@ -64,5 +66,11 @@ export class UpdateUserDto {
   })
   @Prop({ default: '', required: false })
   @IsString()
-  invitedBy: string
+  invitedBy: string;
+
+  @ApiProperty({
+    example: 'Fecha de Creación del Registro.',
+  })
+  @Prop({ default: moment().toISOString() })
+  updatedAt: string;
 }

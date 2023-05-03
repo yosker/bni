@@ -9,7 +9,8 @@ import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { Treasury } from 'src/treasury/interfaces/treasury.interfaces';
 import { Charges } from 'src/charges/interfaces/charges.interfaces';
-import * as moment from 'moment';
+
+const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -24,7 +25,7 @@ export class TreasuryReportService {
 
   async getFullData(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
-      let objResult = {
+      const objResult = {
         totalIncomeGraph: {},
         totalChargesGraph: {},
       };
@@ -64,17 +65,15 @@ export class TreasuryReportService {
 
   private async totalIncomeResult(chapterId: string) {
     try {
-      const now = new Date();
-      const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
         chapterId: ObjectId(chapterId),
         status: EstatusRegister.Active,
         createdAt: {
-          $gte: new Date(gte),
-          $lt: new Date(lte),
+          $gte: moment(gte).toISOString(),
+          $lt: moment(lte).toISOString(),
         },
       };
       return [
@@ -83,7 +82,9 @@ export class TreasuryReportService {
         },
         {
           $group: {
-            _id: { month: { $month: '$createdAt' } },
+            _id: {
+              $month: { date: { $toDate: "$createdAt" } },
+            }, 
             totalAmount: { $sum: '$payment' },
           },
         },
@@ -113,17 +114,15 @@ export class TreasuryReportService {
 
   async totalChargesResult(chapterId: string) {
     try {
-      const now = new Date();
-      const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
         chapterId: ObjectId(chapterId),
         status: EstatusRegister.Active,
         createdAt: {
-          $gte: new Date(gte),
-          $lt: new Date(lte),
+          $gte: moment(gte).toISOString(),
+          $lt: moment(lte).toISOString(),
         },
       };
       return [
@@ -132,7 +131,9 @@ export class TreasuryReportService {
         },
         {
           $group: {
-            _id: { month: { $month: '$createdAt' } },
+            _id: {
+              $month: { date: { $toDate: "$createdAt" } },
+            }, 
             totalAmount: { $sum: '$amount' },
           },
         },

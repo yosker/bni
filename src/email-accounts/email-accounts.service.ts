@@ -20,20 +20,35 @@ export class EmailAccountsService {
     private readonly emailAccount: Model<EmailAccount>,
     private servicesResponse: ServicesResponse,
     private readonly sharedService: SharedService,
-  ) {}
+  ) { }
   async create(
     createEmailAccountsDTO: CreateEmailAccountsDTO,
     res: Response,
     jwtPayload: JWTPayload,
   ) {
     try {
-      createEmailAccountsDTO.chapterId = ObjectId(jwtPayload.idChapter);
-      const email = await this.emailAccount.create(createEmailAccountsDTO);
-      return res.status(HttpStatus.OK).json({
-        statusCode: this.servicesResponse.statusCode,
-        message: this.servicesResponse.message,
-        result: email,
+
+      const existAccount = await this.emailAccount.findOne({
+        chapterId: ObjectId(jwtPayload.idChapter),
+        email: createEmailAccountsDTO.email,
+        status: EstatusRegister.Active
       });
+
+      if (existAccount != null) {
+        return res.status(200).json({
+          statusCode: 409,
+          message: 'RECORD_DUPLICATED',
+          result: {},
+        });
+      } else {
+        createEmailAccountsDTO.chapterId = ObjectId(jwtPayload.idChapter);
+        const email = await this.emailAccount.create(createEmailAccountsDTO);
+        return res.status(HttpStatus.OK).json({
+          statusCode: this.servicesResponse.statusCode,
+          message: this.servicesResponse.message,
+          result: email,
+        });
+      }
     } catch (error) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -108,17 +123,34 @@ export class EmailAccountsService {
     res: Response,
     jwtPayload: JWTPayload,
   ) {
-    updateEmailAccountsDTO.chapterId = ObjectId(jwtPayload.idChapter);
-    return res.status(HttpStatus.OK).json({
-      statusCode: this.servicesResponse.statusCode,
-      message: this.servicesResponse.message,
-      result: await this.emailAccount.updateOne(
-        {
-          _id: ObjectId(id),
-        },
-        updateEmailAccountsDTO,
-      ),
-    });
+
+
+    const existAccount = await this.emailAccount.findOne({
+      chapterId: ObjectId(jwtPayload.idChapter),
+      email: updateEmailAccountsDTO.email,
+      status: EstatusRegister.Active,
+      _id: { $ne:  ObjectId(id) }
+    })
+
+    if (existAccount != null) {
+      return res.status(200).json({
+        statusCode: 409,
+        message: 'RECORD_DUPLICATED',
+        result: {},
+      });
+    } else {
+      updateEmailAccountsDTO.chapterId = ObjectId(jwtPayload.idChapter);
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: await this.emailAccount.updateOne(
+          {
+            _id: ObjectId(id),
+          },
+          updateEmailAccountsDTO,
+        ),
+      });
+    }
   }
 
   async delete(id: string, res: Response) {

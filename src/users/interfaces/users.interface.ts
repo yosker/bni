@@ -11,12 +11,12 @@ export interface User extends Document {
   imageURL: string;
   companyName: string;
   profession: string;
-  createdAt: Date;
+  createdAt: string;
   status: string;
   completedApplication: string;
   completedInterview: boolean;
   invitedBy: string;
-  resetPassword:  boolean;
-  letterSent:  boolean;
+  resetPassword: boolean;
+  letterSent: boolean;
   accepted: boolean;
 }

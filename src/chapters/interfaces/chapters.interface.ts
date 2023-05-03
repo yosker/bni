@@ -13,8 +13,8 @@ export interface Chapter extends Document {
   sessionType: { type: string };
   tokenChapter: string;
   meetingId: string;
-   createdAt: {
-    type: Date;
+  createdAt: {
+    type: string;
   };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

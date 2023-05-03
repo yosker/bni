@@ -6,6 +6,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { now } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
+const moment = require('moment-timezone');
+
 export class ChargesDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
   userId: object;
@@ -24,8 +26,8 @@ export class ChargesDTO extends PartialType(RegisterAuthDto) {
 
   urlFile: string;
 
-  @Prop({ default: now(), required: false })
-  createdAt?: Date;
+  @Prop({ default: moment().toISOString(), required: false })
+  createdAt?: string;
 
   @Prop({ default: EstatusRegister.Active, required: false })
   status?: string;

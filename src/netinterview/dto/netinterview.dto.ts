@@ -3,6 +3,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
+const moment = require('moment-timezone');
+
 export class NetinterviewDTO {
   chapterId: object;
   createdBy: string;
@@ -96,8 +98,8 @@ export class NetinterviewDTO {
   @ApiProperty({
     example: 'Fecha de Creación del Registro.',
   })
-  @Prop({ default: new Date() })
-  createdAt: Date;
+  @Prop({ default: moment().toISOString() })
+  createdAt: string;
 
   @ApiProperty({
     example: 'Estatus del Registro.',

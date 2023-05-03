@@ -3,6 +3,8 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsString } from 'class-validator';
 import { CreateCommentDto } from './create-comment.dto';
 
+const moment = require('moment-timezone');
+
 export class UpdateCommentDto extends PartialType(CreateCommentDto) {
   createdBy: object;
 
@@ -21,6 +23,6 @@ export class UpdateCommentDto extends PartialType(CreateCommentDto) {
   @ApiProperty({
     example: 'Fecha de Actualizaación del Registro.',
   })
-  @Prop({ default: new Date() })
-  updatedAt: Date;
+  @Prop({ default: moment().toISOString() })
+  updatedAt: string;
 }

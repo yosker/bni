@@ -10,9 +10,9 @@ import { Response } from 'express';
 import { NonAttendance } from './interfaces/non-attendance.interfaces';
 import { ServicesResponse } from 'src/responses/response';
 import { NonAttendances } from './schemas/non-attendance.schema';
-import * as moment from 'moment';
 
 const ObjectId = require('mongodb').ObjectId;
+const moment = require('moment-timezone');
 
 @Injectable()
 export class NonAttendanceService {
@@ -116,8 +116,8 @@ export class NonAttendanceService {
       {
         $match: {
           createdAt: {
-            $gte: new Date(dateFrom),
-            $lte: new Date(dateTo),
+            $gte: moment(dateFrom).toISOString(),
+            $lte: moment(dateTo).toISOString(),
           },
         },
       },
@@ -156,7 +156,7 @@ export class NonAttendanceService {
   }
 
   async formatDate(date) {
-    const d = new Date(date);
+    const d = moment(date);
     let month = '' + (d.getMonth() + 1);
     let day = '' + d.getDate();
     const year = d.getFullYear();

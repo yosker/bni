@@ -1,6 +1,8 @@
 import { Schema } from 'mongoose';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
+const moment = require('moment-timezone');
+
 export const AttendanceSchema = new Schema({
   chapterId: { type: Object, required: true },
   chapterSessionId: { type: Object, required: true },
@@ -10,10 +12,10 @@ export const AttendanceSchema = new Schema({
   attendanceDate: { type: String, required: false },
   letterSent: { type: Boolean, default: false, required: false },
   createdAt: {
-    type: Date,
-    default: new Date().toISOString(),
+    type: String,
+    default: moment().toISOString(),
     required: false,
   },
-  updatedAt:  { type: String, required: false },
+  updatedAt: { type: String, required: false },
   status: { type: String, default: EstatusRegister.Active, required: false },
 });

@@ -18,5 +18,5 @@ export interface UsersInterview extends Document {
   question11: string;
   question12: number[];
   question13: string;
-  dateOfInterview: Date;
+  dateOfInterview: string;
 }

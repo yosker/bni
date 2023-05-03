@@ -10,6 +10,6 @@ export interface EvaluationPeriod extends Document {
   finalPeriod: { type: string };
   notes: { type: string };
   commitments: Array<Commitments>;
-  createdAt: { type: Date };
+  createdAt: { type: string };
   status: { type: string; default: EstatusRegister.Active; required: false };
 }

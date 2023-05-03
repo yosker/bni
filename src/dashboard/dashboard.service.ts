@@ -13,10 +13,10 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { ServicesResponse } from 'src/responses/response';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
-import * as moment from 'moment';
 import { MembershipActivities } from 'src/membership-activities/schemas/membership-activity.schema';
 
 const ObjectId = require('mongodb').ObjectId;
+const moment = require('moment-timezone');
 
 @Injectable()
 export class DashboardService {
@@ -32,11 +32,11 @@ export class DashboardService {
 
     @InjectModel(MembershipActivities.name)
     private readonly membershipActivityModel: Model<MembershipActivity>,
-  ) { }
+  ) {}
 
   async getFullData(jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
-      let objResult = {
+      const objResult = {
         totalNets: 0,
         totalVisitors: 0,
         totalCash: 0,
@@ -87,24 +87,14 @@ export class DashboardService {
 
   private async totalNetsResult(chapterId: string) {
     try {
-      const now = new Date();
-      const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
-
-      const filter = {
-        idChapter: ObjectId(chapterId),
-        status: EstatusRegister.Active,
-        role: { $ne: 'Visitante' },
-        createdAt: {
-          $gte: new Date(gte),
-          $lt: new Date(lte),
-        },
-      };
-
+    
       return [
         {
-          $match: filter,
+          $match: {
+            idChapter: ObjectId(chapterId),
+            status: EstatusRegister.Active,
+            role: { $ne: 'Visitante' },
+          }
         },
         { $group: { _id: null, totalNetworkers: { $sum: 1 } } },
         { $project: { _id: 0 } },
@@ -124,7 +114,7 @@ export class DashboardService {
         jwtPayload.idChapter,
       );
       const totalvisitors = await this.usersModel.aggregate(pipeline);
-      let totalVisitors =
+      const totalVisitors =
         totalvisitors[0] == undefined ? 0 : totalvisitors[0].totalVisitors;
       return totalVisitors;
     } catch (err) {
@@ -136,9 +126,8 @@ export class DashboardService {
 
   private async totalVisitorsResult(chapterId: string) {
     try {
-      const now = new Date();
-      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
         role: {
@@ -147,8 +136,8 @@ export class DashboardService {
         idChapter: ObjectId(chapterId),
         status: EstatusRegister.Active,
         createdAt: {
-          $gte: new Date(gte),
-          $lt: new Date(lte),
+          $gte: moment(gte).toISOString(),
+          $lt: moment(lte).toISOString(),
         },
       };
       return [
@@ -183,10 +172,8 @@ export class DashboardService {
 
   private async totalAbsencesResult(chapterId: string) {
     try {
-      const now = new Date();
-      const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
 
       return [
         {
@@ -209,17 +196,19 @@ export class DashboardService {
             attended: false,
             status: EstatusRegister.Active,
             createdAt: {
-              $gte: new Date(gte),
-              $lt: new Date(lte),
+              $gte: moment(gte).toISOString(),
+              $lt: moment(lte).toISOString(),
             },
           },
         },
         {
           $group: {
-            _id: { month: { $month: '$createdAt' } },
-            totalAbsences: { $sum: 1 },
-          },
-        },
+              _id: {
+                  $month: { date: { $toDate: "$createdAt" } },
+              },
+              totalAbsences: { $sum: 1 }
+          }
+      }
       ];
     } catch (err) {
       throw new HttpErrorByCode[500](
@@ -248,9 +237,8 @@ export class DashboardService {
 
   private async totalVisitorsLastSixMonthsResult(chapterId: string) {
     try {
-      const now = new Date();
-      const gte = moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
         role: {
@@ -259,8 +247,8 @@ export class DashboardService {
         idChapter: ObjectId(chapterId),
         status: EstatusRegister.Active,
         createdAt: {
-          $gte: new Date(gte),
-          $lt: new Date(lte),
+          $gte: moment(gte).toISOString(),
+          $lt: moment(lte).toISOString(),
         },
       };
 
@@ -270,10 +258,12 @@ export class DashboardService {
         },
         {
           $group: {
-            _id: { month: { $month: '$createdAt' } },
-            total: { $sum: 1 },
-          },
-        },
+              _id: {
+                  $month: { date: { $toDate: "$createdAt" } },
+              },
+              total: { $sum: 1 }
+          }
+      }
       ];
     } catch (err) {
       throw new HttpErrorByCode[500](
@@ -308,7 +298,7 @@ export class DashboardService {
 
   private async totalIncomeResult(chapterId: string) {
     try {
-      const now = new Date();
+      const now = moment().toISOString();
       const gte =
         moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
@@ -317,8 +307,8 @@ export class DashboardService {
         chapterId: ObjectId(chapterId),
         status: EstatusRegister.Active,
         createdAt: {
-          $gte: new Date(gte),
-          $lt: new Date(lte),
+          $gte: moment(gte).toISOString(),
+          $lt: moment(lte).toISOString(),
         },
       };
       return [
@@ -341,7 +331,7 @@ export class DashboardService {
 
   private async totalChargesResult(chapterId: string) {
     try {
-      const now = new Date();
+      const now = moment().toISOString();
       const gte =
         moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
@@ -350,8 +340,8 @@ export class DashboardService {
         chapterId: ObjectId(chapterId),
         status: EstatusRegister.Active,
         createdAt: {
-          $gte: new Date(gte),
-          $lt: new Date(lte),
+          $gte: moment(gte).toISOString(),
+          $lt: moment(lte).toISOString(),
         },
       };
       return [
