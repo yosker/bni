@@ -29,7 +29,7 @@ export class ChargesService {
   ): Promise<Response> {
     try {
       let s3Response = '';
-      const now = moment().toISOString();
+      const now = new Date();
 
       // ESCENARIO 1 SE GUARDA CON ARCHIVO
       // ESCENARIO 2 SE GUARDA SIN ARCHIVO

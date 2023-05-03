@@ -82,7 +82,9 @@ export class TreasuryReportService {
         },
         {
           $group: {
-            _id: { month: { $month: '$createdAt' } },
+            _id: {
+              $month: { date: { $toDate: "$createdAt" } },
+            }, 
             totalAmount: { $sum: '$payment' },
           },
         },
@@ -129,7 +131,9 @@ export class TreasuryReportService {
         },
         {
           $group: {
-            _id: { month: { $month: '$createdAt' } },
+            _id: {
+              $month: { date: { $toDate: "$createdAt" } },
+            }, 
             totalAmount: { $sum: '$amount' },
           },
         },

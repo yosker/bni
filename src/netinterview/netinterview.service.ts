@@ -193,12 +193,14 @@ export class NetinterviewService {
             [`${interview[0].strength1}`, `${interview[0].growth1}`],
             [`${interview[0].strength2}`, `${interview[0].growth2}`],
             [`Revisó: ${interview[0].createdBy}`, `Fecha de revisión: ${createdDate}`]],
-          options: {
-            divider: {
-              header: { disabled: false, width: 0.5, opacity: 0.5 },
-              vertical: { disabled: false, width: 1, opacity: 0.5 },
+            options: {
+              divider: {
+                header: { disabled: true, width: 0, opacity: 0.0 },
+                vertical: { disabled: true, width: 0, opacity: 0.5 },
+                horizontal: { disabled: true, width: 0.5, opacity: 0.5 },
+              },
+              hideHeader: true,
             },
-          }
         }
         doc.moveDown();
         doc.table(table, { columnSize: [150, 300] });

@@ -87,24 +87,14 @@ export class DashboardService {
 
   private async totalNetsResult(chapterId: string) {
     try {
-      const now = moment().toISOString();
-      const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
-
-      const filter = {
-        idChapter: ObjectId(chapterId),
-        status: EstatusRegister.Active,
-        role: { $ne: 'Visitante' },
-        createdAt: {
-          $gte: moment(gte).toISOString(),
-          $lt: moment(lte).toISOString(),
-        },
-      };
-
+    
       return [
         {
-          $match: filter,
+          $match: {
+            idChapter: ObjectId(chapterId),
+            status: EstatusRegister.Active,
+            role: { $ne: 'Visitante' },
+          }
         },
         { $group: { _id: null, totalNetworkers: { $sum: 1 } } },
         { $project: { _id: 0 } },
@@ -213,10 +203,12 @@ export class DashboardService {
         },
         {
           $group: {
-            _id: { month: { $month: '$createdAt' } },
-            totalAbsences: { $sum: 1 },
-          },
-        },
+              _id: {
+                  $month: { date: { $toDate: "$createdAt" } },
+              },
+              totalAbsences: { $sum: 1 }
+          }
+      }
       ];
     } catch (err) {
       throw new HttpErrorByCode[500](
@@ -266,10 +258,12 @@ export class DashboardService {
         },
         {
           $group: {
-            _id: { month: { $month: '$createdAt' } },
-            total: { $sum: 1 },
-          },
-        },
+              _id: {
+                  $month: { date: { $toDate: "$createdAt" } },
+              },
+              total: { $sum: 1 }
+          }
+      }
       ];
     } catch (err) {
       throw new HttpErrorByCode[500](
