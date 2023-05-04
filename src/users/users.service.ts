@@ -988,7 +988,7 @@ export class UsersService {
         {
           $project: {
             dateOfInterview: {
-              $dateToString: { format: '%Y-%m-%d', date: '$dateOfInterview' },
+              $dateToString: { format: '%Y-%m-%d',  date: { $toDate: "$dateOfInterview" }  },
             },
             finalDate: '$dateOfInterview',
             interviwedName: {
