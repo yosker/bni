@@ -85,8 +85,9 @@ export class UsersController {
     @Param('chapterId') chapterId: string,
     @Param('role') role: string,
     @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
   ) {
-    return this.usersService.findAll(chapterId, role, res);
+    return this.usersService.findAll(chapterId, role, res, jwtPayload);
   }
 
   @ApiBearerAuth()
@@ -167,7 +168,7 @@ export class UsersController {
   ) {
     return await this.usersService.updateVisitor(id, updateUserDto, res);
   }
-  
+
   @Get('/createpdf/:id')
   async pdf(@Param('id') id: string, @Res() res: Response): Promise<void> {
     const buffer = await this.usersService.createFile(id);
@@ -176,7 +177,7 @@ export class UsersController {
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'attachment; filename-example.pdf',
       'Content-Length': buffer.length,
-    })
+    });
     res.end(buffer);
   }
 
@@ -184,8 +185,8 @@ export class UsersController {
   async sendLetter(
     @Param('InterviwedId') InterviwedId: string,
     @Param('type') type: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return await this.usersService.sendLetter(InterviwedId,type,res);
+    return await this.usersService.sendLetter(InterviwedId, type, res);
   }
 }

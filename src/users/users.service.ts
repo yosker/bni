@@ -48,6 +48,7 @@ export class UsersService {
     chapterId: string,
     role: string,
     res: Response,
+    jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
       const filter = {
@@ -74,7 +75,7 @@ export class UsersService {
               $dateToString: {
                 date: '$createdAtDate',
                 format: '%Y-%m-%dT%H:%M:%S',
-                timezone: 'America/Mexico_City',
+                timezone: jwtPayload.timeZone,
               },
             },
             email: 1,
@@ -988,7 +989,10 @@ export class UsersService {
         {
           $project: {
             dateOfInterview: {
-              $dateToString: { format: '%Y-%m-%d',  date: { $toDate: "$dateOfInterview" }  },
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: { $toDate: '$dateOfInterview' },
+              },
             },
             finalDate: '$dateOfInterview',
             interviwedName: {
