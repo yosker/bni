@@ -57,14 +57,48 @@ export class UsersService {
       filter['role'] =
         role == 'nets' ? { $ne: 'Visitante' } : { $eq: 'Visitante' };
 
-      const user = await this.usersModel.aggregate([
+      const query: any = [
         {
           $match: filter,
         },
         {
+          $addFields: {
+            createdAtDate: {
+              $toDate: '$createdAt',
+            },
+          },
+        },
+        {
+          $project: {
+            localCreatedAt: {
+              $dateToString: {
+                date: '$createdAtDate',
+                format: '%Y-%m-%dT%H:%M:%S',
+                timezone: 'America/Mexico_City',
+              },
+            },
+            email: 1,
+            name: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            idChapter: 1,
+            role: 1,
+            lastName: 1,
+            phoneNumber: 1,
+            imageURL: '',
+            companyName: 1,
+            profession: 1,
+            completedApplication: 1,
+            completedInterview: 1,
+            invitedBy: 1,
+          },
+        },
+        {
           $sort: { createdAt: -1 },
         },
-      ]);
+      ];
+
+      const user: any = await this.usersModel.aggregate(query);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -353,7 +387,8 @@ export class UsersService {
         name: findUser.name + ' ' + findUser.lastName,
         companyName: findUser.companyName,
         profession: findUser.profession,
-        imageURL: findUser.imageURL,
+        image: findUser.imageURL,
+        email: findUser.email,
         // qr: qrCreated,
       };
       return res.status(HttpStatus.OK).json({

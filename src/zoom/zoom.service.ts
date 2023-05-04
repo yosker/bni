@@ -90,8 +90,8 @@ export class ZoomService {
           );
       }
 
-      for (let index = 0; index < meeting.registrants.length; index++) {
-        const registrant = meeting.registrants[index];
+      for (const element of meeting.registrants) {
+        const registrant = element;
         //Buscamos al usuario por su email
         const user = await this.usersModel.findOne({
           email: registrant.email,
