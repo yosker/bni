@@ -4,14 +4,12 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ZoomService } from './zoom.service';
 import { CreateZoomDto } from './dto/create-zoom.dto';
-import { UpdateZoomDto } from './dto/update-zoom.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
@@ -38,30 +36,27 @@ export class ZoomController {
     return this.zoomService.getUsersByMeetingId(createZoomDto, res);
   }
 
-  @Patch('/setUsersMeeting/:chapterId')
+  @Patch('/setUsersMeeting')
   setUsersByMeetingId(
-    @Param('chapterId') chapterId: string,
+    @Body() filters: any,
     @Auth() jwtPayload: JWTPayload,
     @Res() res: Response,
   ) {
-    return this.zoomService.setUsersByMeetingId(chapterId, jwtPayload, res);
+    return this.zoomService.setUsersByMeetingId(jwtPayload, res, filters);
   }
 
-  @Get('token/:chapterId')
-  findOne(@Param('chapterId') chapterId: string, @Res() res: Response) {
-    return this.zoomService.findOne(chapterId, res);
+  @Get('token')
+  findOne(@Body() filters: any, @Res() res: Response) {
+    return this.zoomService.findOne(res, filters);
   }
 
   @Patch('/updateTokenChapter')
-  updateTokenChapter(
-    @Body() updateZoomDto: UpdateZoomDto,
-    @Res() res: Response,
-  ) {
-    return this.zoomService.updateTokenChapter(updateZoomDto, res);
+  updateTokenChapter(@Body() filters: any, @Res() res: Response) {
+    return this.zoomService.updateTokenChapter(res, filters);
   }
 
-  @Get('meetings/:chapterId')
-  getMeetings(@Param('chapterId') chapterId: string, @Res() res: Response) {
-    return this.zoomService.getMeetings(chapterId, res);
+  @Get('meetings/')
+  getMeetings(@Body() filters: any, @Res() res: Response) {
+    return this.zoomService.getMeetings(res, filters);
   }
 }
