@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateZoomDto } from './dto/create-zoom.dto';
-import { UpdateZoomDto } from './dto/update-zoom.dto';
 import { HttpService } from '@nestjs/axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -60,12 +59,15 @@ export class ZoomService {
    * @returns respuesta
    */
   async setUsersByMeetingId(
-    chapterId: string,
     jwtPayload: JWTPayload,
     res: Response,
+    filters: any,
   ) {
     try {
-      const chapter = await this.validateChapterExist(chapterId);
+      const chapter: any = await this.validateChapterExist(
+        filters.chapterId,
+        filters.sessionDate,
+      );
       if (!chapter) {
         return res
           .status(HttpStatus.BAD_REQUEST)
@@ -95,7 +97,7 @@ export class ZoomService {
         //Buscamos al usuario por su email
         const user = await this.usersModel.findOne({
           email: registrant.email,
-          idChapter: ObjectId(chapterId),
+          idChapter: ObjectId(filters.chapterId),
         });
 
         const leaveTime = moment
@@ -106,7 +108,7 @@ export class ZoomService {
         if (!user) {
           //Si no se Encuentra el Usuario, se Crea como Visitante
           const userVisitor = {
-            idChapter: ObjectId(chapterId),
+            idChapter: ObjectId(filters.chapterId),
             email: registrant.email,
             name: registrant.first_name,
             role: 'Visitante',
@@ -123,13 +125,10 @@ export class ZoomService {
             //De lo contrario se le pasa asistencia
             const dateAttendance = moment().format('YYYY-MM-DD');
 
-            console.log(user.email);
-            console.log(registrant.email);
-
             await this.attendanceModel.findOneAndUpdate(
               {
                 userId: ObjectId(user._id),
-                chapterId: ObjectId(chapterId),
+                chapterId: ObjectId(filters.chapterId),
                 attendanceDate: dateAttendance,
               },
               {
@@ -141,10 +140,16 @@ export class ZoomService {
         }
       }
 
+      const sessionData = await this.getAttendanceUsersByDate(
+        chapter.sessionDate,
+        filters.chapterId,
+        jwtPayload.timeZone,
+      );
+
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: meeting,
+        result: sessionData,
       });
     } catch (error) {
       throw res.json(
@@ -159,9 +164,12 @@ export class ZoomService {
    * @param res token del Capítulo
    * @returns token
    */
-  async findOne(chapterId: string, res: Response) {
+  async findOne(res: Response, filters: any) {
     try {
-      const chapter = await this.validateChapterExist(chapterId);
+      const chapter: any = await this.validateChapterExist(
+        filters.chapterId,
+        filters.sessionDate,
+      );
       if (!chapter) {
         return res
           .status(HttpStatus.BAD_REQUEST)
@@ -194,10 +202,11 @@ export class ZoomService {
    * @param res respuesta
    * @returns respuesta
    */
-  async updateTokenChapter(updateZoomDto: UpdateZoomDto, res: Response) {
+  async updateTokenChapter(res: Response, filters: any) {
     try {
-      const chapter = await this.validateChapterExist(
-        updateZoomDto.chapterId.toString(),
+      const chapter: any = await this.validateChapterExist(
+        filters.chapterId.toString(),
+        filters.sessionDate,
       );
       if (!chapter) {
         return res
@@ -210,14 +219,11 @@ export class ZoomService {
           );
       }
 
-      await this.chapterModel.findByIdAndUpdate(
-        ObjectId(updateZoomDto.chapterId),
-        {
-          $set: {
-            tokenChapter: updateZoomDto.tokenChapter,
-          },
+      await this.chapterModel.findByIdAndUpdate(ObjectId(filters.chapterId), {
+        $set: {
+          tokenChapter: chapter.tokenChapter,
         },
-      );
+      });
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -235,25 +241,69 @@ export class ZoomService {
 
   /**
    * @description Valida si el Capítulo Existe
-   * @param chapterId Chapter Id
-   * @returns Objeto Capítulo
+   * @param chapterId Id del Capítulo
+   * @param session Fecha de la Sesión
+   * @returns Capítulo
    */
-  async validateChapterExist(chapterId: string) {
+  async validateChapterExist(chapterId: string, sessionDate: string) {
     try {
-      const chapter = await this.chapterModel.findOne({
-        _id: ObjectId(chapterId),
-      });
-      if (!chapter) return false;
-      return chapter;
+      const query = [
+        {
+          $match: {
+            _id: ObjectId(chapterId),
+          },
+        },
+        {
+          $lookup: {
+            from: 'chaptersessions',
+            localField: '_id',
+            foreignField: 'chapterId',
+            as: 'chaptersessionsData',
+          },
+        },
+        {
+          $unwind: '$chaptersessionsData',
+        },
+        {
+          $match: {
+            'chaptersessionsData.sessionDate': sessionDate,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            meetingId: '$meetingId',
+            tokenChapter: '$tokenChapter',
+            sessionDay: '$sessionDate',
+            sessionSchedule: '$sessionSchedule',
+            status: '$status',
+            email: '$email',
+            sessionDate: '$chaptersessionsData.sessionDate',
+            sessionChapterDate: '$chaptersessionsData.sessionChapterDate',
+          },
+        },
+      ];
+      const chapter = await this.chapterModel.aggregate(query);
+      if (!chapter || chapter.length == 0) return false;
+      return chapter[0];
     } catch (error) {
       console.log(error.message);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async getMeetings(chapterId: string, res: Response) {
+  /**
+   * @description Obtiene la información de la sesión
+   * @param chapterId Id del Capítulo
+   * @param res Resultado
+   * @returns Sesión por su Id
+   */
+  async getMeetings(res: Response, filters: any) {
     try {
-      const chapter = await this.validateChapterExist(chapterId);
+      const chapter: any = await this.validateChapterExist(
+        filters.chapterId,
+        filters.sessionDate,
+      );
       if (!chapter) {
         return res
           .status(HttpStatus.BAD_REQUEST)
@@ -329,4 +379,67 @@ export class ZoomService {
         });
     });
   };
+
+  /**
+   * @description Obtiene la Información de los Usuarios de por Fecha
+   * @param attendanceDate Día de la Sesión
+   * @param chapterId Id del Capítulo
+   * @param timeZone Zona Horaria
+   * @returns Arreglo de Usuarios
+   */
+  async getAttendanceUsersByDate(
+    attendanceDate: string,
+    chapterId: string,
+    timeZone: string,
+  ) {
+    try {
+      const query = [
+        {
+          $match: {
+            chapterId: ObjectId(chapterId),
+            attendanceDate,
+            attended: true,
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'usersData',
+          },
+        },
+        {
+          $unwind: '$usersData',
+        },
+        {
+          $project: {
+            userId: '$usersData.id',
+            name: '$usersData.name',
+            lastName: '$usersData.lastName',
+            email: '$usersData.email',
+            phoneNumber: '$usersData.phoneNumber',
+            attendanceDate: '$attendanceDate',
+            updatedAt: '$updatedAt',
+            localUpdatedAt: {
+              $dateToString: {
+                format: '%H:%M:%S',
+                date: {
+                  $dateFromString: {
+                    dateString: '$updatedAt',
+                    timezone: timeZone,
+                    format: '%Y-%m-%dT%H:%M:%S.%LZ',
+                  },
+                },
+              },
+            },
+          },
+        },
+      ];
+      return await this.attendanceModel.aggregate(query);
+    } catch (error) {
+      console.log(error.message);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
