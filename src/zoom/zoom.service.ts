@@ -418,6 +418,7 @@ export class ZoomService {
             name: '$usersData.name',
             lastName: '$usersData.lastName',
             email: '$usersData.email',
+            imageURL: '$usersData.imageURL',
             phoneNumber: '$usersData.phoneNumber',
             attendanceDate: '$attendanceDate',
             updatedAt: '$updatedAt',

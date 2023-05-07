@@ -147,8 +147,8 @@ export class AttendanceService {
           role: 'Visitante',
           status: EstatusRegister.Active,
           createdAt: {
-            $gte: moment(`${sessionDate}T00:00:00.000`),
-            $lt: moment(`${sessionDate}T23:59:59.999`),
+            $gte: `${sessionDate}T00:00:00.000`,
+            $lt: `${sessionDate}T23:59:59.999`,
           },
         },
         {
@@ -159,6 +159,8 @@ export class AttendanceService {
           invitedBy: 1,
           completedApplication: 1,
           completedInterview: 1,
+          email:1,
+          createdAt:1,
         },
       );
 
