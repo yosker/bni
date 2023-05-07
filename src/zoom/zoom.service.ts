@@ -82,13 +82,18 @@ export class ZoomService {
       const meeting: any = await this.getDataMeeting(
         chapter.meetingId,
         chapter.tokenChapter,
-      );
+      ).catch((error) => {
+        throw new HttpException(error.message, error.status, error);
+      });
 
-      if (!meeting) {
+      if (!meeting || !meeting.length) {
         return res
           .status(HttpStatus.BAD_REQUEST)
           .json(
-            new HttpException('SESSION_NOT_FOUND.', HttpStatus.BAD_REQUEST),
+            new HttpException(
+              'No se encuentra la sesión enviada.',
+              HttpStatus.BAD_REQUEST,
+            ),
           );
       }
 
