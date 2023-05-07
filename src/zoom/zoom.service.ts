@@ -87,6 +87,12 @@ export class ZoomService {
       });
 
       if (!meeting || !meeting.length) {
+
+        // return res.status(HttpStatus.OK).json({
+        //   statusCode: 404,
+        //   message:  'No se encuentra la sesión enviada.',
+        //   result: {},
+        // });
         return res
           .status(HttpStatus.BAD_REQUEST)
           .json(
