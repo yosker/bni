@@ -69,14 +69,11 @@ export class ZoomService {
         filters.sessionDate,
       );
       if (!chapter) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json(
-            new HttpException(
-              'CHAPTER_TOKEN_NOT_FOUND.',
-              HttpStatus.BAD_REQUEST,
-            ),
-          );
+        return res.status(HttpStatus.OK).json({
+          statusCode: 404,
+          message:'CHAPTER_TOKEN_NOT_FOUND.',
+          result: {},
+        });
       }
 
       const meeting: any = await this.getDataMeeting(
@@ -87,14 +84,11 @@ export class ZoomService {
       });
 
       if (!meeting || !meeting.length) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json(
-            new HttpException(
-              'No se encuentra la sesión enviada.',
-              HttpStatus.BAD_REQUEST,
-            ),
-          );
+        return res.status(HttpStatus.OK).json({
+          statusCode: 404,
+          message:'No se encuentra la sesión enviada.',
+          result: {},
+        });
       }
 
       for (const element of meeting.registrants) {
