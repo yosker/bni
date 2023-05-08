@@ -87,12 +87,6 @@ export class ZoomService {
       });
 
       if (!meeting || !meeting.length) {
-
-        // return res.status(HttpStatus.OK).json({
-        //   statusCode: 404,
-        //   message:  'No se encuentra la sesión enviada.',
-        //   result: {},
-        // });
         return res
           .status(HttpStatus.BAD_REQUEST)
           .json(
@@ -452,6 +446,33 @@ export class ZoomService {
     } catch (error) {
       console.log(error.message);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * @description Obtiene las Asistencias de los Usuarios
+   * @param jwtPayload JSON para OBTENER INFORMACIÓN DEL USUARIO LOGUUEADO
+   * @param res Resultado
+   * @param filters Filtros
+   * @returns Arreglo de usuarios
+   */
+  async getUsersSessions(jwtPayload: JWTPayload, res: Response, filters: any) {
+    try {
+      const sessionData = await this.getAttendanceUsersByDate(
+        filters.sessionDate,
+        filters.chapterId,
+        jwtPayload.timeZone,
+      );
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: sessionData,
+      });
+    } catch (error) {
+      throw res.json(
+        new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR),
+      );
     }
   }
 }
