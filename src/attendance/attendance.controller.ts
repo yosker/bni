@@ -44,11 +44,13 @@ export class AttendanceController {
     @Param('chapterId') chapterId: string,
     @Param('sessionDate') sessionDate: string,
     @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
   ) {
     return await this.attendanceService.VisitorsList(
       chapterId,
       sessionDate,
       res,
+      jwtPayload,
     );
   }
 
