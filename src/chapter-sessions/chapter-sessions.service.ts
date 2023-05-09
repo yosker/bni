@@ -76,6 +76,9 @@ export class ChapterSessionsService {
               attended: false,
               attendanceType: AttendanceType.OnSite,
               attendanceDate: chapterSessionDTO.sessionDate,
+              attendanceDateTime: moment(
+                chapterSessionDTO.sessionDate,
+              ).toISOString(),
               createdAt: moment().toISOString(),
             };
             await this.attendanceModel.create(attendance);
