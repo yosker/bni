@@ -7,6 +7,7 @@ export interface Attendance extends Document {
   attended: boolean;
   attendanceType: string;
   attendanceDate: string;
+  attendanceDateTime: string;
   letterSent: boolean;
   createdAt: { type: string };
   updatedAt: { type: string };

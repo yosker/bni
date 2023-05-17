@@ -69,27 +69,26 @@ export class ZoomService {
         filters.sessionDate,
       );
       if (!chapter) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json(
-            new HttpException(
-              'CHAPTER_TOKEN_NOT_FOUND.',
-              HttpStatus.BAD_REQUEST,
-            ),
-          );
+        return res.status(HttpStatus.OK).json({
+          statusCode: 404,
+          message:'CHAPTER_TOKEN_NOT_FOUND.',
+          result: {},
+        });
       }
 
       const meeting: any = await this.getDataMeeting(
         chapter.meetingId,
         chapter.tokenChapter,
-      );
+      ).catch((error) => {
+        throw new HttpException(error.message, error.status, error);
+      });
 
-      if (!meeting) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json(
-            new HttpException('SESSION_NOT_FOUND.', HttpStatus.BAD_REQUEST),
-          );
+      if (!meeting || !meeting.length) {
+        return res.status(HttpStatus.OK).json({
+          statusCode: 404,
+          message:'No se encuentra la sesión enviada.',
+          result: {},
+        });
       }
 
       for (const element of meeting.registrants) {
@@ -418,6 +417,7 @@ export class ZoomService {
             name: '$usersData.name',
             lastName: '$usersData.lastName',
             email: '$usersData.email',
+            imageURL: '$usersData.imageURL',
             phoneNumber: '$usersData.phoneNumber',
             attendanceDate: '$attendanceDate',
             updatedAt: '$updatedAt',
@@ -440,6 +440,33 @@ export class ZoomService {
     } catch (error) {
       console.log(error.message);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * @description Obtiene las Asistencias de los Usuarios
+   * @param jwtPayload JSON para OBTENER INFORMACIÓN DEL USUARIO LOGUUEADO
+   * @param res Resultado
+   * @param filters Filtros
+   * @returns Arreglo de usuarios
+   */
+  async getUsersSessions(jwtPayload: JWTPayload, res: Response, filters: any) {
+    try {
+      const sessionData = await this.getAttendanceUsersByDate(
+        filters.sessionDate,
+        filters.chapterId,
+        jwtPayload.timeZone,
+      );
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: sessionData,
+      });
+    } catch (error) {
+      throw res.json(
+        new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR),
+      );
     }
   }
 }

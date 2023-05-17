@@ -59,4 +59,13 @@ export class ZoomController {
   getMeetings(@Body() filters: any, @Res() res: Response) {
     return this.zoomService.getMeetings(res, filters);
   }
+
+  @Post('/getUsersSessions')
+  getUsersSessions(
+    @Body() filters: any,
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response,
+  ) {
+    return this.zoomService.getUsersSessions(jwtPayload, res, filters);
+  }
 }

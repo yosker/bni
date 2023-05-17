@@ -139,16 +139,24 @@ export class AttendanceService {
     chapterId: string,
     sessionDate: string,
     res: Response,
+    jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
+      // Convertir fecha de México a fecha de UTC
+      const dateMexico = moment.tz(sessionDate, jwtPayload.timeZone);
+      const dateUTC = dateMexico.clone().tz('UTC');
+      const sessionDateUTC = dateUTC.format('YYYY-MM-DD');
+      const startDate = moment(`${sessionDateUTC}T00:00:00.000Z`).toISOString();
+      const endDate = moment(`${sessionDateUTC}T23:59:59.999Z`).toISOString();
+
       const visitorList = await this.usersModel.find(
         {
           idChapter: ObjectId(chapterId),
           role: 'Visitante',
           status: EstatusRegister.Active,
           createdAt: {
-            $gte: moment(`${sessionDate}T00:00:00.000`),
-            $lt: moment(`${sessionDate}T23:59:59.999`),
+            $gte: startDate,
+            $lte: endDate,
           },
         },
         {
@@ -159,6 +167,8 @@ export class AttendanceService {
           invitedBy: 1,
           completedApplication: 1,
           completedInterview: 1,
+          email: 1,
+          createdAt: 1,
         },
       );
 
@@ -168,14 +178,18 @@ export class AttendanceService {
         result: visitorList,
       });
     } catch (err) {
-      throw res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(
-          new HttpException(
-            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          ),
-        );
+      if (err instanceof HttpException) {
+        throw res.status(err.getStatus()).json(err.getResponse());
+      } else {
+        throw res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json(
+            new HttpException(
+              'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            ),
+          );
+      }
     }
   }
 

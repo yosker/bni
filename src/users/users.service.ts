@@ -41,7 +41,7 @@ export class UsersService {
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
     @InjectModel('UsersInterview')
     private readonly usersInterviewModel: Model<UsersInterview>,
-  ) {}
+  ) { }
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -164,13 +164,13 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-              await this.sharedService.uploadFile(
-                dataBuffer,
-                filename,
-                '.jpg',
-                's3-bucket-users',
-              )
-            ).result
+            await this.sharedService.uploadFile(
+              dataBuffer,
+              filename,
+              '.jpg',
+              's3-bucket-users',
+            )
+          ).result
           : '';
       createUserDto = {
         ...createUserDto,
@@ -190,20 +190,30 @@ export class UsersService {
           newUser.idChapter.toString();
 
         const chapter = await this.chapterModel.findById(newUser.idChapter);
+
+        let templateName = '';
+
+        if (newUser.role != 'Networker') {
+          templateName = process.env.LEADERSHIP_WELCOME_TEMPLATE
+        } else {
+          templateName = process.env.NETWORKERS_WELCOME_TEMPLATE
+        }
+
         // OBJETO PARA EL CORREO
-        const emailProperties = {
+        const emailLeaderProperties = {
           emailConfigAut: chapter.email,
           passwordAut: chapter.password,
-          template: process.env.NETWORKERS_WELCOME_TEMPLATE,
+          template: templateName,
           subject: process.env.SUBJECT_CHAPTER_WELCOME,
           name: newUser.name + ' ' + newUser.lastName,
           user: newUser.email,
           pass: pass,
-          urlPlatform: url,
+          urlPlatform: process.env.URL_PLATFORM, //URL DE LA PLATAFORMA
+          urlQR: url, //URL DE NETS (CONTIENE QR)
           amount: '',
           to: newUser.email,
         };
-        await this.sharedService.sendMailer(emailProperties, false);
+        await this.sharedService.sendMailer(emailLeaderProperties, false);
       }
 
       if (newUser.role.toLowerCase() != 'visitante') {

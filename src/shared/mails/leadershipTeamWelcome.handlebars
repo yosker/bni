@@ -9,18 +9,8 @@
     <meta name="x-apple-disable-message-reformatting">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="telephone=no" name="format-detection">
-    <title>Copia de Nueva plantilla de correo electrC3B3nico 2022-12-29</title><!--[if (mso 16)]>
-<style type="text/css">
-a {text-decoration: none;}
-</style>
-<![endif]--><!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--><!--[if gte mso 9]>
-<xml>
-<o:OfficeDocumentSettings>
-<o:AllowPNG></o:AllowPNG>
-<o:PixelsPerInch>96</o:PixelsPerInch>
-</o:OfficeDocumentSettings>
-</xml>
-<![endif]--><!--[if !mso]><!-- -->
+    <title></title>
+
     <link href="https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i" rel="stylesheet"><!--<![endif]-->
     <style type="text/css">
         #outlook a {
@@ -62,6 +52,15 @@ a {text-decoration: none;}
             max-height: 0;
             line-height: 0;
             mso-hide: all;
+        }
+
+        [data-ogsb] .es-button {
+            border-width: 0 !important;
+            padding: 15px 25px 15px 25px !important;
+        }
+
+        [data-ogsb] .es-button.es-button-1 {
+            padding: 15px 30px !important;
         }
 
         @media only screen and (max-width:600px) {
@@ -186,7 +185,7 @@ a {text-decoration: none;}
             button.es-button {
                 font-size: 20px !important;
                 display: block !important;
-                padding: 15px 25px 15px 25px !important
+                border-width: 15px 25px 15px 25px !important
             }
 
             .es-btn-fw {
@@ -438,7 +437,7 @@ a {text-decoration: none;}
                                                                     style="Margin:0;padding-bottom:5px;padding-left:30px;padding-right:30px;padding-top:35px">
                                                                     <h1
                                                                         style="Margin:0;line-height:58px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:48px;font-style:normal;font-weight:normal;color:#111111">
-                                                                        ¡Bienvenid@!</h1>
+                                                                        ¡Bienvenid@! {{ objMail.name }}</h1>
                                                                 </td>
                                                             </tr>
                                                             <tr style="border-collapse:collapse">
@@ -488,20 +487,23 @@ a {text-decoration: none;}
                                                                     style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
                                                                     <p
                                                                         style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;font-size:18px">
-                                                                        Dando clic en el botón obtendrás tu código QR
-                                                                        para registrar tu asistencia en las sesiones
-                                                                        presenciales. <br><br></p>
+                                                                        Bienvenid@ a tu plataforma para la
+                                                                        administración de tu capítulo.<br>
+                                                                        Ingresa con las siguientes credenciales:<br>
+                                                                        usuario: {{objMail.user}}<br>
+                                                                        contraseña: {{objMail.pass}}<br><br></p>
                                                                 </td>
+
                                                             </tr>
                                                             <tr style="border-collapse:collapse">
                                                                 <td align="center"
                                                                     style="Margin:0;padding-left:10px;padding-right:10px;padding-top:35px;padding-bottom:35px">
                                                                     <span class="es-button-border"
-                                                                        style="border-style:solid;border-color:#FFA73B;background:#c8102e;border-width:1px;display:inline-block;border-radius:2px;width:auto;mso-border-alt:10px"><a
-                                                                            href="{{objMail.urlQR}}"
-                                                                            class="es-button es-button-1672368803292"
+                                                                        style="border-style:solid;border-color:#FFA73B;background:#c8102e;border-width:1px;display:inline-block;border-radius:2px;width:auto"><a
+                                                                            href="{{objMail.urlPlatform}}"
+                                                                            class="es-button es-button-1"
                                                                             target="_blank"
-                                                                            style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;display:inline-block;background:#c8102e;border-radius:2px;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center;padding:15px 30px;border-color:#c8102e">Ingresar</a></span>
+                                                                            style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;border-style:solid;border-color:#c8102e;border-width:15px 30px;display:inline-block;background:#c8102e;border-radius:2px;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center">Ingresar</a></span>
                                                                 </td>
                                                             </tr>
                                                             <tr style="border-collapse:collapse">
@@ -516,10 +518,35 @@ a {text-decoration: none;}
                                                             <tr style="border-collapse:collapse">
                                                                 <td class="es-m-txt-l" align="left"
                                                                     style="padding:0;Margin:0;padding-top:20px;padding-left:30px;padding-right:30px">
-                                                                    <a target="_blank" href="{{objMail.urlQR}}"
-                                                                        style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFA73B;font-size:18px">{{objMail.urlQR}}</a><br>
+                                                                    <a target="_blank" href="{{ objMail.urlPlatform}}"
+                                                                        style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFA73B;font-size:18px">{{objMail.urlPlatform}}</a><br>
                                                                 </td>
                                                             </tr>
+
+                                                            <tr style="border-collapse:collapse">
+                                                                <td class="es-m-txt-l" align="left"
+                                                                    style="padding:0;Margin:0;padding-top:20px;padding-left:30px;padding-right:30px">
+                                                                    <p
+                                                                        style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;font-size:18px">
+                                                                        Dando clic en el botón obtendrás tu código QR
+                                                                        para registrar tu asistencia en las sesiones
+                                                                        presenciales.</p>
+                                                                </td>
+                                                            </tr>
+                                                            <tr style="border-collapse:collapse">
+                                                                <td align="center"
+                                                                    style="Margin:0;padding-left:10px;padding-right:10px;padding-top:35px;padding-bottom:35px">
+                                                                    <span class="es-button-border"
+                                                                        style="border-style:solid;border-color:#FFA73B;background:#c8102e;border-width:1px;display:inline-block;border-radius:2px;width:auto;mso-border-alt:10px"><a
+                                                                            href="{{objMail.urlQR}}"
+                                                                            class="es-button es-button-1683500979483"
+                                                                            target="_blank"
+                                                                            style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;display:inline-block;background:#c8102e;border-radius:2px;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center;padding:15px 30px;border-color:#c8102e">Ingresar</a></span>
+                                                                </td>
+                                                            </tr>
+
+
+
                                                             <tr style="border-collapse:collapse">
                                                                 <td class="es-m-txt-l" align="left"
                                                                     style="padding:0;Margin:0;padding-top:20px;padding-left:30px;padding-right:30px">
