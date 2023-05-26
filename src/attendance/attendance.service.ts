@@ -54,7 +54,8 @@ export class AttendanceService {
           .json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
       }
 
-      const currentDate = jwtPayload.localTime.split(' ')[0];
+      const currentDateZone = moment().tz(jwtPayload.timeZone);
+      const currentDate = currentDateZone.format('YYYY-MM-DD');
       let authAttendance = false;
 
       //VALIDAMOS QUE LA SESION EXISTA EXISTA Y QUE ESTE ACTIVA
@@ -105,6 +106,7 @@ export class AttendanceService {
           1,
           jwtPayload.timeZone,
         );
+
         const userData = await this.attendanceModel.aggregate(pipeline);
 
         return res.status(HttpStatus.OK).json({
@@ -275,12 +277,16 @@ export class AttendanceService {
             },
             imageUrl: '$userData.imageURL',
             attendanceDate: '$attendanceDate',
-            createdAt: '$createdAt',
+            createdAt: {
+              $toDate: '$createdAt', // Convertir a tipo Date
+            },
             attendanceHour: {
               $dateToString: {
                 format: '%H:%M:%S',
-                date: '$createdAt',
-                timezone: timeZone, // aquí indicamos la zona horaria deseada
+                date: {
+                  $toDate: '$createdAt', // Convertir a tipo Date nuevamente
+                },
+                timezone: timeZone,
               },
             },
             companyName: '$userData.companyName',
