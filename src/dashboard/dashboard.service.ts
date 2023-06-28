@@ -126,8 +126,8 @@ export class DashboardService {
 
   private async totalVisitorsResult(chapterId: string) {
     try {
-      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('DD-MM-YYYY') + 'T00:00:00.000';
+      const lte = moment().format('DD-MM-YYYY') + 'T23:59:59.999';
 
       const filter = {
         role: {
@@ -172,8 +172,8 @@ export class DashboardService {
 
   private async totalAbsencesResult(chapterId: string) {
     try {
-      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('DD-MM-YYYY') + 'T00:00:00.000';
+      const lte = moment().format('DD-MM-YYYY') + 'T23:59:59.999';
 
       return [
         {
@@ -237,8 +237,8 @@ export class DashboardService {
 
   private async totalVisitorsLastSixMonthsResult(chapterId: string) {
     try {
-      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('DD-MM-YYYY') + 'T00:00:00.000';
+      const lte = moment().format('DD-MM-YYYY') + 'T23:59:59.999';
 
       const filter = {
         role: {
@@ -300,8 +300,8 @@ export class DashboardService {
     try {
       const now = moment().toISOString();
       const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+        moment(now).add(-6, 'M').format('DD-MM-YYYY') + 'T00:00:00.000';
+      const lte = moment(now).format('DD-MM-YYYY') + 'T23:59:59.999';
 
       const filter = {
         chapterId: ObjectId(chapterId),
@@ -333,8 +333,8 @@ export class DashboardService {
     try {
       const now = moment().toISOString();
       const gte =
-        moment(now).add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
-      const lte = moment(now).format('YYYY-MM-DD') + 'T23:59:59.999';
+        moment(now).add(-6, 'M').format('DD-MM-YYYY') + 'T00:00:00.000';
+      const lte = moment(now).format('DD-MM-YYYY') + 'T23:59:59.999';
 
       const filter = {
         chapterId: ObjectId(chapterId),
