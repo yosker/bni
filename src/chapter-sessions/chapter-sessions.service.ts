@@ -137,7 +137,7 @@ export class ChapterSessionsService {
           _id: 0,
           sessionDate: 1,
         })
-        .sort({ sessionChapterDate: -1 });
+        .sort({ sessionDate: -1 });
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
