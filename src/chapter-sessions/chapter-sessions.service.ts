@@ -76,6 +76,9 @@ export class ChapterSessionsService {
               attended: false,
               attendanceType: AttendanceType.OnSite,
               attendanceDate: chapterSessionDTO.sessionDate,
+              attendanceDateTime: moment(
+                chapterSessionDTO.sessionDate,
+              ).toISOString(),
               createdAt: moment().toISOString(),
             };
             await this.attendanceModel.create(attendance);
@@ -113,7 +116,7 @@ export class ChapterSessionsService {
     res: Response,
   ): Promise<Response> {
     try {
-      const currentDate = moment().format('YYYY-MM-DD');
+      const currentDate = moment().format('DD-MM-YYYY');
 
       let filter = {};
       if (chapterId != '0') {

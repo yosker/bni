@@ -30,6 +30,8 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
 
   attendanceDate: string;
 
+  attendanceDateTime: string;
+
   @Prop({ default: false, required: false })
   letterSent: boolean;
 

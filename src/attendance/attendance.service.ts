@@ -54,7 +54,8 @@ export class AttendanceService {
           .json(new HttpException('USER_NOT_FOUND.', HttpStatus.BAD_REQUEST));
       }
 
-      const currentDate = jwtPayload.localTime.split(' ')[0];
+      const currentDateZone = moment().tz(jwtPayload.timeZone);
+      const currentDate = currentDateZone.format('DD-MM-YYYY');
       let authAttendance = false;
 
       //VALIDAMOS QUE LA SESION EXISTA EXISTA Y QUE ESTE ACTIVA
@@ -105,6 +106,7 @@ export class AttendanceService {
           1,
           jwtPayload.timeZone,
         );
+
         const userData = await this.attendanceModel.aggregate(pipeline);
 
         return res.status(HttpStatus.OK).json({
@@ -139,16 +141,23 @@ export class AttendanceService {
     chapterId: string,
     sessionDate: string,
     res: Response,
+    jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
+      const dateMexico = moment(sessionDate, 'DD-MM-YYYY').tz(jwtPayload.timeZone);
+      const dateUTC = dateMexico.clone().tz('UTC');
+      const sessionDateUTC = dateUTC.format('DD-MM-YYYY');
+      const startDate = moment.utc(sessionDateUTC, 'DD-MM-YYYY').toISOString();
+      const endDate = moment.utc(sessionDateUTC, 'DD-MM-YYYY').endOf('day').toISOString();
+
       const visitorList = await this.usersModel.find(
         {
           idChapter: ObjectId(chapterId),
           role: 'Visitante',
           status: EstatusRegister.Active,
           createdAt: {
-            $gte: `${sessionDate}T00:00:00.000`,
-            $lt: `${sessionDate}T23:59:59.999`,
+            $gte: startDate,
+            $lte: endDate,
           },
         },
         {
@@ -159,8 +168,8 @@ export class AttendanceService {
           invitedBy: 1,
           completedApplication: 1,
           completedInterview: 1,
-          email:1,
-          createdAt:1,
+          email: 1,
+          createdAt: 1,
         },
       );
 
@@ -170,14 +179,18 @@ export class AttendanceService {
         result: visitorList,
       });
     } catch (err) {
-      throw res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json(
-          new HttpException(
-            'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          ),
-        );
+      if (err instanceof HttpException) {
+        throw res.status(err.getStatus()).json(err.getResponse());
+      } else {
+        throw res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json(
+            new HttpException(
+              'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            ),
+          );
+      }
     }
   }
 
@@ -263,12 +276,16 @@ export class AttendanceService {
             },
             imageUrl: '$userData.imageURL',
             attendanceDate: '$attendanceDate',
-            createdAt: '$createdAt',
+            createdAt: {
+              $toDate: '$createdAt', // Convertir a tipo Date
+            },
             attendanceHour: {
               $dateToString: {
                 format: '%H:%M:%S',
-                date: '$createdAt',
-                timezone: timeZone, // aquí indicamos la zona horaria deseada
+                date: {
+                  $toDate: '$createdAt', // Convertir a tipo Date nuevamente
+                },
+                timezone: timeZone,
               },
             },
             companyName: '$userData.companyName',

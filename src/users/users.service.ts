@@ -161,23 +161,23 @@ export class UsersService {
       const plainToHash = await hash(pass, 10);
       let createUserDto = req;
 
-      const s3Response =
-        filename != 'avatar.jpg'
-          ? await (
-            await this.sharedService.uploadFile(
-              dataBuffer,
-              filename,
-              '.jpg',
-              's3-bucket-users',
-            )
-          ).result
-          : '';
+      // const s3Response =
+      //   filename != 'avatar.jpg'
+      //     ? await (
+      //       await this.sharedService.uploadFile(
+      //         dataBuffer,
+      //         filename,
+      //         '.jpg',
+      //         's3-bucket-users',
+      //       )
+      //     ).result
+      //     : '';
       createUserDto = {
         ...createUserDto,
         password: plainToHash,
         idChapter: ObjectId(createUserDto.idChapter),
         invitedBy: '-',
-        imageURL: s3Response,
+        imageURL: '',//s3Response,
       };
 
       const newUser = await this.usersModel.create(createUserDto);
@@ -213,7 +213,12 @@ export class UsersService {
           amount: '',
           to: newUser.email,
         };
-        await this.sharedService.sendMailer(emailLeaderProperties, false);
+        try {
+          this.sharedService.sendMailer(emailLeaderProperties, false);
+        } catch (error) {
+          console.log(error);
+        }
+
       }
 
       if (newUser.role.toLowerCase() != 'visitante') {
