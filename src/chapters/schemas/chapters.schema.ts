@@ -8,7 +8,7 @@ export const ChapterSchema = new Schema({
   region: { type: String, required: true },
   name: { type: String, required: true, length: 80, unique: true },
   email: { type: String, required: true },
-  password: { type: String, required: false },
+  password: { type: String, required: false,length: 80 },
   sessionDate: { type: String, required: true },
   attendanceDate: { type: String, required: false },
   sessionSchedule: { type: String, required: true },

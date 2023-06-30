@@ -65,12 +65,14 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   @ApiProperty({
     example: 'Token del capítulo.',
   })
+  @Prop({ default:"" })
   @IsString()
   tokenChapter: string;
 
   @ApiProperty({
     example: 'Id del meeting de la sesión.',
   })
+  @Prop({ default:"" })
   @IsString()
   meetingId: string;
 
