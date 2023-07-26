@@ -74,8 +74,8 @@ export class ChaptersService {
       //OBJETO PARA EL CORREO
       const emailProperties = {
         email: createChapterDTO.email,
-        from: "net_session_manager@outlook.com", 
-        password: password, 
+        from: 'net_session_manager@outlook.com',
+        password: password,
         name: createChapterDTO.name,
         template: process.env.CHAPTERS_WELCOME,
         subject: process.env.SUBJECT_CHAPTER_WELCOME,
@@ -88,7 +88,7 @@ export class ChaptersService {
       const newUser = await this.usersModel.create(createUserDto);
 
       if (newChapter != null && newUser != null)
-       await this.sharedService.sendEmail(emailProperties);
+        await this.sharedService.sendEmail(emailProperties);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,

@@ -25,7 +25,7 @@ export class SharedService {
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
-  ) { }
+  ) {}
 
   /**
    * @description Genera un password aleatorio
@@ -139,7 +139,7 @@ export class SharedService {
         const includePage = arrPresident.includes(page);
         response = includePage ? true : false;
       }
-    } catch (err) { }
+    } catch (err) {}
     return response;
   }
 
@@ -172,11 +172,11 @@ export class SharedService {
 
       const attachmentProperties = [];
       if (attachment) {
-         const obj = {
+        const obj = {
           filename: 'carta.pdf',
-          contentDisposition: "attachment",
-          content: (Buffer.from(emailProperties.file)),
-        }
+          contentDisposition: 'attachment',
+          content: Buffer.from(emailProperties.file),
+        };
         attachmentProperties.push(obj);
       }
 
@@ -193,18 +193,16 @@ export class SharedService {
         context: {
           objMail: emailProperties,
         },
-      }
+      };
 
-      mailTransport.sendMail(emailOptions,
-        function (error: any) {
-          if (error) {
-            console.log(error);
-            return;
-          }
-          console.log('Message sent');
-          mailTransport.close();
-        },
-      );
+      mailTransport.sendMail(emailOptions, function (error: any) {
+        if (error) {
+          console.log(error);
+          return;
+        }
+        console.log('Message sent');
+        mailTransport.close();
+      });
     } catch (error) {
       console.log('Error getConfigEmail: ', error);
       throw error;

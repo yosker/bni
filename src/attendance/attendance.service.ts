@@ -144,11 +144,16 @@ export class AttendanceService {
     jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
-      const dateMexico = moment(sessionDate, 'YYYY-MM-DD').tz(jwtPayload.timeZone);
+      const dateMexico = moment(sessionDate, 'YYYY-MM-DD').tz(
+        jwtPayload.timeZone,
+      );
       const dateUTC = dateMexico.clone().tz('UTC');
       const sessionDateUTC = dateUTC.format('YYYY-MM-DD');
       const startDate = moment.utc(sessionDateUTC, 'YYYY-MM-DD').toISOString();
-      const endDate = moment.utc(sessionDateUTC, 'YYYY-MM-DD').endOf('day').toISOString();
+      const endDate = moment
+        .utc(sessionDateUTC, 'YYYY-MM-DD')
+        .endOf('day')
+        .toISOString();
 
       const visitorList = await this.usersModel.find(
         {

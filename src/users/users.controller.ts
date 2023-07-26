@@ -37,12 +37,14 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
     @Request() req,
     @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
   ): Promise<any> {
     return await this.usersService.create(
       file.buffer,
       file.originalname,
       req.body,
       res,
+      jwtPayload,
     );
   }
 

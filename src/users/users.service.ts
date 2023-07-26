@@ -41,7 +41,7 @@ export class UsersService {
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
     @InjectModel('UsersInterview')
     private readonly usersInterviewModel: Model<UsersInterview>,
-  ) { }
+  ) {}
 
   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS USUARIOS
   async findAll(
@@ -146,6 +146,7 @@ export class UsersService {
     filename: string,
     req,
     res: Response,
+    jwtPayload: JWTPayload,
   ): Promise<Response> {
     const findRole = this.rolesModel.findOne({
       name: req.role,
@@ -159,7 +160,16 @@ export class UsersService {
     try {
       const pass = await this.sharedService.passwordGenerator(6);
       const plainToHash = await hash(pass, 10);
-      let createUserDto = req;
+      let createUserDto: any = req;
+
+      const chapter = await this.chapterModel.findById(createUserDto.idChapter);
+
+      if (!chapter)
+        return res.status(HttpStatus.NOT_FOUND).json({
+          statusCode: 404,
+          message: 'CHAPTER_NOT_FOUND',
+          result: {},
+        });
 
       // const s3Response =
       //   filename != 'avatar.jpg'
@@ -177,7 +187,7 @@ export class UsersService {
         password: plainToHash,
         idChapter: ObjectId(createUserDto.idChapter),
         invitedBy: '-',
-        imageURL: '',//s3Response,
+        imageURL: '', //s3Response,
       };
 
       const newUser = await this.usersModel.create(createUserDto);
@@ -189,14 +199,12 @@ export class UsersService {
           '&chapterId=' +
           newUser.idChapter.toString();
 
-        const chapter = await this.chapterModel.findById(newUser.idChapter);
-
         let templateName = '';
 
         if (newUser.role != 'Networker') {
-          templateName = process.env.LEADERSHIP_WELCOME_TEMPLATE
+          templateName = process.env.LEADERSHIP_WELCOME_TEMPLATE;
         } else {
-          templateName = process.env.NETWORKERS_WELCOME_TEMPLATE
+          templateName = process.env.NETWORKERS_WELCOME_TEMPLATE;
         }
 
         // OBJETO PARA EL CORREO
@@ -218,12 +226,15 @@ export class UsersService {
         } catch (error) {
           console.log(error);
         }
-
       }
 
       if (newUser.role.toLowerCase() != 'visitante') {
         //Setea las fechas de sesion del usuario
-        await this.setUserSessions(newUser._id, newUser.idChapter.toString());
+        await this.setUserSessions(
+          newUser._id,
+          newUser.idChapter.toString(),
+          jwtPayload.timeZone,
+        );
       }
 
       return res.status(HttpStatus.OK).json({
@@ -595,11 +606,19 @@ export class UsersService {
     }
   }
 
-  private async setUserSessions(userId: string, chapterId: string) {
+  private async setUserSessions(
+    userId: string,
+    chapterId: string,
+    timeZone: string,
+  ) {
     try {
+
+      // Convierte la fecha y hora al huso horario deseado ('America/Mexico_City')
+      const currentDateTime = moment().tz(timeZone).format();
+
       const chapterSessions = await this.chapterSessionModel.find({
         sessionChapterDate: {
-          $gte: moment().toISOString(),
+          $gte: currentDateTime,
         },
       });
 
