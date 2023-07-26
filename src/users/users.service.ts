@@ -21,6 +21,7 @@ import { Chapter } from 'src/chapters/interfaces/chapters.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersInterview } from 'src/users-interviews/interfaces/users-interview.interface';
 import { join } from 'path';
+import { UsersType } from 'src/shared/enums/usersType';
 
 const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
@@ -56,7 +57,9 @@ export class UsersService {
         ['status']: EstatusRegister.Active,
       };
       filter['role'] =
-        role == 'nets' ? { $ne: 'Visitante' } : { $eq: 'Visitante' };
+        role == 'nets'
+          ? { $ne: UsersType.Visitante }
+          : { $eq: UsersType.Visitante };
 
       const query: any = [
         {
@@ -228,7 +231,7 @@ export class UsersService {
         }
       }
 
-      if (newUser.role.toLowerCase() != 'visitante') {
+      if (newUser.role.toLowerCase() != UsersType.Visitante) {
         //Setea las fechas de sesion del usuario
         await this.setUserSessions(
           newUser._id,
@@ -612,9 +615,8 @@ export class UsersService {
     timeZone: string,
   ) {
     try {
-
       // Convierte la fecha y hora al huso horario deseado ('America/Mexico_City')
-      const currentDateTime = moment().tz(timeZone).format();
+      const currentDateTime = moment().tz(timeZone).startOf('day').format();
 
       const chapterSessions = await this.chapterSessionModel.find({
         sessionChapterDate: {

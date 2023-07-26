@@ -11,6 +11,7 @@ import { Users } from 'src/users/schemas/users.schema';
 import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { UsersType } from 'src/shared/enums/usersType';
 
 const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
@@ -64,7 +65,7 @@ export class ChapterSessionsService {
           const usersChapter = await this.usersModel.find({
             idChapter: ObjectId(chapterSessionDTO.chapterId),
             role: {
-              $ne: 'Visitantes',
+              $ne: UsersType.Visitante,
             },
           });
 
