@@ -39,6 +39,7 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   email: string;
 
   @Prop({ default: '', required: false })
+  @IsString()
   password: string;
 
   @ApiProperty({

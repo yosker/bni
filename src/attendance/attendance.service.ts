@@ -55,7 +55,7 @@ export class AttendanceService {
       }
 
       const currentDateZone = moment().tz(jwtPayload.timeZone);
-      const currentDate = currentDateZone.format('DD-MM-YYYY');
+      const currentDate = currentDateZone.format('YYYY-MM-DD');
       let authAttendance = false;
 
       //VALIDAMOS QUE LA SESION EXISTA EXISTA Y QUE ESTE ACTIVA
@@ -144,11 +144,11 @@ export class AttendanceService {
     jwtPayload: JWTPayload,
   ): Promise<Response> {
     try {
-      const dateMexico = moment(sessionDate, 'DD-MM-YYYY').tz(jwtPayload.timeZone);
+      const dateMexico = moment(sessionDate, 'YYYY-MM-DD').tz(jwtPayload.timeZone);
       const dateUTC = dateMexico.clone().tz('UTC');
-      const sessionDateUTC = dateUTC.format('DD-MM-YYYY');
-      const startDate = moment.utc(sessionDateUTC, 'DD-MM-YYYY').toISOString();
-      const endDate = moment.utc(sessionDateUTC, 'DD-MM-YYYY').endOf('day').toISOString();
+      const sessionDateUTC = dateUTC.format('YYYY-MM-DD');
+      const startDate = moment.utc(sessionDateUTC, 'YYYY-MM-DD').toISOString();
+      const endDate = moment.utc(sessionDateUTC, 'YYYY-MM-DD').endOf('day').toISOString();
 
       const visitorList = await this.usersModel.find(
         {
@@ -490,7 +490,7 @@ export class AttendanceService {
           },
         );
 
-        const currentDate = moment().format('DD-MM-YYYY');
+        const currentDate = moment().format('YYYY-MM-DD');
         doc.text('', 80, 80);
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`Fecha: ${currentDate}`, {

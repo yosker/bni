@@ -1155,7 +1155,7 @@ export class UsersService {
         doc.addPage();
         doc.text('', 0, 50);
 
-        const currentDate = moment().format('DD-MM-YYYY');
+        const currentDate = moment().format('YYYY-MM-DD');
         doc.text('', 80, 80);
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`Fecha: ${currentDate}`, {
@@ -1458,7 +1458,7 @@ export class UsersService {
           align: 'left',
         });
         doc.moveDown();
-        const currentDate = moment().format('DD-MM-YYYY');
+        const currentDate = moment().format('YYYY-MM-DD');
         doc.font('Helvetica-Bold').fontSize(9);
         doc.text(`Fecha: ${currentDate}`, {
           width: doc.page.width - 125,

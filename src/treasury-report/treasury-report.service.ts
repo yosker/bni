@@ -65,8 +65,8 @@ export class TreasuryReportService {
 
   private async totalIncomeResult(chapterId: string) {
     try {
-      const gte = moment().add(-6, 'M').format('DD-MM-YYYY') + 'T00:00:00.000';
-      const lte = moment().format('DD-MM-YYYY') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
         chapterId: ObjectId(chapterId),
@@ -114,8 +114,8 @@ export class TreasuryReportService {
 
   async totalChargesResult(chapterId: string) {
     try {
-      const gte = moment().add(-6, 'M').format('DD-MM-YYYY') + 'T00:00:00.000';
-      const lte = moment().format('DD-MM-YYYY') + 'T23:59:59.999';
+      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
 
       const filter = {
         chapterId: ObjectId(chapterId),

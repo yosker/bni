@@ -116,7 +116,7 @@ export class ChapterSessionsService {
     res: Response,
   ): Promise<Response> {
     try {
-      const currentDate = moment().format('DD-MM-YYYY');
+      const currentDate = moment().format('YYYY-MM-DD');
 
       let filter = {};
       if (chapterId != '0') {

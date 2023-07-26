@@ -74,8 +74,8 @@ export class ChaptersService {
       //OBJETO PARA EL CORREO
       const emailProperties = {
         email: createChapterDTO.email,
-        from: "meeting.reporter@outlook.com", // newChapter.email,
-        password: password, //newChapter.password,
+        from: "net_session_manager@outlook.com", 
+        password: password, 
         name: createChapterDTO.name,
         template: process.env.CHAPTERS_WELCOME,
         subject: process.env.SUBJECT_CHAPTER_WELCOME,

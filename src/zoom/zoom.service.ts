@@ -122,7 +122,7 @@ export class ZoomService {
         } else {
           if (user.role.toLowerCase() !== 'visitante') {
             //De lo contrario se le pasa asistencia
-            const dateAttendance = moment().format('DD-MM-YYYY');
+            const dateAttendance = moment().format('YYYY-MM-DD');
 
             await this.attendanceModel.findOneAndUpdate(
               {

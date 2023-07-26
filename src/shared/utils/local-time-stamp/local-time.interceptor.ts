@@ -26,7 +26,7 @@ export class LocalTimeInterceptor implements NestInterceptor {
     let localTime;
     if (geo && geo.ll) {
       const zoneName = geo.timezone;
-      localTime = moment().tz(zoneName).format('DD-MM-YYYY HH:mm:ss');
+      localTime = moment().tz(zoneName).format('YYYY-MM-DD HH:mm:ss');
     }
 
     // Modifica la propiedad localTime del objeto global jwtPayload
