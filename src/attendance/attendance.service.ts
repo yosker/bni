@@ -348,7 +348,7 @@ export class AttendanceService {
     const filter = {
       chapterId: ObjectId(chapterId),
       attendanceDate: {
-        $lt: lte.split('T').shift(),
+        $lte: lte.split('T').shift(),
       },
       attended: false,
     };

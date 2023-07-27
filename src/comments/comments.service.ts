@@ -31,7 +31,7 @@ export class CommentsService {
 
       createCommentDto.visitorId = ObjectId(createCommentDto.visitorId);
 
-      if (comments?.length >= 5) {
+      if (comments?.length >= 4) {
         this.userModel.findByIdAndUpdate(createCommentDto.visitorId, {
           accepted: createCommentDto.accepted,
         });

@@ -95,6 +95,8 @@ export class UsersService {
             completedApplication: 1,
             completedInterview: 1,
             invitedBy: 1,
+            accepted:1,
+            letterSent:1
           },
         },
         {
@@ -174,23 +176,23 @@ export class UsersService {
           result: {},
         });
 
-      // const s3Response =
-      //   filename != 'avatar.jpg'
-      //     ? await (
-      //       await this.sharedService.uploadFile(
-      //         dataBuffer,
-      //         filename,
-      //         '.jpg',
-      //         's3-bucket-users',
-      //       )
-      //     ).result
-      //     : '';
+      const s3Response =
+        filename != 'avatar.jpg'
+          ? await (
+            await this.sharedService.uploadFile(
+              dataBuffer,
+              filename,
+              '.jpg',
+              's3-bucket-users',
+            )
+          ).result
+          : '';
       createUserDto = {
         ...createUserDto,
         password: plainToHash,
         idChapter: ObjectId(createUserDto.idChapter),
         invitedBy: '-',
-        imageURL: '', //s3Response,
+        imageURL: s3Response
       };
 
       const newUser = await this.usersModel.create(createUserDto);
@@ -1116,6 +1118,17 @@ export class UsersService {
       const subject =
         type == 'aceptacion' ? 'Carta de aceptación' : 'Carta de no aceptación';
 
+
+      let arrEmails = '';
+      objUser[0].emailAccounts.forEach(async (obj) => {
+        if (
+          obj.status == 'Active' &&
+          (obj.acceptedAccount == 'Ambos' || obj.acceptedAccount == 'Acepetado')
+        ) {
+          arrEmails = obj.email + ';' + arrEmails;
+        }
+      });
+
       const emailProperties = {
         emailConfigAut: chapter.email,
         passwordAut: chapter.password,
@@ -1124,6 +1137,7 @@ export class UsersService {
         amount: '',
         name: '',
         to: objUser[0].email,
+        cc:arrEmails,
         user: '',
         pass: '',
         urlPlatform: '',
@@ -1266,8 +1280,8 @@ export class UsersService {
         const table = {
           headers: ['', ''],
           rows: [
-            [`Membresía 1 año:`, `$11,900.00`],
-            [`Membresía 2 años:`, `$19,900.00`],
+            [`Membresía 1 año:`, `$15,800.00`],
+            [`Membresía 2 años:`, `$23,800.00`],
           ],
           options: {
             divider: {

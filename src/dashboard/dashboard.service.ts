@@ -195,7 +195,7 @@ export class DashboardService {
             chapterId: ObjectId(chapterId),
             attended: false,
             status: EstatusRegister.Active,
-            createdAt: {
+            attendanceDateTime: {
               $gte: moment(gte).toISOString(),
               $lt: moment(lte).toISOString(),
             },
@@ -204,7 +204,7 @@ export class DashboardService {
         {
           $group: {
               _id: {
-                  $month: { date: { $toDate: "$createdAt" } },
+                  $month: { date: { $toDate: "$attendanceDateTime" } },
               },
               totalAbsences: { $sum: 1 }
           }
@@ -285,9 +285,13 @@ export class DashboardService {
       const objCharge = await this.chargesModel.aggregate(pipelineCharges);
 
       let totalCash = 0;
-      if (objIncome.length > 0 || objCharge.length > 0) {
-        totalCash = objIncome[0].totalAmount - objCharge[0].totalAmount;
-      }
+      let totalIncome = 0; 
+      let totalAmount = 0;
+
+      totalIncome = objIncome.length > 0 ? objIncome[0].totalAmount : 0; 
+      totalAmount = objCharge.length > 0 ? objCharge[0].totalAmount : 0;
+      totalCash = totalIncome - totalAmount;
+
       return totalCash;
     } catch (err) {
       throw new HttpErrorByCode[500](

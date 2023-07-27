@@ -183,6 +183,7 @@ export class SharedService {
       let emailOptions = {
         from: emailProperties.emailConfigAut,
         to: emailProperties.to,
+        cc:emailProperties.cc, 
         replyTo: emailProperties.emailConfigAut,
         subject: emailProperties.subject,
         text: emailProperties.template,

@@ -186,7 +186,7 @@ export class NetinterviewService {
           width: doc.page.width,
           align: 'left'
         });
-        const createdDate = interview[0].createdAt.toLocaleDateString();
+        const createdDate = interview[0].createdAt; //.toLocaleDateString();
         const table = {
           headers: ['Fuerzas:', 'Desarrollo Potencial:'],
           rows: [
