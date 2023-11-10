@@ -39,7 +39,7 @@ export class PasswordRecoverService {
         //ENVIO DE CORREO CON CONPROBANTE DE APORTACIÓN
         const emailProperties = {
           email:  obj.email,
-          from: 'meeting.reporter@outlook.com',
+          from: 'net_session_manager@outlook.com',
           name: '',
           template: 'temporalPassword',
           subject: 'Contraseña Temporal',
