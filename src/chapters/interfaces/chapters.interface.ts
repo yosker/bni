@@ -11,8 +11,8 @@ export interface Chapter extends Document {
   attendanceDate: { type: string };
   sessionSchedule: { type: string };
   sessionType: { type: string };
-  tokenChapter: string;
-  meetingId: string;
+  tokenChapter: { type: string; required: false; default:''}
+  meetingId: { type: string; required: false; default:''}
   createdAt: {
     type: string;
   };
