@@ -68,9 +68,11 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
   })
 
   @Prop({ default: "", required: false })
+  @IsString()
   tokenChapter: string;
 
   @Prop({ default: "", required: false })
+  @IsString()
   meetingId: string;
 
   @Prop({ default: moment().toISOString() })

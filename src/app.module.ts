@@ -28,6 +28,7 @@ import { TreasuryReportModule } from './treasury-report/treasury-report.module';
 import { QuestionsReferencesModule } from './questions-references/questions-references.module';
 import { PasswordRecoverModule } from './password-recover/password-recover.module';
 import { ZoomModule } from './zoom/zoom.module';
+import { MonitoringlettersModule } from './monitoringletters/monitoringletters.module';
 
 
 @Module({
@@ -72,6 +73,7 @@ import { ZoomModule } from './zoom/zoom.module';
     QuestionsReferencesModule,
     PasswordRecoverModule,
     ZoomModule,
+    MonitoringlettersModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],

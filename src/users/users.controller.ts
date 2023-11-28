@@ -191,4 +191,29 @@ export class UsersController {
   ) {
     return await this.usersService.sendLetter(InterviwedId, type, res);
   }
+  
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), JwtGuard)
+  @Get('/acceptedUsersList/:chapterId')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  findAcceptedUsers(
+    @Param('chapterId') chapterId: string,
+    @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
+  ) {
+    return this.usersService.findAllAcceptedUsers(chapterId, res, jwtPayload);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), JwtGuard)
+  @Get('convertVisitorToNetworker/:id')
+  updateVisitorIntoNetworker(
+    @Param('id') id: string,
+    @Res() res: Response
+  ) {
+    return this.usersService.convertVisitorIntoNetworker(id, res);
+  }
+
+
 }

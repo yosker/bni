@@ -123,8 +123,6 @@ export class EmailAccountsService {
     res: Response,
     jwtPayload: JWTPayload,
   ) {
-
-
     const existAccount = await this.emailAccount.findOne({
       chapterId: ObjectId(jwtPayload.idChapter),
       email: updateEmailAccountsDTO.email,

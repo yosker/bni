@@ -25,24 +25,37 @@ export class CommentsService {
     jwtPayload: JWTPayload,
   ) {
     try {
-      const comments = await this.commentModel.find({
-        interviewId: ObjectId(createCommentDto.interviewId),
-      });
 
+      const totalVotes = 4; 
+
+      //AGREGAMOS EL COMENTARIO Y VOTACION 
       createCommentDto.visitorId = ObjectId(createCommentDto.visitorId);
-
-      if (comments?.length >= 4) {
-        this.userModel.findByIdAndUpdate(createCommentDto.visitorId, {
-          accepted: createCommentDto.accepted,
-        });
-      }
       createCommentDto.createdBy = ObjectId(jwtPayload.id);
       const newComment = await this.commentModel.create(createCommentDto);
+     
+      //OBTENEMOS LAS VOTACIONES = TRUE
+      const comments = await this.commentModel.find({
+        visitorId: ObjectId(createCommentDto.visitorId),
+        accepted: true
+      });
+
+      //CONTAMOS LAS VOTACIONES "accepted = TRUE" 
+      let totalUsersVotes = comments.length;
+     
+      //SI EL TOTAL DE VOTACIONES = totalVotes ACTUALIZAMOS AL USUARO COMO ACPETADO 
+      if (totalVotes === totalUsersVotes){
+        await this.userModel.findByIdAndUpdate(
+          { _id: ObjectId(createCommentDto.visitorId), },
+          { accepted: true},
+        );
+      };
+
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
         result: newComment,
       });
+
     } catch (error) {
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -130,6 +143,7 @@ export class CommentsService {
       updateCommentDto.createdBy = ObjectId(jwtPayload.id);
       updateCommentDto.visitorId = ObjectId(updateCommentDto.visitorId);
 
+      
       await this.commentModel.updateOne(
         {
           _id: ObjectId(id),
@@ -137,6 +151,30 @@ export class CommentsService {
         updateCommentDto,
       );
 
+
+      let totalVotes = 4; 
+
+      //OBTENEMOS LAS VOTACIONES = TRUE
+      const comments = await this.commentModel.find({
+        visitorId: ObjectId(updateCommentDto.visitorId),
+        accepted: true
+      });
+
+      //CONTAMOS LAS VOTACIONES "accepted = TRUE" 
+      let totalUsersVotes = comments.length;
+     
+      //SI EL TOTAL DE VOTACIONES = totalVotes ACTUALIZAMOS AL USUARO COMO ACPETADO 
+      if (totalVotes === totalUsersVotes){
+        await this.userModel.findByIdAndUpdate(
+          { _id: ObjectId(updateCommentDto.visitorId), },
+          { accepted: true},
+        );
+      }else{
+        await this.userModel.findByIdAndUpdate(
+          { _id: ObjectId(updateCommentDto.visitorId), },
+          { accepted: false },
+        );
+      }
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,

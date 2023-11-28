@@ -66,6 +66,14 @@ export class UsersService {
           $match: filter,
         },
         {
+          $lookup: {
+              from: 'comments',
+              localField: '_id', //arriba -> users
+              foreignField: 'visitorId',
+              as: 'comments',
+          },
+      },
+        {
           $addFields: {
             createdAtDate: {
               $toDate: '$createdAt',
@@ -96,14 +104,15 @@ export class UsersService {
             completedInterview: 1,
             invitedBy: 1,
             accepted:1,
-            letterSent:1
+            letterSent:1,
+            comments:1
           },
         },
         {
           $sort: { createdAt: -1 },
         },
       ];
-
+   
       const user: any = await this.usersModel.aggregate(query);
 
       return res.status(HttpStatus.OK).json({
@@ -655,7 +664,6 @@ export class UsersService {
   }
 
   //ENDPOINT PARA EXPORTAR LA ENTREVISTA A PDF
-
   public async createFile(userInterviewId: string): Promise<Buffer> {
     try {
       const pipeline: any = await this.resultQuery(userInterviewId);
@@ -1073,15 +1081,16 @@ export class UsersService {
     }
   }
 
-  //ENDPOINT PARA ARMAR LA CARTA Y ENVIAR POR CORREO. TAMBIÉN SE EDITA EL ESTATUS A CARTA ENVIADA
+  //ENDPOINT PARA ARMAR LA CARTA DE ACEPTACION O RECHAZO Y ENVIAR POR CORREO. TAMBIÉN SE EDITA EL ESTATUS A CARTA ENVIADA
   async sendLetter(id: string, type: string, res: Response): Promise<Response> {
     try {
-      await this.usersModel.updateOne(
+      await this.usersModel.findByIdAndUpdate(
         {
           _id: ObjectId(id),
         },
         {
           letterSent: true,
+          updatedAt: moment().toISOString() 
         },
       );
 
@@ -1589,4 +1598,121 @@ export class UsersService {
       );
     }
   }
+
+   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS INVITADOS CON CARTA DE ACEPTACION
+   async findAllAcceptedUsers(
+    chapterId: string,
+    res: Response,
+    jwtPayload: JWTPayload,
+  ): Promise<Response> {
+    try {
+      const filter = {
+        ['idChapter']: ObjectId(chapterId),
+        ['status']: EstatusRegister.Active,
+        ['role']: UsersType.Visitante,
+        ['accepted']: true,
+        ['letterSent']: true,
+      };
+      const query: any = [
+        {
+          $match: filter,
+        },
+        {
+          $project: {
+            email: 1,
+            name: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            idChapter: 1,
+            role: 1,
+            lastName: 1,
+            phoneNumber: 1,
+            imageURL: '',
+            companyName: 1,
+            profession: 1,
+            completedApplication: 1,
+            completedInterview: 1,
+            invitedBy: 1,
+            accepted:1,
+            letterSent:1
+          },
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+      ];
+      const user: any = await this.usersModel.aggregate(query);
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: user,
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
+  //ENDPOINT PARA CAMBIAR EL ROL DE USAURIO (DE INVITADO A NETWORKER)
+  async convertVisitorIntoNetworker(id: string, res: Response): Promise<Response> {
+    try {
+      const user = await this.usersModel.findById({ _id: ObjectId(id) });
+
+      const pass = await this.sharedService.passwordGenerator(6);
+      const plainToHash = await hash(pass, 10);
+
+      await this.usersModel.updateOne(
+        { _id: ObjectId(id) },
+        { role: "Networker", password: plainToHash},
+      );
+      
+      const chapter = await this.chapterModel.findById("");
+
+      const url =
+      process.env.URL_NET_PLATFORM +
+      '?id=' +
+      user._id.toString() +
+      '&chapterId=' +
+      user.idChapter.toString();
+
+      // OBJETO PARA EL CORREO
+      const emailLeaderProperties = {
+        emailConfigAut: chapter.email,
+        passwordAut: chapter.password,
+        template: process.env.NETWORKERS_WELCOME_TEMPLATE,
+        subject: process.env.SUBJECT_CHAPTER_WELCOME,
+        name: user.name + ' ' + user.lastName,
+        user: user.email,
+        pass: pass,
+        urlPlatform: process.env.URL_PLATFORM, //URL DE LA PLATAFORMA
+        urlQR: url, //URL DE NETS (CONTIENE QR)
+        amount: '',
+        to: user.email,
+      };
+
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+    } catch (err) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
+  }
+
 }
