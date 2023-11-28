@@ -1661,7 +1661,7 @@ export class UsersService {
   }
 
   //ENDPOINT PARA CAMBIAR EL ROL DE USAURIO (DE INVITADO A NETWORKER)
-  async convertVisitorIntoNetworker(id: string, res: Response): Promise<Response> {
+  async convertVisitorIntoNetworker(id: string,jwtPayload: JWTPayload, res: Response): Promise<Response> {
     try {
       const user = await this.usersModel.findById({ _id: ObjectId(id) });
 
@@ -1673,7 +1673,7 @@ export class UsersService {
         { role: "Networker", password: plainToHash},
       );
       
-      const chapter = await this.chapterModel.findById("");
+      const chapter = await this.chapterModel.findById(jwtPayload.idChapter);
 
       const url =
       process.env.URL_NET_PLATFORM +
@@ -1696,7 +1696,11 @@ export class UsersService {
         amount: '',
         to: user.email,
       };
-
+      try {
+        this.sharedService.sendMailer(emailLeaderProperties, false);
+      } catch (error) {
+        console.log(error);
+      }
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -1714,5 +1718,4 @@ export class UsersService {
         );
     }
   }
-
 }

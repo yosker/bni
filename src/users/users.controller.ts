@@ -210,10 +210,9 @@ export class UsersController {
   @Get('convertVisitorToNetworker/:id')
   updateVisitorIntoNetworker(
     @Param('id') id: string,
+    @Auth() jwtPayload: JWTPayload,
     @Res() res: Response
   ) {
-    return this.usersService.convertVisitorIntoNetworker(id, res);
+    return this.usersService.convertVisitorIntoNetworker(id,jwtPayload, res);
   }
-
-
 }

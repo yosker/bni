@@ -4,14 +4,10 @@ import { Model } from 'mongoose';
 import { ServicesResponse } from 'src/responses/response';
 import { MonitoringLetters } from 'src/monitoringletters/interfaces/monitoringletters.interface';
 import { MonitoringLettersDTO } from 'src/monitoringletters/dto/monitoringletters.dto';
-
-import { User } from 'src/users/interfaces/users.interface';
-import { Users } from 'src/users/schemas/users.schema';
 import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 const ObjectId = require('mongodb').ObjectId;
 
