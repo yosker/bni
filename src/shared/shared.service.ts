@@ -57,7 +57,7 @@ export class SharedService {
   }
 
   async sendEmail(emailProperties: any): Promise<ServicesResponse> {
-    const { statusCode, message, result } = this.servicesResponse;
+    let { statusCode, message, result } = this.servicesResponse;
     try {
       emailProperties = {
         ...emailProperties,
@@ -74,7 +74,10 @@ export class SharedService {
         },
       });
     } catch (err) {
-      throw new HttpErrorByCode[500](err.toString());
+      message = err.message;
+      result = err.message;
+      statusCode = err.statusCode;
+      return { statusCode, message, result };
     }
     return { statusCode, message, result };
   }
