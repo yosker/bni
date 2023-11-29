@@ -1701,7 +1701,6 @@ export class UsersService {
       } catch (error) {
         console.log(error);
       }
-
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,

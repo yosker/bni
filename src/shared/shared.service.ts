@@ -74,7 +74,7 @@ export class SharedService {
         },
       });
     } catch (err) {
-      throw new HttpErrorByCode[500]('INTERNAL_SERVER_ERROR');
+      throw new HttpErrorByCode[500](err.toString());
     }
     return { statusCode, message, result };
   }
