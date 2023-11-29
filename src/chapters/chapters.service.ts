@@ -103,12 +103,7 @@ export class ChaptersService {
       } else {
         throw res
           .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .json(
-            new HttpException(
-              'INTERNAL_SERVER_ERROR.',
-              HttpStatus.INTERNAL_SERVER_ERROR,
-            ),
-          );
+          .json(new HttpException(res, HttpStatus.INTERNAL_SERVER_ERROR));
       }
     }
   }
