@@ -101,7 +101,7 @@ export class ChaptersService {
           .status(HttpStatus.BAD_REQUEST)
           .json(new HttpException('RECORD_DUPLICATED.', HttpStatus.CONFLICT));
       } else {
-        throw res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(err);
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(err);
       }
     }
   }
