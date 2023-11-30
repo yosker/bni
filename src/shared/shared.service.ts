@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ServicesResponse } from 'src/responses/response';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { S3 } from 'aws-sdk';
 
 const hbs = require('nodemailer-express-handlebars');
@@ -9,6 +8,10 @@ const nodemailer = require('nodemailer');
 const generateSafeId = require('generate-safe-id');
 import { join } from 'path';
 import { bool } from 'aws-sdk/clients/redshiftdata';
+import { Log } from 'src/logs/interfaces/logs.interface';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Logs } from 'src/logs/schemas/logs.schema';
 
 @Injectable()
 export class SharedService {
@@ -25,6 +28,7 @@ export class SharedService {
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
+    @InjectModel(Logs.name) private readonly logModel: Model<Log>,
   ) {}
 
   /**
@@ -74,6 +78,11 @@ export class SharedService {
         },
       });
     } catch (err) {
+      await this.logModel.create({
+        message: err.message,
+        stackTrace: err.stack,
+        createdAt: new Date().toISOString(),
+      });
       message = err.message;
       result = err.message;
       statusCode = err.statusCode;
@@ -183,10 +192,10 @@ export class SharedService {
         attachmentProperties.push(obj);
       }
 
-      let emailOptions = {
+      const emailOptions = {
         from: emailProperties.emailConfigAut,
         to: emailProperties.to,
-        cc:emailProperties.cc, 
+        cc: emailProperties.cc,
         replyTo: emailProperties.emailConfigAut,
         subject: emailProperties.subject,
         text: emailProperties.template,
@@ -208,6 +217,11 @@ export class SharedService {
         mailTransport.close();
       });
     } catch (error) {
+      await this.logModel.create({
+        message: error.message,
+        stackTrace: error.stack,
+        createdAt: new Date().toISOString(),
+      });
       console.log('Error getConfigEmail: ', error);
       throw error;
     }

@@ -13,6 +13,8 @@ import { SharedService } from 'src/shared/shared.service';
 import { Response } from 'express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { Log } from 'src/logs/interfaces/logs.interface';
+import { Logs } from 'src/logs/schemas/logs.schema';
 
 const ObjectId = require('mongodb').ObjectId;
 @Injectable()
@@ -20,8 +22,9 @@ export class ChaptersService {
   constructor(
     @InjectModel('Chapter') private readonly chapterModel: Model<Chapter>,
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
+    @InjectModel(Logs.name) private readonly logModel: Model<Log>,
     private readonly sharedService: SharedService,
-    private servicesResponse: ServicesResponse,
+    private readonly servicesResponse: ServicesResponse,
   ) {}
 
   async getChapters() {
@@ -57,7 +60,6 @@ export class ChaptersService {
     res: Response,
   ): Promise<Response> {
     const { result } = this.servicesResponse;
-
     const chapter: Chapter = new this.chapterModel(createChapterDTO);
     try {
       const newChapter = await chapter.save();
@@ -96,11 +98,17 @@ export class ChaptersService {
         result: result,
       });
     } catch (err) {
+      await this.logModel.create({
+        message: err.message,
+        stackTrace: err.stack,
+        createdAt: new Date().toISOString(),
+      });
       if (err.code === 11000) {
         return res
           .status(HttpStatus.BAD_REQUEST)
           .json(new HttpException('RECORD_DUPLICATED.', HttpStatus.CONFLICT));
       } else {
+        this.logModel.create('Ocurrió un error', err.stack);
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(err);
       }
     }
