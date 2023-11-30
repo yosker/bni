@@ -87,6 +87,11 @@ export class AuthService {
     const { email, password } = loginAuthDto;
 
     try {
+      await this.logModel.create({
+        message: `op:::: ${ip} loginAuthDto:::: ${loginAuthDto}`,
+        stackTrace: `loginAuthDto:::: ${loginAuthDto}`,
+        createdAt: new Date().toISOString(),
+      });
       const timeZone = await this.ipService.getTimeZone(ip);
       const findUser = await this.usersModel.findOne(
         { email },
