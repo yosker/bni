@@ -21,7 +21,16 @@ export class IpService {
       const { timezone } = response.data;
       return timezone;
     } catch (error) {
-      console.log(error);
+      if (axios.isAxiosError(error)) {
+        // Axios error (puede incluir información sobre la solicitud y la respuesta)
+        console.error('Axios error:', error.toJSON());
+
+        if (error.response) {
+          throw new Error(error.response.toString());
+        }
+      } else {
+        throw new Error(error.response.toString());
+      }
       throw new Error('Error fetching local time');
     }
   }
