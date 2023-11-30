@@ -21,8 +21,8 @@ export class AuthController {
     @Res() res: Response,
     @Req() req: Request,
   ) {
-    let ip: any = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    if (ip === '::1') ip = req.headers['x-forwarded-for'] || req.ip;
+    let ip: any = req?.headers['x-forwarded-for'] || req?.socket?.remoteAddress;
+    if (ip === '::1') ip = req?.headers['x-forwarded-for'] || req?.ip;
     return this.authService.login(loginAuthDto, res, ip);
   }
 }
