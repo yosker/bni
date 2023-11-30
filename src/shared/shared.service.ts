@@ -8,10 +8,6 @@ const nodemailer = require('nodemailer');
 const generateSafeId = require('generate-safe-id');
 import { join } from 'path';
 import { bool } from 'aws-sdk/clients/redshiftdata';
-// import { Log } from 'src/logs/interfaces/logs.interface';
-// import { Model } from 'mongoose';
-// import { InjectModel } from '@nestjs/mongoose';
-// import { Logs } from 'src/logs/schemas/logs.schema';
 
 @Injectable()
 export class SharedService {
@@ -28,7 +24,6 @@ export class SharedService {
   constructor(
     private servicesResponse: ServicesResponse,
     private mailerService: MailerService,
-    // @InjectModel(Logs.name) private readonly logModel: Model<Log>,
   ) {}
 
   /**
