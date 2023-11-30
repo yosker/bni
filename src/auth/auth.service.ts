@@ -11,7 +11,8 @@ import { ServicesResponse } from '../responses/response';
 import { Response } from 'express';
 import * as moment from 'moment-timezone';
 import { IpService } from 'src/shared/utils/ip/ip.service';
-
+import { Logs } from 'src/logs/schemas/logs.schema';
+import { Log } from 'src/logs/interfaces/logs.interface';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -19,6 +20,7 @@ const ObjectId = require('mongodb').ObjectId;
 export class AuthService {
   constructor(
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
+    @InjectModel(Logs.name) private readonly logModel: Model<Log>,
     private jwtService: JwtService,
     private readonly servicesResponse: ServicesResponse,
     private readonly ipService: IpService,
@@ -134,6 +136,11 @@ export class AuthService {
         result: data,
       });
     } catch (err) {
+      await this.logModel.create({
+        message: err.message,
+        stackTrace: err.stack,
+        createdAt: new Date().toISOString(),
+      });
       throw res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(

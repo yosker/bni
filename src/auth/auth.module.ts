@@ -9,6 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { ServicesResponse } from 'src/responses/response';
 import { IpService } from 'src/shared/utils/ip/ip.service';
+import { Logs, LogsSchema } from 'src/logs/schemas/logs.schema';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { IpService } from 'src/shared/utils/ip/ip.service';
         name: Users.name,
         schema: UsersSchema,
       },
+      { name: Logs.name, schema: LogsSchema },
     ]),
     PassportModule.register({
       defaultStrategy: 'jwt',
