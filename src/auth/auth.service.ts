@@ -88,7 +88,7 @@ export class AuthService {
 
     try {
       await this.logModel.create({
-        message: `op:::: ${ip}`,
+        message: `ip:::: ${ip}`,
         stackTrace: `loginAuthDto:::: ${JSON.stringify(loginAuthDto)}`,
         createdAt: new Date().toISOString(),
       });
