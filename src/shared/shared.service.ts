@@ -73,15 +73,7 @@ export class SharedService {
         },
       });
     } catch (err) {
-      // await this.logModel.create({
-      //   message: err.message,
-      //   stackTrace: err.stack,
-      //   createdAt: new Date().toISOString(),
-      // });
-      message = err.message;
-      result = err.message;
-      statusCode = err.statusCode;
-      return { statusCode, message, result };
+      throw new Error(err);
     }
     return { statusCode, message, result };
   }
@@ -212,13 +204,7 @@ export class SharedService {
         mailTransport.close();
       });
     } catch (error) {
-      // await this.logModel.create({
-      //   message: error.message,
-      //   stackTrace: error.stack,
-      //   createdAt: new Date().toISOString(),
-      // });
-      console.log('Error getConfigEmail: ', error);
-      throw error;
+      throw new Error(error);
     }
   }
 }
