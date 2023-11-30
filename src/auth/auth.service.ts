@@ -88,8 +88,8 @@ export class AuthService {
 
     try {
       await this.logModel.create({
-        message: `op:::: ${ip} loginAuthDto:::: ${loginAuthDto}`,
-        stackTrace: `loginAuthDto:::: ${loginAuthDto}`,
+        message: `op:::: ${ip}`,
+        stackTrace: `loginAuthDto:::: ${JSON.stringify(loginAuthDto)}`,
         createdAt: new Date().toISOString(),
       });
       const timeZone = await this.ipService.getTimeZone(ip);
