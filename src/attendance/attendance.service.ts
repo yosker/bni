@@ -17,6 +17,7 @@ import { PaginateResult } from 'src/shared/pagination/pagination-result';
 import { join } from 'path';
 import { Logs } from 'src/logs/schemas/logs.schema';
 import { Log } from 'src/logs/interfaces/logs.interface';
+import { stringify } from 'querystring';
 
 const ObjectId = require('mongodb').ObjectId;
 const PDFDocument = require('pdfkit-table');
@@ -221,7 +222,7 @@ export class AttendanceService {
       const userData = await this.attendanceModel.aggregate(pipeline);
       // También puedes almacenar la IP en la base de datos si es necesario
       await this.logModel.create({
-        message: `pipeline extraído: ${pipeline}`,
+        message: `pipeline extraído: ${JSON.stringify(pipeline)}`,
         stackTrace: 'NetworkersList',
         createdAt: new Date().toISOString(),
       });
