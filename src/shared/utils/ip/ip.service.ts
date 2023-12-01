@@ -17,7 +17,15 @@ export class IpService {
 
   async getTimeZone(ip: string): Promise<string> {
     try {
-      const response = await axios.get(`http://worldtimeapi.org/api/ip/${ip}`);
+      let url = '';
+
+      if (ip && ip.includes('::ffff:')) {
+        url = 'https://api.ipify.org/?format=json';
+      } else {
+        url = `http://worldtimeapi.org/api/ip/${ip}`;
+      }
+
+      const response = await axios.get(url);
       const { timezone } = response.data;
       return timezone;
     } catch (error) {
