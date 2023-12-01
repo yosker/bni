@@ -26,21 +26,12 @@ export class IpService {
         console.error('Axios error:', error.toJSON());
 
         if (error.response) {
-          // Puedes acceder a información específica de la respuesta
-          console.error('Response status:', error.response.status);
-          console.error('Response data:', error.response.data);
-          throw new Error(
-            `Error fetching local time. Status: ${error.response.status}`,
-          );
-        } else {
-          // Si no hay respuesta, lanza una excepción general
-          throw new Error('Error fetching local time. No response.');
+          throw new Error(error.response.toString());
         }
       } else {
-        // Otro tipo de error, lanza una excepción general
-        console.error('General error:', error);
-        throw new Error('Error fetching local time. General error.');
+        throw new Error(error.response.toString());
       }
+      throw new Error('Error fetching local time');
     }
   }
 }
