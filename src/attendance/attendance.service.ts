@@ -86,15 +86,15 @@ export class AttendanceService {
 
         attendanceDTO = {
           ...attendanceDTO,
-          attendanceDate: currentDate,
           userId: ObjectId(attendanceDTO.userId),
-          chapterId: ObjectId(jwtPayload.idChapter),
           attended: true,
           updatedAt: moment().toISOString(),
         };
         await this.attendanceModel.findOneAndUpdate(
           {
             userId: ObjectId(attendanceDTO.userId),
+            attendanceDate: currentDate,
+            chapterId: ObjectId(jwtPayload.idChapter),
           },
           attendanceDTO,
         );
