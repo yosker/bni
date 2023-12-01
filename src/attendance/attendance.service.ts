@@ -282,7 +282,7 @@ export class AttendanceService {
             imageUrl: '$userData.imageURL',
             attendanceDate: '$attendanceDate',
             createdAt: {
-              $toDate: '$updatedAt', // Convertir a tipo Date
+              $toDate: '$createdAt', // Convertir a tipo Date
             },
             attendanceHour: {
               $dateToString: {
