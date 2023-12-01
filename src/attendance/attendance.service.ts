@@ -88,7 +88,7 @@ export class AttendanceService {
           ...attendanceDTO,
           userId: ObjectId(attendanceDTO.userId),
           attended: true,
-          updatedAt: jwtPayload.timeZone,
+          updatedAt: moment().toISOString(),
         };
         await this.attendanceModel.findOneAndUpdate(
           {
