@@ -17,6 +17,10 @@ export const AttendanceSchema = new Schema({
     default: moment().toISOString(),
     required: false,
   },
-  updatedAt: { type: String, required: false },
+  updatedAt: {
+    type: String,
+    default: moment().toISOString(),
+    required: false,
+  },
   status: { type: String, default: EstatusRegister.Active, required: false },
 });
