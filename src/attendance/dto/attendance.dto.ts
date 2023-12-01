@@ -37,7 +37,6 @@ export class AttendanceDTO extends PartialType(RegisterAuthDto) {
 
   createdAt?: string;
 
-  @Prop({ default: moment().toISOString(), required: false })
   updatedAt?: string;
 
   @Prop({ default: EstatusRegister.Active, required: false })
