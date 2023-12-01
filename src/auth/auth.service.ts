@@ -142,7 +142,7 @@ export class AuthService {
       });
     } catch (err) {
       await this.logModel.create({
-        message: err.message,
+        message: JSON.stringify(err.message),
         stackTrace: err.stack,
         createdAt: new Date().toISOString(),
       });
