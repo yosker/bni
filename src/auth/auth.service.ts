@@ -13,6 +13,7 @@ import * as moment from 'moment-timezone';
 import { IpService } from 'src/shared/utils/ip/ip.service';
 import { Logs } from 'src/logs/schemas/logs.schema';
 import { Log } from 'src/logs/interfaces/logs.interface';
+import axios from 'axios';
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -87,6 +88,12 @@ export class AuthService {
     const { email, password } = loginAuthDto;
 
     try {
+      if (ip && ip.includes('::ffff:')) {
+        const responsev2: any = await axios.get(
+          `https://api.ipify.org/?format=json`,
+        );
+        ip = responsev2?.ip;
+      }
       await this.logModel.create({
         message: `ip:::: ${ip}`,
         stackTrace: `loginAuthDto:::: ${JSON.stringify(loginAuthDto)}`,
