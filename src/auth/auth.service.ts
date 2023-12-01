@@ -90,14 +90,11 @@ export class AuthService {
     try {
       if (ip && ip.includes('::ffff:')) {
         const response = await axios.get('https://api.ipify.org/?format=json');
-        const ipAddress = response.data.ip;
-
-        // Ahora puedes hacer lo que quieras con la dirección IP
-        console.log('Dirección IP:', ipAddress);
+        ip = response.data.ip;
 
         // También puedes almacenar la IP en la base de datos si es necesario
         await this.logModel.create({
-          message: `Dirección IP extraída: ${ipAddress}`,
+          message: `Dirección IP extraída: ${ip}`,
           stackTrace: 'responsev2',
           createdAt: new Date().toISOString(),
         });
