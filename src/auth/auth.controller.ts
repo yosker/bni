@@ -21,7 +21,7 @@ export class AuthController {
     @Res() res: Response,
     @Req() req: Request,
   ) {
-    let ip: any = req?.headers['x-forwarded-for'] || req?.socket?.remoteAddress;
+    let ip: any = req?.headers['x-forwarded-for'] || req?.ip;
 
     // Para casos específicos donde el proxy agrega varias direcciones IP en 'x-forwarded-for'
     if (ip && ip.includes(',')) {
