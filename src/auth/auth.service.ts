@@ -91,19 +91,8 @@ export class AuthService {
       if (ip && ip.includes('::ffff:')) {
         const response = await axios.get('https://api.ipify.org/?format=json');
         ip = response.data.ip;
-
-        // También puedes almacenar la IP en la base de datos si es necesario
-        await this.logModel.create({
-          message: `Dirección IP extraída: ${ip}`,
-          stackTrace: 'responsev2',
-          createdAt: new Date().toISOString(),
-        });
       }
-      await this.logModel.create({
-        message: `ip_:::: ${ip}`,
-        stackTrace: `loginAuthDto:::: ${JSON.stringify(loginAuthDto)}`,
-        createdAt: new Date().toISOString(),
-      });
+
       const timeZone = await this.ipService.getTimeZone(ip);
       const findUser = await this.usersModel.findOne(
         { email },

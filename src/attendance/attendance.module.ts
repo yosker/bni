@@ -12,6 +12,7 @@ import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessio
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
 import { ChapterSchema } from 'src/chapters/schemas/chapters.schema';
 import { SharedService } from 'src/shared/shared.service';
+import { Logs, LogsSchema } from 'src/logs/schemas/logs.schema';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SharedService } from 'src/shared/shared.service';
       },
       { name: 'ChapterSession', schema: ChapterSessionSchema },
       { name: 'Chapter', schema: ChapterSchema },
+      { name: Logs.name, schema: LogsSchema },
     ]),
     AuthModule,
   ],

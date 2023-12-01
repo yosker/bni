@@ -15,6 +15,8 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 import { PaginateResult } from 'src/shared/pagination/pagination-result';
 import { join } from 'path';
+import { Logs } from 'src/logs/schemas/logs.schema';
+import { Log } from 'src/logs/interfaces/logs.interface';
 
 const ObjectId = require('mongodb').ObjectId;
 const PDFDocument = require('pdfkit-table');
@@ -26,6 +28,7 @@ export class AttendanceService {
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<any>,
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
+    @InjectModel(Logs.name) private readonly logModel: Model<Log>,
     @InjectModel('ChapterSession')
     private readonly chapterSessionModel: Model<ChapterSession>,
     private readonly servicesResponse: ServicesResponse,
@@ -216,7 +219,12 @@ export class AttendanceService {
       );
 
       const userData = await this.attendanceModel.aggregate(pipeline);
-
+      // También puedes almacenar la IP en la base de datos si es necesario
+      await this.logModel.create({
+        message: `pipeline extraído: ${pipeline}`,
+        stackTrace: 'NetworkersList',
+        createdAt: new Date().toISOString(),
+      });
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -408,7 +416,6 @@ export class AttendanceService {
   }
 
   //ENDPOINT PARA ARMAR LA CARTA Y ENVIAR POR CORREO. TAMBIÉN SE EDITA EL ESTATUS A CARTA ENVIADA
-
   async sendLetter(
     id: string,
     attendanceNumber: number,
