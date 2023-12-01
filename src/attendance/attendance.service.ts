@@ -288,7 +288,7 @@ export class AttendanceService {
               $dateToString: {
                 format: '%H:%M:%S',
                 date: {
-                  $toDate: '$createdAt', // Convertir a tipo Date nuevamente
+                  $toDate: '$updatedAt', // Convertir a tipo Date nuevamente
                 },
                 timezone: timeZone,
               },
