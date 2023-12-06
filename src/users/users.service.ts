@@ -91,7 +91,13 @@ export class UsersService {
             },
             email: 1,
             name: 1,
-            createdAt: 1,
+            createdAt: {
+              $dateToString: {
+                date: '$createdAtDate',
+                format: '%Y-%m-%dT%H:%M:%S',
+                timezone: jwtPayload.timeZone,
+              },
+            },
             updatedAt: 1,
             idChapter: 1,
             role: 1,
@@ -109,10 +115,9 @@ export class UsersService {
           },
         },
         {
-          $sort: { createdAt: -1 },
+          $sort: { localCreatedAt: -1 },
         },
       ];
-   
       const user: any = await this.usersModel.aggregate(query);
 
       return res.status(HttpStatus.OK).json({
@@ -161,7 +166,7 @@ export class UsersService {
     req,
     res: Response,
     jwtPayload: JWTPayload,
-  ): Promise<Response> {
+   ): Promise<Response> {
     const findRole = this.rolesModel.findOne({
       name: req.role,
     });
