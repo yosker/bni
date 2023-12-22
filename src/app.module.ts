@@ -29,7 +29,7 @@ import { QuestionsReferencesModule } from './questions-references/questions-refe
 import { PasswordRecoverModule } from './password-recover/password-recover.module';
 import { ZoomModule } from './zoom/zoom.module';
 import { MonitoringlettersModule } from './monitoringletters/monitoringletters.module';
-
+import { PresentationcalendarModule } from './presentationcalendar/presentationcalendar.module';
 
 @Module({
   imports: [
@@ -74,6 +74,7 @@ import { MonitoringlettersModule } from './monitoringletters/monitoringletters.m
     PasswordRecoverModule,
     ZoomModule,
     MonitoringlettersModule,
+    PresentationcalendarModule,
   ],
   controllers: [],
   providers: [SharedService, ServicesResponse],

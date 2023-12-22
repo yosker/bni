@@ -215,4 +215,17 @@ export class UsersController {
   ) {
     return this.usersService.convertVisitorIntoNetworker(id,jwtPayload, res);
   }
+ 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), JwtGuard)
+  @Post('changeLeadershipTeam')
+  updateLeadershipTeamMember(
+    @Body() obj: any,
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response
+  ) {
+    return this.usersService.changeLeadershipMember(obj,jwtPayload, res);
+  }
+
+
 }

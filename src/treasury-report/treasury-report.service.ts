@@ -71,10 +71,6 @@ export class TreasuryReportService {
       const filter = {
         chapterId: ObjectId(chapterId),
         status: EstatusRegister.Active,
-        createdAt: {
-          $gte: moment(gte).toISOString(),
-          $lt: moment(lte).toISOString(),
-        },
       };
       return [
         {
@@ -82,14 +78,10 @@ export class TreasuryReportService {
         },
         {
           $group: {
-            _id: {
-              $month: { date: { $toDate: "$createdAt" } },
-            }, 
+            _id:  "$monthYear",
             totalAmount: { $sum: '$payment' },
+            // _id: {  $month: { date: { $toDate: "$createdAt" } }, }, 
           },
-        },
-        {
-          $sort: { createdAt: 1 },
         },
       ];
     } catch (err) {
@@ -120,10 +112,6 @@ export class TreasuryReportService {
       const filter = {
         chapterId: ObjectId(chapterId),
         status: EstatusRegister.Active,
-        createdAt: {
-          $gte: moment(gte).toISOString(),
-          $lt: moment(lte).toISOString(),
-        },
       };
       return [
         {
@@ -132,13 +120,11 @@ export class TreasuryReportService {
         {
           $group: {
             _id: {
-              $month: { date: { $toDate: "$createdAt" } },
-            }, 
+              year: { $year: { date: { $toDate: '$createdAt' } } },
+              month: { $month: { date: { $toDate: '$createdAt' } } },
+            },
             totalAmount: { $sum: '$amount' },
           },
-        },
-        {
-          $sort: { createdAt: 1 },
         },
       ];
     } catch (err) {

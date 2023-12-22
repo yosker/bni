@@ -88,8 +88,15 @@ export class MenuService {
             },
             {
               idSubModulo: 1,
-              nombre: 'Usuarios Sesión Online',
+              nombre: 'Usuarios sesión online',
               urlPagina: 'onlineUsersform.html',
+              ordenModulo: 2,
+              estilo: '',
+            },
+            {
+              idSubModulo: 3,
+              nombre: 'Equipo de liderazgo',
+              urlPagina: 'leadershipTeamList.html',
               ordenModulo: 2,
               estilo: '',
             },
@@ -102,15 +109,15 @@ export class MenuService {
           ordenModulo: 1,
           subModulos: [
             {
-              idSubModulo: 1,
-              nombre: 'Agregar Networker',
+              idSubModulo: 4,
+              nombre: 'Agregar networker',
               urlPagina: 'usersform.html',
               ordenModulo: 1,
               estilo: '',
             },
             {
-              idSubModulo: 2,
-              nombre: 'Consultar Networkers',
+              idSubModulo: 5,
+              nombre: 'Consultar networkers',
               urlPagina: 'userslist.html',
               ordenModulo: 2,
               estilo: '',
@@ -123,8 +130,8 @@ export class MenuService {
           ordenModulo: 2,
           subModulos: [
             {
-              idSubModulo: 3,
-              nombre: 'Consultar Visitantes',
+              idSubModulo: 6,
+              nombre: 'Consultar visitantes',
               urlPagina: 'visitorslist.html',
               ordenModulo: 1,
               estilo: '',
@@ -137,7 +144,7 @@ export class MenuService {
           ordenModulo: 3,
           subModulos: [
             {
-              idSubModulo: 4,
+              idSubModulo: 7,
               nombre: 'Cuentas de correo',
               urlPagina: 'emailaccounts.html',
               ordenModulo: 1,
@@ -151,7 +158,7 @@ export class MenuService {
           ordenModulo: 4,
           subModulos: [
             {
-              idSubModulo: 5,
+              idSubModulo: 8,
               nombre: 'Periodo de pruebas',
               urlPagina: 'evaluationperiod.html',
               ordenModulo: 1,
@@ -165,7 +172,7 @@ export class MenuService {
           ordenModulo: 5,
           subModulos: [
             {
-              idSubModulo: 6,
+              idSubModulo: 9,
               nombre: 'Asignar actividad',
               urlPagina: 'activities.html',
               ordenModulo: 1,
@@ -180,7 +187,7 @@ export class MenuService {
           ordenModulo: 6,
           subModulos: [
             {
-              idSubModulo: 7,
+              idSubModulo: 10,
               nombre: 'Carta por faltas',
               urlPagina: 'absencesform.html',
               ordenModulo: 1,
@@ -194,33 +201,44 @@ export class MenuService {
           ordenModulo: 7,
           subModulos: [
             {
-              idSubModulo: 8,
+              idSubModulo: 11,
               nombre: 'Aportaciones',
               urlPagina: 'contributionList.html',
               ordenModulo: 1,
               estilo: '',
             },
             {
-              idSubModulo: 9,
+              idSubModulo: 12,
               nombre: 'Gastos',
               urlPagina: 'chargesList.html',
               ordenModulo: 2,
               estilo: '',
             },
             {
-              idSubModulo: 10,
+              idSubModulo: 13,
               nombre: 'Ingresos - Gastos',
               urlPagina: 'report.html',
               ordenModulo: 3,
               estilo: '',
             },
             {
-              idSubModulo: 11,
-              nombre: 'Seguimiento Cartas',
+              idSubModulo: 14,
+              nombre: 'Seguimiento cartas',
               urlPagina: 'applicationlist.html',
               ordenModulo: 4,
               estilo: '',
             },
+            {
+              idSubModulo: 15,
+              nombre: 'Calendario de presentaciones',
+              urlPagina: 'presentationCalendar.html',
+              ordenModulo: 5,
+              estilo: '',
+            },
+
+            
+
+
           ],
         },
       ],

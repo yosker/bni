@@ -161,7 +161,7 @@ export class DashboardService {
       const pipeline: any = await this.totalAbsencesResult(
         jwtPayload.idChapter,
       );
-      const totalAbsences = await this.attendanceModel.aggregate(pipeline);
+      const totalAbsences = await this.attendanceModel.aggregate(pipeline).sort({_id:-1});
       return totalAbsences;
     } catch (err) {
       throw new HttpErrorByCode[500](
@@ -310,10 +310,10 @@ export class DashboardService {
       const filter = {
         chapterId: ObjectId(chapterId),
         status: EstatusRegister.Active,
-        createdAt: {
-          $gte: moment(gte).toISOString(),
-          $lt: moment(lte).toISOString(),
-        },
+        // createdAt: {
+        //   $gte: moment(gte).toISOString(),
+        //   $lt: moment(lte).toISOString(),
+        // },
       };
       return [
         {
@@ -343,10 +343,10 @@ export class DashboardService {
       const filter = {
         chapterId: ObjectId(chapterId),
         status: EstatusRegister.Active,
-        createdAt: {
-          $gte: moment(gte).toISOString(),
-          $lt: moment(lte).toISOString(),
-        },
+        // createdAt: {
+        //   $gte: moment(gte).toISOString(),
+        //   $lt: moment(lte).toISOString(),
+        // },
       };
       return [
         {
