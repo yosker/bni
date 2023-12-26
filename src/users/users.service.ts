@@ -429,12 +429,15 @@ export class UsersService {
         status: EstatusRegister.Active,
       });
 
+      const chapter = await this.chapterModel.findById({_id: ObjectId(chapterId)});
+
       const dataUser = {
         name: findUser.name + ' ' + findUser.lastName,
         companyName: findUser.companyName,
         profession: findUser.profession,
         image: findUser.imageURL,
         email: findUser.email,
+        chapterName :chapter.name
         // qr: qrCreated,
       };
       return res.status(HttpStatus.OK).json({

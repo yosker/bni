@@ -97,4 +97,16 @@ export class AttendanceController {
       res,
     );
   }
+
+  
+  @Get('/getUsersAttendancesList')
+  async UsersAttendancesList(
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response,
+  ) {
+    return await this.attendanceService.getUsersAttendances(
+      jwtPayload,
+      res,
+    );
+  }
 }

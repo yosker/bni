@@ -617,4 +617,67 @@ export class AttendanceService {
       );
     }
   }
+
+   //ENDPOINT QUE RETORNA LA LISTA DE ASISTENCIA POR USUARIO Y LISTA DE SESIONES POR CAPITULO 
+  async getUsersAttendances(jwtPayload: JWTPayload, res: Response){
+    try {
+
+      let { statusCode, message } = this.servicesResponse;
+      const pipeline: any = await this.getUsersAttendancesQuery(ObjectId(jwtPayload.idChapter));
+      const usersAteendance = await  this.usersModel.aggregate(pipeline).sort({ "name": 1 });
+      const chapterSession = await this.chapterSessionModel.find({ chapterId: ObjectId(jwtPayload.idChapter), status: EstatusRegister.Active}).sort({sessionDate:-1})
+      const chapterName = await this.chapterModel.findById({_id: ObjectId(jwtPayload.idChapter)})
+      const objResult = {
+        chapterName: chapterName.name,
+        usersAttendanceList: usersAteendance,
+        chapterSessionList: chapterSession
+      };
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: statusCode,
+        message: message,
+        result: objResult,
+      });
+    }
+    catch(error){
+      throw res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json(
+        new HttpException(
+          'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
+      );
+    }
+  }
+
+  //QUERY QUE RETORNA LA LISTA DE ASISTENCIA POR USUARIO 
+  async getUsersAttendancesQuery(chapterId: string){
+    
+    try {
+      return [
+        {
+        $match: {
+          idChapter: ObjectId(chapterId),
+          status:  EstatusRegister.Active,
+          role: { $ne: "Visitante" },
+        }
+        },
+        {
+          $lookup:{
+              from: 'attendances',
+              localField: '_id',
+              foreignField: 'userId',
+              pipeline: [{ $sort: {"attendanceDateTime": -1} }],
+              as: 'users',
+          }
+        },
+        {
+            $project: { _id: "$_id",name: "$name",lastName: "$lastName", attendances: "$users"}
+        },
+      ] 
+    }catch(error){
+      console.log(error)
+    }
+  }
 }

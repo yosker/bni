@@ -122,6 +122,13 @@ export class MenuService {
               ordenModulo: 2,
               estilo: '',
             },
+            {
+              idSubModulo: 6,
+              nombre: 'Asistencia networkers',
+              urlPagina: 'attendanceList.html',
+              ordenModulo: 3,
+              estilo: '',
+            },
           ],
         },
         {
@@ -130,7 +137,7 @@ export class MenuService {
           ordenModulo: 2,
           subModulos: [
             {
-              idSubModulo: 6,
+              idSubModulo: 7,
               nombre: 'Consultar visitantes',
               urlPagina: 'visitorslist.html',
               ordenModulo: 1,
@@ -144,7 +151,7 @@ export class MenuService {
           ordenModulo: 3,
           subModulos: [
             {
-              idSubModulo: 7,
+              idSubModulo: 8,
               nombre: 'Cuentas de correo',
               urlPagina: 'emailaccounts.html',
               ordenModulo: 1,
@@ -158,7 +165,7 @@ export class MenuService {
           ordenModulo: 4,
           subModulos: [
             {
-              idSubModulo: 8,
+              idSubModulo: 9,
               nombre: 'Periodo de pruebas',
               urlPagina: 'evaluationperiod.html',
               ordenModulo: 1,
@@ -172,7 +179,7 @@ export class MenuService {
           ordenModulo: 5,
           subModulos: [
             {
-              idSubModulo: 9,
+              idSubModulo: 10,
               nombre: 'Asignar actividad',
               urlPagina: 'activities.html',
               ordenModulo: 1,
@@ -187,7 +194,7 @@ export class MenuService {
           ordenModulo: 6,
           subModulos: [
             {
-              idSubModulo: 10,
+              idSubModulo: 11,
               nombre: 'Carta por faltas',
               urlPagina: 'absencesform.html',
               ordenModulo: 1,
@@ -201,44 +208,40 @@ export class MenuService {
           ordenModulo: 7,
           subModulos: [
             {
-              idSubModulo: 11,
+              idSubModulo: 12,
               nombre: 'Aportaciones',
               urlPagina: 'contributionList.html',
               ordenModulo: 1,
               estilo: '',
             },
             {
-              idSubModulo: 12,
+              idSubModulo: 13,
               nombre: 'Gastos',
               urlPagina: 'chargesList.html',
               ordenModulo: 2,
               estilo: '',
             },
             {
-              idSubModulo: 13,
+              idSubModulo: 14,
               nombre: 'Ingresos - Gastos',
               urlPagina: 'report.html',
               ordenModulo: 3,
               estilo: '',
             },
             {
-              idSubModulo: 14,
+              idSubModulo: 15,
               nombre: 'Seguimiento cartas',
               urlPagina: 'applicationlist.html',
               ordenModulo: 4,
               estilo: '',
             },
             {
-              idSubModulo: 15,
+              idSubModulo: 16,
               nombre: 'Calendario de presentaciones',
               urlPagina: 'presentationCalendar.html',
               ordenModulo: 5,
               estilo: '',
             },
-
-            
-
-
           ],
         },
       ],
