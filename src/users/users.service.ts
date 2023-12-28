@@ -103,7 +103,7 @@ export class UsersService {
             role: 1,
             lastName: 1,
             phoneNumber: 1,
-            imageURL: 1,
+            imageURL: '',
             companyName: 1,
             profession: 1,
             completedApplication: 1,
@@ -286,13 +286,50 @@ export class UsersService {
     if (!findRole)
       throw new HttpErrorByCode[404]('NOT_FOUND_ROLE', this.servicesResponse);
 
+    const findChapterSession = await this.chapterSessionModel.findOne({
+      chapterId: ObjectId(createUserDto.idChapter),
+      sessionDate: moment().format('YYYY-MM-DD'),
+    });
+
+    if (!findChapterSession)
+      throw new HttpErrorByCode[404](
+        'NOT_FOUND_CHAPTERSESSION',
+        this.servicesResponse,
+      );
+
     try {
       createUserDto = {
         ...createUserDto,
         idChapter: ObjectId(createUserDto.idChapter),
         resetPassword: false,
       };
-      await this.usersModel.create(createUserDto);
+
+      //S le pasa asistencia al usuario nuevo
+      const dateAttendance = moment().format('YYYY-MM-DD');
+      const leaveTime = moment(dateAttendance).toISOString();
+      let newUser = await this.usersModel.findOne({
+        email: createUserDto.email,
+      });
+
+      if (!newUser) newUser = await this.usersModel.create(createUserDto);
+
+      const attendance = await this.attendanceModel.findOne({
+        chapterId: ObjectId(createUserDto.idChapter),
+        userId: ObjectId(newUser._id),
+        attendanceDate: dateAttendance,
+      });
+
+      if (!attendance?._id) {
+        await this.attendanceModel.create({
+          userId: ObjectId(newUser._id),
+          chapterId: ObjectId(createUserDto.idChapter),
+          attendanceDate: dateAttendance,
+          attendanceType: AttendanceType.OnSite,
+          chapterSessionId: ObjectId(findChapterSession._id),
+          attended: true,
+          updatedAt: leaveTime,
+        });
+      }
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -429,15 +466,12 @@ export class UsersService {
         status: EstatusRegister.Active,
       });
 
-      const chapter = await this.chapterModel.findById({_id: ObjectId(chapterId)});
-
       const dataUser = {
         name: findUser.name + ' ' + findUser.lastName,
         companyName: findUser.companyName,
         profession: findUser.profession,
         image: findUser.imageURL,
         email: findUser.email,
-        chapterName :chapter.name
         // qr: qrCreated,
       };
       return res.status(HttpStatus.OK).json({
@@ -1729,40 +1763,43 @@ export class UsersService {
     }
   }
 
-
-  //ENDPOIT PARA CAMBIAR AL EQUIPO DE LIDERAZGO 
-  async changeLeadershipMember(obj: any,  jwtPayload: JWTPayload, res: Response): Promise<Response>{
-
-    try{
-
+  //ENDPOIT PARA CAMBIAR AL EQUIPO DE LIDERAZGO
+  async changeLeadershipMember(
+    obj: any,
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
+    try {
       const user = await this.usersModel.findById({ _id: ObjectId(obj.id) });
       const lastRole = user.role;
       //ACUTALIZAMOS EL ROL A NETWORKER DE QUIEN DEJARA EL CARGO. Y LE QUITAMOS ACCESO A LA PLATAFORMA
       await this.usersModel.updateOne(
-        { _id: ObjectId(obj.id)},
-        { role: "Networker", resetPassword: false, password: ""},
+        { _id: ObjectId(obj.id) },
+        { role: 'Networker', resetPassword: false, password: '' },
       );
-      //GENERAMOS NUEVA CONTRASEÑA PARA EL NUEVO INTEGRANTE DEL EQUIPO 
+      //GENERAMOS NUEVA CONTRASEÑA PARA EL NUEVO INTEGRANTE DEL EQUIPO
       const pass = await this.sharedService.passwordGenerator(6);
       const plainToHash = await hash(pass, 10);
-      
+
       //LE ASIGNAMOS EL ROL Y CONTRASEÑA AL NUEVO INTEGRANTE
       await this.usersModel.updateOne(
-        { _id: ObjectId(obj.newId)},
-        { role: lastRole, password: plainToHash},
+        { _id: ObjectId(obj.newId) },
+        { role: lastRole, password: plainToHash },
       );
 
-      //LE ENVIAMOS CORREO CON SUS CREDENCIALES PARA EL ACCESO A LA PLATAFORMA 
+      //LE ENVIAMOS CORREO CON SUS CREDENCIALES PARA EL ACCESO A LA PLATAFORMA
       const url =
-      process.env.URL_NET_PLATFORM +
-      '?id=' +
-      obj.newId.toString() +
-      '&chapterId=' +
-      jwtPayload.idChapter.toString();
+        process.env.URL_NET_PLATFORM +
+        '?id=' +
+        obj.newId.toString() +
+        '&chapterId=' +
+        jwtPayload.idChapter.toString();
 
-      let templateName = process.env.LEADERSHIP_WELCOME_TEMPLATE;
+      const templateName = process.env.LEADERSHIP_WELCOME_TEMPLATE;
       const chapter = await this.chapterModel.findById(jwtPayload.idChapter);
-      const newUser = await this.usersModel.findById({ _id: ObjectId(obj.newId) });
+      const newUser = await this.usersModel.findById({
+        _id: ObjectId(obj.newId),
+      });
 
       // OBJETO PARA EL CORREO
       const emailLeaderProperties = {
@@ -1789,18 +1826,15 @@ export class UsersService {
         message: this.servicesResponse.message,
         result: {},
       });
-
-
-    }catch(err){
+    } catch (err) {
       throw res
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json(
-        new HttpException(
-          'INTERNAL_SERVER_ERROR.',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        ),
-      );
-
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
     }
   }
 }

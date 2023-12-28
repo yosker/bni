@@ -191,7 +191,7 @@ export class UsersController {
   ) {
     return await this.usersService.sendLetter(InterviwedId, type, res);
   }
-  
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('/acceptedUsersList/:chapterId')
@@ -211,21 +211,19 @@ export class UsersController {
   updateVisitorIntoNetworker(
     @Param('id') id: string,
     @Auth() jwtPayload: JWTPayload,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.usersService.convertVisitorIntoNetworker(id,jwtPayload, res);
+    return this.usersService.convertVisitorIntoNetworker(id, jwtPayload, res);
   }
- 
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), JwtGuard)
   @Post('changeLeadershipTeam')
   updateLeadershipTeamMember(
     @Body() obj: any,
     @Auth() jwtPayload: JWTPayload,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.usersService.changeLeadershipMember(obj,jwtPayload, res);
+    return this.usersService.changeLeadershipMember(obj, jwtPayload, res);
   }
-
-
 }

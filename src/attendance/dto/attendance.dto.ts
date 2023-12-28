@@ -5,7 +5,6 @@ import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { EstatusRegister } from 'src/shared/enums/register.enum';
 
-const moment = require('moment-timezone');
 export class AttendanceDTO extends PartialType(RegisterAuthDto) {
   chapterId: object;
 

@@ -10,6 +10,9 @@ import { Attendance } from 'src/attendance/interfaces/attendance.interfaces';
 import { User } from 'src/users/interfaces/users.interface';
 import { Users } from 'src/users/schemas/users.schema';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { AttendanceType } from 'src/shared/enums/attendance.enum';
+import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
@@ -23,6 +26,8 @@ export class ZoomService {
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     @InjectModel('Attendance')
     private readonly attendanceModel: Model<Attendance>,
+    @InjectModel('ChapterSession')
+    private readonly chapterSessionModel: Model<ChapterSession>,
   ) {}
 
   /**
@@ -71,7 +76,7 @@ export class ZoomService {
       if (!chapter) {
         return res.status(HttpStatus.OK).json({
           statusCode: 404,
-          message:'CHAPTER_TOKEN_NOT_FOUND.',
+          message: 'CHAPTER_TOKEN_NOT_FOUND.',
           result: {},
         });
       }
@@ -86,7 +91,7 @@ export class ZoomService {
       if (!meeting || !meeting.length) {
         return res.status(HttpStatus.OK).json({
           statusCode: 404,
-          message:'No se encuentra la sesión enviada.',
+          message: 'No se encuentra la sesión enviada.',
           result: {},
         });
       }
@@ -118,23 +123,72 @@ export class ZoomService {
             invitedBy: registrant.invitedBy,
             updatedAt: leaveTime,
           };
-          await this.usersModel.create(userVisitor);
-        } else {
-          if (user.role.toLowerCase() !== 'visitante') {
-            //De lo contrario se le pasa asistencia
-            const dateAttendance = moment().format('YYYY-MM-DD');
+          const newUser = await this.usersModel.create(userVisitor);
 
+          //S le pasa asistencia al usuario nuevo
+          const dateAttendance = moment().format('YYYY-MM-DD');
+          const findChapterSession = await this.chapterSessionModel.findOne({
+            chapterId: ObjectId(filters.chapterId),
+            sessionDate: dateAttendance,
+          });
+
+          if (!findChapterSession?._id)
+            throw new HttpErrorByCode[404](
+              'NOT_FOUND_CHAPTERSESSION',
+              this.servicesResponse,
+            );
+
+          await this.attendanceModel.create(
+            {
+              userId: ObjectId(newUser._id),
+              chapterId: ObjectId(filters.chapterId),
+              attendanceDate: dateAttendance,
+              attendanceType: AttendanceType.OnZoom,
+              chapterSessionId: ObjectId(findChapterSession._id),
+            },
+            {
+              attended: true,
+              updatedAt: leaveTime,
+            },
+          );
+        } else {
+          //De lo contrario se le pasa asistencia
+          const dateAttendance = moment().format('YYYY-MM-DD');
+
+          if (user.role.toLowerCase() !== 'visitante') {
             await this.attendanceModel.findOneAndUpdate(
               {
                 userId: ObjectId(user._id),
                 chapterId: ObjectId(filters.chapterId),
                 attendanceDate: dateAttendance,
+                attendanceType: AttendanceType.OnZoom,
               },
               {
                 attended: true,
                 updatedAt: leaveTime,
               },
             );
+          } else if (user.role.toLowerCase() === 'visitante') {
+            const findChapterSession = await this.chapterSessionModel.findOne({
+              chapterId: ObjectId(filters.chapterId),
+              sessionDate: dateAttendance,
+            });
+
+            if (!findChapterSession)
+              throw new HttpErrorByCode[404](
+                'NOT_FOUND_CHAPTERSESSION',
+                this.servicesResponse,
+              );
+
+            await this.attendanceModel.create({
+              userId: ObjectId(user._id),
+              chapterId: ObjectId(filters.chapterId),
+              attendanceDate: dateAttendance,
+              attendanceType: AttendanceType.OnSite,
+              chapterSessionId: ObjectId(findChapterSession._id),
+              attended: true,
+              updatedAt: leaveTime,
+            });
           }
         }
       }
