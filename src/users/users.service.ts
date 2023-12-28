@@ -103,7 +103,7 @@ export class UsersService {
             role: 1,
             lastName: 1,
             phoneNumber: 1,
-            imageURL: '',
+            imageURL: 1,
             companyName: 1,
             profession: 1,
             completedApplication: 1,
@@ -429,12 +429,15 @@ export class UsersService {
         status: EstatusRegister.Active,
       });
 
+      const chapter = await this.chapterModel.findById({_id: ObjectId(chapterId)});
+
       const dataUser = {
         name: findUser.name + ' ' + findUser.lastName,
         companyName: findUser.companyName,
         profession: findUser.profession,
         image: findUser.imageURL,
         email: findUser.email,
+        chapterName :chapter.name
         // qr: qrCreated,
       };
       return res.status(HttpStatus.OK).json({
@@ -1723,6 +1726,81 @@ export class UsersService {
             HttpStatus.INTERNAL_SERVER_ERROR,
           ),
         );
+    }
+  }
+
+
+  //ENDPOIT PARA CAMBIAR AL EQUIPO DE LIDERAZGO 
+  async changeLeadershipMember(obj: any,  jwtPayload: JWTPayload, res: Response): Promise<Response>{
+
+    try{
+
+      const user = await this.usersModel.findById({ _id: ObjectId(obj.id) });
+      const lastRole = user.role;
+      //ACUTALIZAMOS EL ROL A NETWORKER DE QUIEN DEJARA EL CARGO. Y LE QUITAMOS ACCESO A LA PLATAFORMA
+      await this.usersModel.updateOne(
+        { _id: ObjectId(obj.id)},
+        { role: "Networker", resetPassword: false, password: ""},
+      );
+      //GENERAMOS NUEVA CONTRASEÑA PARA EL NUEVO INTEGRANTE DEL EQUIPO 
+      const pass = await this.sharedService.passwordGenerator(6);
+      const plainToHash = await hash(pass, 10);
+      
+      //LE ASIGNAMOS EL ROL Y CONTRASEÑA AL NUEVO INTEGRANTE
+      await this.usersModel.updateOne(
+        { _id: ObjectId(obj.newId)},
+        { role: lastRole, password: plainToHash},
+      );
+
+      //LE ENVIAMOS CORREO CON SUS CREDENCIALES PARA EL ACCESO A LA PLATAFORMA 
+      const url =
+      process.env.URL_NET_PLATFORM +
+      '?id=' +
+      obj.newId.toString() +
+      '&chapterId=' +
+      jwtPayload.idChapter.toString();
+
+      let templateName = process.env.LEADERSHIP_WELCOME_TEMPLATE;
+      const chapter = await this.chapterModel.findById(jwtPayload.idChapter);
+      const newUser = await this.usersModel.findById({ _id: ObjectId(obj.newId) });
+
+      // OBJETO PARA EL CORREO
+      const emailLeaderProperties = {
+        emailConfigAut: chapter.email,
+        passwordAut: chapter.password,
+        template: templateName,
+        subject: process.env.SUBJECT_CHAPTER_WELCOME,
+        name: newUser.name + ' ' + newUser.lastName,
+        user: newUser.email,
+        pass: pass,
+        urlPlatform: process.env.URL_PLATFORM, //URL DE LA PLATAFORMA
+        urlQR: url, //URL DE NETS (CONTIENE QR)
+        amount: '',
+        to: newUser.email,
+      };
+      try {
+        this.sharedService.sendMailer(emailLeaderProperties, false);
+      } catch (error) {
+        console.log(error);
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: {},
+      });
+
+
+    }catch(err){
+      throw res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json(
+        new HttpException(
+          'INTERNAL_SERVER_ERROR.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
+      );
+
     }
   }
 }
