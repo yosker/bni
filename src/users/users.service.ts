@@ -67,12 +67,12 @@ export class UsersService {
         },
         {
           $lookup: {
-              from: 'comments',
-              localField: '_id', //arriba -> users
-              foreignField: 'visitorId',
-              as: 'comments',
+            from: 'comments',
+            localField: '_id', //arriba -> users
+            foreignField: 'visitorId',
+            as: 'comments',
           },
-      },
+        },
         {
           $addFields: {
             createdAtDate: {
@@ -109,9 +109,9 @@ export class UsersService {
             completedApplication: 1,
             completedInterview: 1,
             invitedBy: 1,
-            accepted:1,
-            letterSent:1,
-            comments:1
+            accepted: 1,
+            letterSent: 1,
+            comments: 1,
           },
         },
         {
@@ -166,7 +166,7 @@ export class UsersService {
     req,
     res: Response,
     jwtPayload: JWTPayload,
-   ): Promise<Response> {
+  ): Promise<Response> {
     const findRole = this.rolesModel.findOne({
       name: req.role,
     });
@@ -193,20 +193,20 @@ export class UsersService {
       const s3Response =
         filename != 'avatar.jpg'
           ? await (
-            await this.sharedService.uploadFile(
-              dataBuffer,
-              filename,
-              '.jpg',
-              's3-bucket-users',
-            )
-          ).result
+              await this.sharedService.uploadFile(
+                dataBuffer,
+                filename,
+                '.jpg',
+                's3-bucket-users',
+              )
+            ).result
           : '';
       createUserDto = {
         ...createUserDto,
         password: plainToHash,
         idChapter: ObjectId(createUserDto.idChapter),
         invitedBy: '-',
-        imageURL: s3Response
+        imageURL: s3Response,
       };
 
       const newUser = await this.usersModel.create(createUserDto);
@@ -1095,7 +1095,7 @@ export class UsersService {
         },
         {
           letterSent: true,
-          updatedAt: moment().toISOString() 
+          updatedAt: moment().toISOString(),
         },
       );
 
@@ -1132,7 +1132,6 @@ export class UsersService {
       const subject =
         type == 'aceptacion' ? 'Carta de aceptación' : 'Carta de no aceptación';
 
-
       let arrEmails = '';
       objUser[0].emailAccounts.forEach(async (obj) => {
         if (
@@ -1151,7 +1150,7 @@ export class UsersService {
         amount: '',
         name: '',
         to: objUser[0].email,
-        cc:arrEmails,
+        cc: arrEmails,
         user: '',
         pass: '',
         urlPlatform: '',
@@ -1604,8 +1603,8 @@ export class UsersService {
     }
   }
 
-   //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS INVITADOS CON CARTA DE ACEPTACION
-   async findAllAcceptedUsers(
+  //ENDPOINT QUE REGRESA UNA LISTA DE TODOS LOS INVITADOS CON CARTA DE ACEPTACION
+  async findAllAcceptedUsers(
     chapterId: string,
     res: Response,
     jwtPayload: JWTPayload,
@@ -1638,8 +1637,8 @@ export class UsersService {
             completedApplication: 1,
             completedInterview: 1,
             invitedBy: 1,
-            accepted:1,
-            letterSent:1
+            accepted: 1,
+            letterSent: 1,
           },
         },
         {
@@ -1666,7 +1665,11 @@ export class UsersService {
   }
 
   //ENDPOINT PARA CAMBIAR EL ROL DE USAURIO (DE INVITADO A NETWORKER)
-  async convertVisitorIntoNetworker(id: string,jwtPayload: JWTPayload, res: Response): Promise<Response> {
+  async convertVisitorIntoNetworker(
+    id: string,
+    jwtPayload: JWTPayload,
+    res: Response,
+  ): Promise<Response> {
     try {
       const user = await this.usersModel.findById({ _id: ObjectId(id) });
 
@@ -1675,17 +1678,17 @@ export class UsersService {
 
       await this.usersModel.updateOne(
         { _id: ObjectId(id) },
-        { role: "Networker", password: plainToHash},
+        { role: 'Networker', password: plainToHash },
       );
-      
+
       const chapter = await this.chapterModel.findById(jwtPayload.idChapter);
 
       const url =
-      process.env.URL_NET_PLATFORM +
-      '?id=' +
-      user._id.toString() +
-      '&chapterId=' +
-      user.idChapter.toString();
+        process.env.URL_NET_PLATFORM +
+        '?id=' +
+        user._id.toString() +
+        '&chapterId=' +
+        user.idChapter.toString();
 
       // OBJETO PARA EL CORREO
       const emailLeaderProperties = {
