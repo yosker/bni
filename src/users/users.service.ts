@@ -60,70 +60,14 @@ export class UsersService {
         role == 'nets'
           ? { $ne: UsersType.Visitante }
           : { $eq: UsersType.Visitante };
-
-      const query: any = [
-        {
-          $match: filter,
-        },
-        {
-          $lookup: {
-            from: 'comments',
-            localField: '_id', //arriba -> users
-            foreignField: 'visitorId',
-            as: 'comments',
-          },
-        },
-        {
-          $addFields: {
-            createdAtDate: {
-              $toDate: '$createdAt',
-            },
-          },
-        },
-        {
-          $project: {
-            localCreatedAt: {
-              $dateToString: {
-                date: '$createdAtDate',
-                format: '%Y-%m-%dT%H:%M:%S',
-                timezone: jwtPayload.timeZone,
-              },
-            },
-            email: 1,
-            name: 1,
-            createdAt: {
-              $dateToString: {
-                date: '$createdAtDate',
-                format: '%Y-%m-%dT%H:%M:%S',
-                timezone: jwtPayload.timeZone,
-              },
-            },
-            updatedAt: 1,
-            idChapter: 1,
-            role: 1,
-            lastName: 1,
-            phoneNumber: 1,
-            imageURL: '',
-            companyName: 1,
-            profession: 1,
-            completedApplication: 1,
-            completedInterview: 1,
-            invitedBy: 1,
-            accepted: 1,
-            letterSent: 1,
-            comments: 1,
-          },
-        },
-        {
-          $sort: { localCreatedAt: -1 },
-        },
-      ];
-      const user: any = await this.usersModel.aggregate(query);
+      const pipeline: any = await this.resultQueryUserList(filter);
+      const user = await this.usersModel.aggregate(pipeline);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
         result: user,
+
       });
     } catch (err) {
       throw res
@@ -136,6 +80,82 @@ export class UsersService {
         );
     }
   }
+
+  //QUERY QUE OBTIENE EL LISTADO DE VISITANTES Y NETS
+  private async resultQueryUserList(filters: any) {
+    try {
+      return [
+        {
+          $match: filters 
+        },
+        {
+          $lookup: {
+              from: 'attendances',
+              localField: '_id',
+              foreignField: 'userId',
+              pipeline: [
+                  {
+                      $sort:
+                          { 'updatedAt': -1 }
+                  },
+                  { $limit: 1 }
+              ],
+              as: 'userData',
+          }
+        },
+        {
+          $lookup: {
+            from: 'comments',
+            localField: '_id', 
+            foreignField: 'visitorId',
+            as: 'comments',
+          },
+        },
+        {
+          $project: {
+            updatedAt:"$updatedAt",
+            idChapter:"$idChapter",
+            role:"$role",
+            email: "$email",
+            name: "$name",
+            lastName: "$lastName",
+            phoneNumber:"$phoneNumber",
+            imageURL:"$imageURL",
+            companyName: "$companyName",
+            profession: "$profession",
+            invitedBy: "$invitedBy",
+            completedApplication: "$completedApplication",
+            completedInterview: "$completedInterview",
+            accepted:"$accepted",
+            createdAt: {
+                    $reduce: {
+                      input: "$userData.updatedAt",
+                      initialValue: "",
+                      in: { $concat : ["$$value", "$$this"] }
+                    }
+                },    
+            localCreatedAt:{
+                  $reduce: {
+                    input: "$userData.updatedAt",
+                    initialValue: "",
+                    in: { $concat : ["$$value", "$$this"] }
+                  }
+              },   
+            letterSent: "$letterSent", 
+            comments:"$comments"
+          }
+        },
+        {
+          $sort:{ _id: -1}
+        }
+      ];
+    } catch (err) {
+      throw new HttpErrorByCode[500](
+        'Lo sentimos, ocurrió un error al procesar la información, inténtelo de nuevo o más tarde.',
+      );
+    }
+  }
+
 
   //ENDPOINT QUE REGRESA LA INFORAMCION DE UN USUARIO Y LA BUSQUEDA ES POR ID
   async findOne(id: string, res: Response): Promise<Response> {
@@ -212,14 +232,9 @@ export class UsersService {
       const newUser = await this.usersModel.create(createUserDto);
       if (newUser != null) {
         const url =
-          process.env.URL_NET_PLATFORM +
-          '?id=' +
-          newUser._id.toString() +
-          '&chapterId=' +
-          newUser.idChapter.toString();
+          process.env.URL_NET_PLATFORM +'/' + newUser._id.toString() +'/'+ newUser.idChapter.toString();
 
         let templateName = '';
-
         if (newUser.role != 'Networker') {
           templateName = process.env.LEADERSHIP_WELCOME_TEMPLATE;
         } else {
@@ -373,12 +388,12 @@ export class UsersService {
       let s3Response = '';
 
       if (filename != 'avatar.jpg') {
-        s3Response = await (
+        s3Response = (
           await this.sharedService.uploadFile(
             dataBuffer,
             filename,
             '.jpg',
-            's3-bucket-users',
+            's3-bucket-users'
           )
         ).result.toString();
         await this.sharedService.deleteObjectFromS3(
