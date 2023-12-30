@@ -159,28 +159,8 @@ export class AttendanceService {
         .endOf('day')
         .toISOString();
 
-      const visitorList = await this.usersModel.find(
-        {
-          idChapter: ObjectId(chapterId),
-          role: 'Visitante',
-          status: EstatusRegister.Active,
-          createdAt: {
-            $gte: startDate,
-            $lte: endDate,
-          },
-        },
-        {
-          name: 1,
-          lastName: 1,
-          companyName: 1,
-          profession: 1,
-          invitedBy: 1,
-          completedApplication: 1,
-          completedInterview: 1,
-          email: 1,
-          createdAt: 1,
-        },
-      );
+      const pipeline: any = await this.queryListUsers(chapterId,startDate,endDate, jwtPayload.timeZone);
+      const visitorList = await this.usersModel.aggregate(pipeline);
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
@@ -201,6 +181,78 @@ export class AttendanceService {
           );
       }
     }
+  }
+
+  //QUERY QUE REGRESA EL LISTADO DE DE USUARIO Y VISTANTES REGISTRADOS POR ZOOM 
+  async queryListUsers(chapterId: string, startDate: string , endDate: string, timeZone: string){
+
+        return [
+          {
+            $match: {
+                idChapter: ObjectId(chapterId),
+                status: "Active",
+            }
+          },
+          {
+            $lookup: {
+                from: 'attendances',
+                localField: '_id',
+                foreignField: 'userId',
+                pipeline: [
+                    {
+                        $sort:
+                            { 'updatedAt': -1 }
+                    },
+                    { $limit: 1 }
+                ],
+                as: 'userData',
+            }
+          },
+          {
+            $match: {
+                "userData.attendanceType": "zoom",
+                "userData.updatedAt": {
+                  $gte: startDate,
+                  $lte: endDate,
+                },
+            }
+          },
+          {
+            $project: {
+                _id:"$_id",
+                name: "$name",
+                lastName: "$lastName",
+                role: "$role",
+                email: "$email",
+                imageURL:"$imageURL",
+                companyName: "$companyName",
+                profession: "$profession",
+                invitedBy: "$invitedBy",
+                createdAt: {
+                    $reduce: {
+                        input: "$userData.updatedAt",
+                        initialValue: "",
+                        in: { $concat: ["$$value", "$$this"] }
+                    }
+                },
+                localUpdatedAt: {
+                  $dateToString: {
+                    format: '%H:%M:%S',
+                    date: {
+                      $dateFromString: {
+                        dateString: '$updatedAt',
+                        timezone: timeZone,
+                        format: '%Y-%m-%dT%H:%M:%S.%LZ',
+                      },
+                    },
+                  },
+                },
+            }
+          },
+          {
+            $sort: { _id: -1 }
+          }
+        ]
   }
 
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE REGISTRARON ASISNTENCIA

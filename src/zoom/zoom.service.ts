@@ -440,62 +440,62 @@ export class ZoomService {
    * @param timeZone Zona Horaria
    * @returns Arreglo de Usuarios
    */
-  async getAttendanceUsersByDate(
-    attendanceDate: string,
-    chapterId: string,
-    timeZone: string,
-  ) {
-    try {
-      const query = [
-        {
-          $match: {
-            chapterId: ObjectId(chapterId),
-            attendanceDate,
-            attended: true,
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            localField: 'userId',
-            foreignField: '_id',
-            as: 'usersData',
-          },
-        },
-        {
-          $unwind: '$usersData',
-        },
-        {
-          $project: {
-            userId: '$usersData.id',
-            name: '$usersData.name',
-            lastName: '$usersData.lastName',
-            email: '$usersData.email',
-            imageURL: '$usersData.imageURL',
-            phoneNumber: '$usersData.phoneNumber',
-            attendanceDate: '$attendanceDate',
-            updatedAt: '$updatedAt',
-            localUpdatedAt: {
-              $dateToString: {
-                format: '%H:%M:%S',
-                date: {
-                  $dateFromString: {
-                    dateString: '$updatedAt',
-                    timezone: timeZone,
-                    format: '%Y-%m-%dT%H:%M:%S.%LZ',
-                  },
-                },
-              },
-            },
-          },
-        },
-      ];
-      return await this.attendanceModel.aggregate(query);
-    } catch (error) {
-      console.log(error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  // async getAttendanceUsersByDate(
+  //   attendanceDate: string,
+  //   chapterId: string,
+  //   timeZone: string,
+  // ) {
+  //   try {
+  //     const query = [
+  //       {
+  //         $match: {
+  //           chapterId: ObjectId(chapterId),
+  //           attendanceDate,
+  //           attended: true,
+  //         },
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: 'users',
+  //           localField: 'userId',
+  //           foreignField: '_id',
+  //           as: 'usersData',
+  //         },
+  //       },
+  //       {
+  //         $unwind: '$usersData',
+  //       },
+  //       {
+  //         $project: {
+  //           userId: '$usersData.id',
+  //           name: '$usersData.name',
+  //           lastName: '$usersData.lastName',
+  //           email: '$usersData.email',
+  //           imageURL: '$usersData.imageURL',
+  //           phoneNumber: '$usersData.phoneNumber',
+  //           attendanceDate: '$attendanceDate',
+  //           updatedAt: '$updatedAt',
+  //           localUpdatedAt: {
+  //             $dateToString: {
+  //               format: '%H:%M:%S',
+  //               date: {
+  //                 $dateFromString: {
+  //                   dateString: '$updatedAt',
+  //                   timezone: timeZone,
+  //                   format: '%Y-%m-%dT%H:%M:%S.%LZ',
+  //                 },
+  //               },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     ];
+  //     return await this.attendanceModel.aggregate(query);
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 
   /**
    * @description Obtiene las Asistencias de los Usuarios
@@ -504,23 +504,23 @@ export class ZoomService {
    * @param filters Filtros
    * @returns Arreglo de usuarios
    */
-  async getUsersSessions(jwtPayload: JWTPayload, res: Response, filters: any) {
-    try {
-      const sessionData = await this.getAttendanceUsersByDate(
-        filters.sessionDate,
-        filters.chapterId,
-        jwtPayload.timeZone,
-      );
+  // async getUsersSessions(jwtPayload: JWTPayload, res: Response, filters: any) {
+  //   try {
+  //     const sessionData = await this.getAttendanceUsersByDate(
+  //       filters.sessionDate,
+  //       filters.chapterId,
+  //       jwtPayload.timeZone,
+  //     );
 
-      return res.status(HttpStatus.OK).json({
-        statusCode: this.servicesResponse.statusCode,
-        message: this.servicesResponse.message,
-        result: sessionData,
-      });
-    } catch (error) {
-      throw res.json(
-        new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR),
-      );
-    }
-  }
+  //     return res.status(HttpStatus.OK).json({
+  //       statusCode: this.servicesResponse.statusCode,
+  //       message: this.servicesResponse.message,
+  //       result: sessionData,
+  //     });
+  //   } catch (error) {
+  //     throw res.json(
+  //       new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR),
+  //     );
+  //   }
+  // }
 }
