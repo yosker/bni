@@ -89,7 +89,7 @@ export class ChaptersService {
       createUserDto = { ...createUserDto, password: plainToHash };
       const newUser = await this.usersModel.create(createUserDto);
 
-      if (newChapter != null && newUser != null)
+       if (newChapter != null && newUser != null)
         await this.sharedService.sendEmail(emailProperties);
 
       return res.status(HttpStatus.OK).json({
@@ -129,7 +129,9 @@ export class ChaptersService {
             password: createChapterDTO.password,
             sessionDate: createChapterDTO.sessionDate,
             sessionType: createChapterDTO.sessionType,
-            tokenChapter: createChapterDTO.tokenChapter,
+            clientId: createChapterDTO.clientId,
+            clientSecret: createChapterDTO.clientSecret,
+            accountId: createChapterDTO.accountId,
             meetingId: createChapterDTO.meetingId,
           },
         },

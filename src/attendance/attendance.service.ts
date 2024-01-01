@@ -237,16 +237,22 @@ export class AttendanceService {
                 },
                 localUpdatedAt: {
                   $dateToString: {
-                    format: '%H:%M:%S',
-                    date: {
-                      $dateFromString: {
-                        dateString: '$updatedAt',
-                        timezone: timeZone,
-                        format: '%Y-%m-%dT%H:%M:%S.%LZ',
-                      },
-                    },
-                  },
-                },
+                      format: "%H:%M:%S",
+                      date: {
+                          $dateFromString: {
+                              dateString:{
+                                   $reduce: {
+                                      input: "$userData.updatedAt",
+                                      initialValue: "",
+                                      in: { "$concat": ["$$value", "$$this"] }
+                                  }
+                              },
+                              timezone: timeZone,
+                              format: "%Y-%m-%dT%H:%M:%S.%LZ"
+                          }
+                      }
+                  }
+              }
             }
           },
           {

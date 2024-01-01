@@ -16,7 +16,6 @@ import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
-
 @Injectable()
 export class ZoomService {
   constructor(
@@ -30,6 +29,283 @@ export class ZoomService {
     private readonly chapterSessionModel: Model<ChapterSession>,
   ) {}
 
+  /**
+   * @description Obtiene el token atraves de Server-to-Server OAuth
+   * @param createZoomDto Objecto para creación
+   * @param res respuesta
+   * @returns respuesta
+   
+    Paso 1.- Obtener las credenciales de la colección chapters (filtro chapterId)
+    Paso 2.- Generar un token en base64 Y Generar el access token 
+    Paso 3.- Consultar la APi de zoom y obtener la lista de usuarios conectos (filtro meetingId)
+    Paso 4.- Asignarle la asistencia a los nets y registro de visitantes
+  */
+
+  async handleAttendanceProcess(jwtPayload: JWTPayload, res: Response) {
+    try {
+      
+      //OBTENEMOS EL OBJETO DEL CAPITULO
+      const objChapter = await this.chapterModel.findById({_id: ObjectId(jwtPayload.idChapter)});
+
+      //OBTENEMOS EL ACCES-TOKEN 
+      const accessToken: any = await this.generateAccessToken(objChapter).catch(
+        (error) => {
+          throw new HttpException(error.message, error.status, error);
+        },
+      );
+      
+      //OBTENEMOS LA LISTA DE USUARIOS QUE ESTAN CONECTADOS
+      const meeting: any = await this.getDataMeeting(
+        objChapter.meetingId,
+        accessToken,
+      ).catch((error) => {
+        console.log(error);
+      });
+
+      if (!meeting || meeting.length == 0) {
+        return res.status(HttpStatus.OK).json({
+          statusCode: this.servicesResponse.statusCode,
+          message: 'No se encuentra la sesión enviada.',
+          result: {},
+        });
+      }
+      //REGISTRAMOS LA ASISTENCIA DE LOS NETS Y DE LOS INVITADOS (OBSERVADORES, INVITADOS Y )
+      const obj = await this.setAttendanceUsers(meeting,ObjectId(jwtPayload.idChapter),jwtPayload);
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: this.servicesResponse.statusCode,
+        message: this.servicesResponse.message,
+        result: meeting,
+      });
+
+    } catch (error) {
+      throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR),
+        );
+    }
+  }
+
+  //PROMISE QUE REGRESA EL ACCESS TOKEN
+  generateAccessToken = (objChapter: any): Promise<any> => {
+    
+    const clientID = objChapter.clientId; 
+    const clientSecret = objChapter.clientSecret; 
+    const accountID = objChapter.accountId;
+    const authHeader = Buffer.from(`${clientID}:${clientSecret}`).toString('base64');
+
+    return new Promise((resolve, rejected) => {
+      this.httpService
+        .post(`https://zoom.us/oauth/token`,
+        {
+          grant_type: 'account_credentials',
+          account_id: accountID,
+        }, 
+        {
+        headers: {
+          'Authorization': `Basic ${authHeader}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+        .forEach((value) => {
+          resolve(value?.data.access_token);
+        })
+        .catch((error) => {
+              rejected(`No se encuentra la sesión enviada, ${error.message}`);
+        });
+    });
+  };
+
+ //PROMISE QUE REGRESA LA LISTA DE USUARIOS REGISTRADOS
+  getDataMeeting = (meetingId: any, tokenChapter: string): Promise<any> => {
+    const headers = { Authorization: `Bearer ${tokenChapter}` };
+    return new Promise((resolve, rejected) => {
+      this.httpService
+        .get(`https://api.zoom.us/v2/meetings/${meetingId}/registrants`, {
+          headers,
+        })
+        .forEach((value) => {
+          resolve(value?.data);
+        })
+        .catch((error) => {
+          // Manejar el error de la solicitud
+          rejected(`No se encuentra la sesión enviada, ${error.message}`);
+        });
+    });
+  };
+
+  //FUNCION QUE REGISTRA LA ASISTENCIA
+  async setAttendanceUsers(
+    meeting: any,
+    chapterId: any,
+    jwtPayload: JWTPayload
+  ) {
+    try {
+
+      const dateAttendance = moment().format('YYYY-MM-DD');
+      //SE VALIDA QUE EXISTA LA SESION (SE FILTRA POR CHAPTERID Y FECHA)
+      const findChapterSession = await this.chapterSessionModel.findOne({
+        chapterId: ObjectId(chapterId),
+        sessionDate: dateAttendance,
+      });
+
+      if (!findChapterSession?._id)
+        throw new HttpErrorByCode[404](
+          'NOT_FOUND_CHAPTERSESSION',
+          this.servicesResponse,
+        );
+
+      for (const element of meeting.registrants) {
+        const registrant = element;
+
+        const leaveTime = moment
+          .utc(registrant.create_time)
+          .tz(jwtPayload.timeZone)
+          .toISOString();
+
+        //BUSCAMOS AL USUARIO POR CORREO
+        const user = await this.usersModel.findOne({
+          email: registrant.email,
+          idChapter: ObjectId(chapterId),
+        });
+
+        if (!user) {
+          //SI NO SE ENCUENTRA EL USUARIO, SE CREA COMO VISITANTE
+          const userVisitor = {
+            idChapter: ObjectId(chapterId),
+            email: registrant.email,
+            name: registrant.first_name,
+            role: 'Visitante',
+            lastName: registrant.last_name,
+            phoneNumber: registrant.phone,
+            companyName: registrant.company,
+            profession: registrant.profession,
+            invitedBy: registrant.invitedBy,
+            updatedAt: leaveTime,
+          };
+          const newUser = await this.usersModel.create(userVisitor);
+
+          //SE CREA SU REGISTRO EN ATTENDANCE
+          await this.attendanceModel.create(
+            {
+              userId: ObjectId(newUser._id),
+              chapterId: ObjectId(chapterId),
+              attendanceDate: dateAttendance,
+              attendanceType: AttendanceType.OnZoom,
+              chapterSessionId: ObjectId(findChapterSession._id),
+            },
+            {
+              attended: true,
+              updatedAt: leaveTime,
+            },
+          );
+        } else {
+          //DE LO CONTRARIO SE PASA ASISTENCIA AL NETWORKER O VISITANTE SI EXISTE
+          if (user.role.toLowerCase() !== 'visitante') {
+
+            await this.attendanceModel.findOneAndUpdate(
+              {
+                userId: ObjectId(user._id),
+                chapterId: ObjectId(chapterId),
+                attendanceDate: dateAttendance,
+              },
+              {
+                attended: true,
+                updatedAt: leaveTime,
+                attendanceType: AttendanceType.OnZoom,
+              },
+            );
+          } else if (user.role.toLowerCase() === 'visitante') {
+
+            //SE VALIDA QUE SOLO EXISTA UN REGISTRO CON LA MISMA FECHA POR SESION EN ATTENDANCE 
+            const attendanceRegister = await this.attendanceModel.findOne({  
+              chapterId: ObjectId(chapterId),
+              sessionDate: dateAttendance, 
+              userId: user._id
+             })
+
+            if (attendanceRegister === null) //SE CREA SU ATTENDANCE 
+              await this.attendanceModel.create({
+                userId: ObjectId(user._id),
+                chapterId: ObjectId(chapterId),
+                attendanceDate: dateAttendance,
+                attendanceType: AttendanceType.OnZoom,
+                chapterSessionId: ObjectId(findChapterSession._id),
+                attended: true,
+                updatedAt: leaveTime,
+              });
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
+  async updateAttendaceNet(
+    obj: any,
+    jwtPayload: JWTPayload,
+    res: Response): Promise<Response>{
+      try {
+
+        //BUSCAMOS EL ATTENDACEDATE DEL VISITANTE 
+        const objAttendanceVisitor = await this.attendanceModel.findOne({
+          userId: ObjectId(obj.idVisitor),
+          chapterId: ObjectId(jwtPayload.idChapter),
+          attendanceDate: obj.attendanceDate,
+        })
+
+        //ACTUALIZAMOS EL ROL DEL SUSTITUTO 
+        const objVisitor = await this.usersModel.findOne({
+          _id: ObjectId(obj.idVisitor),
+          chapterId: ObjectId(jwtPayload.idChapter)});
+
+
+        await this.usersModel.updateOne({
+          _id: ObjectId(obj.idVisitor),
+          chapterId: ObjectId(jwtPayload.idChapter)
+        }, 
+        { 
+           name: "Sustituto" + " -> "+ objVisitor.name 
+        });
+
+
+        //ACTUALIZAMOS LA INFO DEL NETWORKER 
+        const objAttendance = await this.attendanceModel.updateOne({
+          userId: ObjectId(obj.idNetworker),
+          chapterId: ObjectId(jwtPayload.idChapter),
+          attendanceDate: obj.attendanceDate,
+        }, 
+        { 
+          attended: true,
+          updatedAt: objAttendanceVisitor.updatedAt,
+          attendanceType: AttendanceType.OnZoom,
+        });
+
+        return res.status(HttpStatus.OK).json({
+          statusCode: this.servicesResponse.statusCode,
+          message: this.servicesResponse.message,
+          result: {},
+        });
+      }
+      catch(error){
+        throw res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          new HttpException(
+            'INTERNAL_SERVER_ERROR.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+
+      }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   /**
    * @description Obtiene la Asistencia de los Usuarios del Meet
    * @param createZoomDto Objecto para creación
@@ -193,16 +469,16 @@ export class ZoomService {
         }
       }
 
-      const sessionData = await this.getAttendanceUsersByDate(
-        chapter.sessionDate,
-        filters.chapterId,
-        jwtPayload.timeZone,
-      );
+      // const sessionData = await this.getAttendanceUsersByDate(
+      //   chapter.sessionDate,
+      //   filters.chapterId,
+      //   jwtPayload.timeZone,
+      // );
 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
-        result: sessionData,
+        result: {}, //sessionData,
       });
     } catch (error) {
       throw res.json(
@@ -382,29 +658,6 @@ export class ZoomService {
         );
     }
   }
-
-  /**
-   * @description Obtiene la información de la sesión enviada
-   * @param meetingId Id del Meet
-   * @param tokenChapter Token del Capítulo
-   * @returns Información del Mee
-   */
-  getDataMeeting = (meetingId: string, tokenChapter: string): Promise<any> => {
-    const headers = { Authorization: `Bearer ${tokenChapter}` };
-    return new Promise((resolve, rejected) => {
-      this.httpService
-        .get(`https://api.zoom.us/v2/meetings/${meetingId}/registrants`, {
-          headers,
-        })
-        .forEach((value) => {
-          resolve(value?.data);
-        })
-        .catch((error) => {
-          // Manejar el error de la solicitud
-          rejected(`No se encuentra la sesión enviada, ${error.message}`);
-        });
-    });
-  };
 
   /**
    * @description Obtiene las sesiones dadas de alta por el usuario

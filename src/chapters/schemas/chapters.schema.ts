@@ -13,7 +13,9 @@ export const ChapterSchema = new Schema({
   attendanceDate: { type: String, required: false },
   sessionSchedule: { type: String, required: true },
   sessionType: { type: String, required: true },
-  tokenChapter: { type: String, required: false },
+  clientId: { type: String, required: false },
+  clientSecret: { type: String, required: false },
+  accountId: { type: String, required: false },
   meetingId: { type: String, required: false },
   createdAt: {
     type: String,

@@ -60,12 +60,20 @@ export class ZoomController {
     return this.zoomService.getMeetings(res, filters);
   }
 
-  // @Post('/getUsersSessions')
-  // getUsersSessions(
-  //   @Body() filters: any,
-  //   @Auth() jwtPayload: JWTPayload,
-  //   @Res() res: Response,
-  // ) {
-  //   return this.zoomService.getUsersSessions(jwtPayload, res, filters);
-  // }
+  @Get('getZoomData')
+  getData( 
+    @Auth() jwtPayload: JWTPayload,
+    @Res() res: Response) {
+    return this.zoomService.handleAttendanceProcess(jwtPayload, res);
+  }
+    
+  @Post('updateAttendaceNetworker')
+  async updateNetworkerAttendance(
+    @Body() obj: any,
+    @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
+  ): Promise<Response> {
+    return await this.zoomService.updateAttendaceNet(obj,jwtPayload, res);
+  }
+
 }

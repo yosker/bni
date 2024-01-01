@@ -69,7 +69,15 @@ export class CreateChapterDTO extends PartialType(RegisterAuthDto) {
 
   @Prop({ default: "", required: false })
   @IsString()
-  tokenChapter: string;
+  clientId: string;
+
+  @Prop({ default: "", required: false })
+  @IsString()
+  clientSecret: string;
+
+  @Prop({ default: "", required: false })
+  @IsString()
+  accountId: string;
 
   @Prop({ default: "", required: false })
   @IsString()
