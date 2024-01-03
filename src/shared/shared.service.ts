@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ServicesResponse } from 'src/responses/response';
-import { S3 } from 'aws-sdk';
+import { S3 } from 'aws-sdk'; // '@aws-sdk/client-s3';
 
 const hbs = require('nodemailer-express-handlebars');
 const nodemailer = require('nodemailer');
 const generateSafeId = require('generate-safe-id');
 import { join } from 'path';
-import { bool } from 'aws-sdk/clients/redshiftdata';
+// import { bool } from 'aws-sdk/clients/redshiftdata';
 
 @Injectable()
 export class SharedService {
@@ -17,8 +17,11 @@ export class SharedService {
 
   private s3 = new S3({
     region: this.region,
-    accessKeyId: this.accessKeyId,
-    secretAccessKey: this.secretAccessKey,
+
+    credentials: {
+      accessKeyId: this.accessKeyId,
+      secretAccessKey: this.secretAccessKey,
+    },
   });
 
   constructor(
@@ -142,7 +145,7 @@ export class SharedService {
     return response;
   }
 
-  async sendMailer(emailProperties: any, attachment: bool) {
+  async sendMailer(emailProperties: any, attachment: boolean) {
     try {
       const transport: any = {
         host: process.env.EMAIL_HOST,

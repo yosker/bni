@@ -251,30 +251,25 @@ export class ZoomService {
     res: Response): Promise<Response>{
       try {
 
-        //BUSCAMOS EL ATTENDACEDATE DEL VISITANTE 
+        //BUSCAMOS EL ATTENDACEDATE DEL VISITANTE Y OBTENEMOS LA FECHA Y HORA DE REGISTRO
         const objAttendanceVisitor = await this.attendanceModel.findOne({
           userId: ObjectId(obj.idVisitor),
           chapterId: ObjectId(jwtPayload.idChapter),
           attendanceDate: obj.attendanceDate,
         })
 
-        //ACTUALIZAMOS EL ROL DEL SUSTITUTO 
-        const objVisitor = await this.usersModel.findOne({
-          _id: ObjectId(obj.idVisitor),
-          chapterId: ObjectId(jwtPayload.idChapter)});
-
-
+      
+       //ACTUALIZAMOS EL ROL DEL SUSTITUTO 
         await this.usersModel.updateOne({
           _id: ObjectId(obj.idVisitor),
           chapterId: ObjectId(jwtPayload.idChapter)
         }, 
         { 
-           name: "Sustituto" + " -> "+ objVisitor.name 
+           role:"Sustituto"
         });
 
-
         //ACTUALIZAMOS LA INFO DEL NETWORKER 
-        const objAttendance = await this.attendanceModel.updateOne({
+        await this.attendanceModel.updateOne({
           userId: ObjectId(obj.idNetworker),
           chapterId: ObjectId(jwtPayload.idChapter),
           attendanceDate: obj.attendanceDate,

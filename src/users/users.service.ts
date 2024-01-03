@@ -56,10 +56,12 @@ export class UsersService {
         ['idChapter']: ObjectId(chapterId),
         ['status']: EstatusRegister.Active,
       };
+      const roles = ['Tesorería','Anfitriones','Membresías','Vicepresidente','Networker','Presidente']
       filter['role'] =
         role == 'nets'
-          ? { $ne: UsersType.Visitante }
+          ? { $in: roles }
           : { $eq: UsersType.Visitante };
+
       const pipeline: any = await this.resultQueryUserList(filter);
       const user = await this.usersModel.aggregate(pipeline);
 

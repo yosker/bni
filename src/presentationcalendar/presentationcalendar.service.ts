@@ -127,8 +127,12 @@ export class PresentationcalendarService {
       let { statusCode, message } = this.servicesResponse;
       const pipeline: any = await this.getQuery(jwtPayload.idChapter);
       const presentationList = await this.presentationCalendarModel.aggregate(pipeline).sort({ presentationDate: -1 });
-
-      const objUserList = await this.usersModel.find({ idChapter: ObjectId(jwtPayload.idChapter), status: EstatusRegister.Active, role: { $ne: UsersType.Visitante }})
+      
+      const roles = ['Tesorería','Anfitriones','Membresías','Vicepresidente','Networker','Presidente']
+      const objUserList = await this.usersModel.find({ 
+        idChapter: ObjectId(jwtPayload.idChapter), 
+        status: EstatusRegister.Active, 
+        role: { $in: roles }})
       
       const lastRecord = await this.presentationCalendarModel.findOne({
         chapterId:ObjectId(jwtPayload.idChapter),
@@ -164,7 +168,7 @@ export class PresentationcalendarService {
         {
           $match: {
               chapterId: ObjectId(chapterId),
-              status: EstatusRegister.Active,
+              status: EstatusRegister.Active
           }
       },
       {

@@ -256,7 +256,7 @@ export class AttendanceService {
             }
           },
           {
-            $sort: { _id: -1 }
+            $sort: { localUpdatedAt: 1 }
           }
         ]
   }

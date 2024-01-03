@@ -172,8 +172,9 @@ export class DashboardService {
 
   private async totalAbsencesResult(chapterId: string) {
     try {
-      const gte = moment().add(-6, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+      const gte = moment().add(-5, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
       const lte = moment().format('YYYY-MM-DD') + 'T23:59:59.999';
+      const roles = ['Tesorería','Anfitriones','Membresías','Vicepresidente','Networker','Presidente']
 
       return [
         {
@@ -190,7 +191,7 @@ export class DashboardService {
         {
           $match: {
             'users.role': {
-              $ne: 'Visitante',
+              $in: roles, //'Visitante',
             },
             chapterId: ObjectId(chapterId),
             attended: false,
