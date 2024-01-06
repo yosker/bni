@@ -68,7 +68,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   // @Role('Admin')
-  @UseGuards(AuthGuard(), JwtGuard),
+  @UseGuards(AuthGuard(), JwtGuard)
   @Post('/createVistor')
   async createVisotors(
     @Body() createUserDto: CreateUserDto,

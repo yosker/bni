@@ -16,6 +16,8 @@ import { ChapterSessionSchema } from 'src/chapter-sessions/schemas/chapterSessio
 import { AttendanceSchema } from 'src/attendance/schemas/attendance.schema';
 import { ChapterSchema } from 'src/chapters/schemas/chapters.schema';
 import { UsersInterviewsSchema } from 'src/users-interviews/schemas/interviews.schema';
+import { Logs, LogsSchema } from 'src/logs/schemas/logs.schema';
+
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -31,6 +33,7 @@ import { UsersInterviewsSchema } from 'src/users-interviews/schemas/interviews.s
       { name: 'Attendance', schema: AttendanceSchema },
       { name: 'Chapter', schema: ChapterSchema },
       { name: 'UsersInterview', schema: UsersInterviewsSchema},
+      { name: Logs.name, schema: LogsSchema },
     ]),
     AuthModule,
     PassportModule.register({

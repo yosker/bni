@@ -22,6 +22,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersInterview } from 'src/users-interviews/interfaces/users-interview.interface';
 import { join } from 'path';
 import { UsersType } from 'src/shared/enums/usersType';
+import { Logs } from 'src/logs/schemas/logs.schema';
+import { Log } from 'src/logs/interfaces/logs.interface';
+
 
 const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
@@ -32,6 +35,7 @@ export class UsersService {
   constructor(
     @InjectModel(Users.name) private readonly usersModel: Model<User>,
     @InjectModel(Roles.name) private readonly rolesModel: Model<Role>,
+    @InjectModel(Logs.name) private readonly logModel: Model<Log>,
     private readonly sharedService: SharedService,
     private servicesResponse: ServicesResponse,
     private jwtService: JwtService,
@@ -303,6 +307,11 @@ export class UsersService {
     const currentDateZone = moment().tz(jwtPayload.timeZone);
     const currentDate = currentDateZone.format('YYYY-MM-DD');
 
+    await this.logModel.create({
+      message: `pipeline extraído: ${JSON.stringify(currentDate)}`,
+      stackTrace: 'users.createVisitor',
+      createdAt: new Date().toISOString(),
+    });
 
     if (!findRole)
       throw new HttpErrorByCode[404]('NOT_FOUND_ROLE', this.servicesResponse);
