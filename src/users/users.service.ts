@@ -158,7 +158,6 @@ export class UsersService {
     }
   }
 
-
   //ENDPOINT QUE REGRESA LA INFORAMCION DE UN USUARIO Y LA BUSQUEDA ES POR ID
   async findOne(id: string, res: Response): Promise<Response> {
     try {
