@@ -384,7 +384,6 @@ export class AttendanceService {
         skip,
         limit,
       );
-
       const noAttendances = await this.attendanceModel.aggregate(pipeline);
 
       return res.status(HttpStatus.OK).json({
@@ -410,12 +409,12 @@ export class AttendanceService {
     skip: number,
     limit: number,
   ) {
-    const now = moment().toISOString();
-    const lte = moment(now).toISOString();
+    const gte = moment().add(-5, 'M').format('YYYY-MM-DD') + 'T00:00:00.000';
+
     const filter = {
       chapterId: ObjectId(chapterId),
       attendanceDate: {
-        $lte: lte.split('T').shift(),
+        $gte: gte.split('T').shift(),
       },
       attended: false,
     };
@@ -438,7 +437,7 @@ export class AttendanceService {
       {
         $match: {
           'usersData.role': {
-            $nin: ['Visitante'],
+            $nin: ['Visitante','Sustituto'],
           },
         },
       },
@@ -713,12 +712,13 @@ export class AttendanceService {
   async getUsersAttendancesQuery(chapterId: string){
     
     try {
+      const roles = ['Tesorería','Anfitriones','Membresías','Vicepresidente','Networker','Presidente']
       return [
         {
         $match: {
           idChapter: ObjectId(chapterId),
           status:  EstatusRegister.Active,
-          role: { $ne: "Visitante" },
+          role: { $in: roles },
         }
         },
         {

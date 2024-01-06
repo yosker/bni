@@ -127,20 +127,55 @@ export class SharedService {
     let response = false;
     try {
       const arrPresident = [
+        'chapterform',
+        'onlineUsersform',
+        'leadershipTeamList',
         'usersform',
         'userslist',
+        'attendanceList',
         'visitorslist',
         'emailaccounts',
         'evaluationperiod',
         'activities',
-        'interviewslist',
         'absencesform',
+        'contributionList',
+        'chargesList',
+        'report',
+        'applicationlist',
+        'presentationCalendar'
       ];
 
-      if (role == 'Presidente') {
+      const arrMembershipTeam = [
+        'usersform',
+        'userslist',
+        'attendanceList',
+        'visitorslist',
+        'evaluationperiod',
+        'activitiesform',
+        'absencesform'
+      ]
+
+      const arrhostingTeam = [
+        'onlineUsersform',
+        'attendanceList',
+        'visitorslist'
+      ]
+
+      if (role == 'Presidente' || role == 'Vicepresidente' || role == 'Tesorería') {
         const includePage = arrPresident.includes(page);
         response = includePage ? true : false;
       }
+
+      if (role == 'Membresías') {
+        const includePage = arrMembershipTeam.includes(page);
+        response = includePage ? true : false;
+      }
+
+      if (role == 'Anfitriones') {
+        const includePage = arrhostingTeam.includes(page);
+        response = includePage ? true : false;
+      }
+
     } catch (err) {}
     return response;
   }

@@ -38,11 +38,16 @@ export class MenuService {
       const chapter = await this.chapterModel.findOne({
         _id: ObjectId(chapterId),
       });
-      if (role == 'Presidente') {
+      if (role == 'Presidente' || role == 'Vicepresidente' || role == 'Tesorería') {
         objMenu = await this.administratorMenu(chapter.name, objUser);
       }
+    
       if (role == 'Membresías') {
-        objMenu = await this.membershipsMenu(chapter.name, objUser);
+        objMenu = await this.membershipsTeamMenu(chapter.name, objUser);
+      }
+
+      if (role == 'Anfitriones') {
+        objMenu = await this.hostingTeamMenu(chapter.name, objUser);
       }
 
       return res.status(HttpStatus.OK).json({
@@ -250,7 +255,7 @@ export class MenuService {
     return menu;
   }
 
-  async membershipsMenu(chapter: any, objUser: any) {
+  async membershipsTeamMenu(chapter: any, objUser: any) {
     const menu = {
       perfil: {
         idUsuario: 0,
@@ -280,6 +285,13 @@ export class MenuService {
               ordenModulo: 2,
               estilo: '',
             },
+            {
+              idSubModulo: 3,
+              nombre: 'Asistencia networkers',
+              urlPagina: 'attendanceList.html',
+              ordenModulo: 3,
+              estilo: '',
+            },
           ],
         },
         {
@@ -288,7 +300,7 @@ export class MenuService {
           ordenModulo: 2,
           subModulos: [
             {
-              idSubModulo: 3,
+              idSubModulo: 4,
               nombre: 'Consultar Visitantes',
               urlPagina: 'visitorslist.html',
               ordenModulo: 1,
@@ -299,7 +311,7 @@ export class MenuService {
         {
           nombre: 'Periodos de prueba',
           estilo: 'engineering',
-          ordenModulo: 4,
+          ordenModulo: 3,
           subModulos: [
             {
               idSubModulo: 5,
@@ -313,10 +325,10 @@ export class MenuService {
         {
           nombre: 'Trabajo membresías',
           estilo: 'checklist',
-          ordenModulo: 6,
+          ordenModulo: 4,
           subModulos: [
             {
-              idSubModulo: 7,
+              idSubModulo: 6,
               nombre: 'Actividades membresías',
               urlPagina: 'activitiesform.html',
               ordenModulo: 1,
@@ -324,6 +336,87 @@ export class MenuService {
             },
           ],
         },
+
+        {
+          nombre: 'Carta por faltas',
+          estilo: 'outgoing_mail',
+          ordenModulo: 5,
+          subModulos: [
+            {
+              idSubModulo: 7,
+              nombre: 'Carta por faltas',
+              urlPagina: 'absencesform.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
+        },
+
+
+
+      ],
+      notificaciones: [],
+    };
+    return menu;
+  }
+  
+  async hostingTeamMenu(chapter: any, objUser: any) {
+    let lastName = objUser.lastName == undefined ? '' : objUser.lastName;
+    const menu = {
+      perfil: {
+        idUsuario: 0,
+        nombreUsuario: objUser.name + ' ' + lastName,
+        avatar: objUser.imageURL,
+        rol: objUser.role,
+        idJerarquia: 0,
+        nombreCompania: chapter,
+      },
+      modulos: [
+        {
+          nombre: 'Capítulo',
+          estilo: 'settings',
+          ordenModulo: 0,
+          subModulos: [
+            {
+              idSubModulo: 1,
+              nombre: 'Usuarios sesión online',
+              urlPagina: 'onlineUsersform.html',
+              ordenModulo: 2,
+              estilo: '',
+            },
+          ],
+        },
+
+        {
+          nombre: 'Networkers',
+          estilo: 'groups',
+          ordenModulo: 1,
+          subModulos: [
+            
+            {
+              idSubModulo: 2,
+              nombre: 'Asistencia networkers',
+              urlPagina: 'attendanceList.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
+        },
+        {
+          nombre: 'Visitantes',
+          estilo: 'contact_page',
+          ordenModulo: 2,
+          subModulos: [
+            {
+              idSubModulo: 3,
+              nombre: 'Consultar visitantes',
+              urlPagina: 'visitorslist.html',
+              ordenModulo: 1,
+              estilo: '',
+            },
+          ],
+        },
+       
       ],
       notificaciones: [],
     };

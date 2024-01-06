@@ -37,7 +37,9 @@ export class EmailAccountsController {
 
   @Get()
   
-  findAll(@Res() res: Response,@Headers('page') page: string, @Auth() jwtPayload: JWTPayload) {
+  findAll(@Res() res: Response,
+         @Headers('page') page: string, 
+         @Auth() jwtPayload: JWTPayload) {
     return this.emailAccountsService.findAll(res,page, jwtPayload);
   }
 
