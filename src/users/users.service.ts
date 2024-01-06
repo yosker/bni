@@ -294,17 +294,22 @@ export class UsersService {
   async createVisitor(
     createUserDto: CreateUserDto,
     res: Response,
+    jwtPayload: JWTPayload
   ): Promise<Response> {
     const findRole = this.rolesModel.findOne({
       name: createUserDto.role,
     });
+
+    const currentDateZone = moment().tz(jwtPayload.timeZone);
+    const currentDate = currentDateZone.format('YYYY-MM-DD');
+
 
     if (!findRole)
       throw new HttpErrorByCode[404]('NOT_FOUND_ROLE', this.servicesResponse);
 
     const findChapterSession = await this.chapterSessionModel.findOne({
       chapterId: ObjectId(createUserDto.idChapter),
-      sessionDate: moment().format('YYYY-MM-DD'),
+      sessionDate: currentDate,//moment().format('YYYY-MM-DD'),
     });
 
     if (!findChapterSession)
@@ -321,8 +326,8 @@ export class UsersService {
       };
 
       //S le pasa asistencia al usuario nuevo
-      const dateAttendance = moment().format('YYYY-MM-DD');
-      const leaveTime = moment(dateAttendance).toISOString();
+      //const dateAttendance = moment().format('YYYY-MM-DD');
+      //const leaveTime = moment(dateAttendance).toISOString();
       let newUser = await this.usersModel.findOne({
         email: createUserDto.email,
       });
@@ -332,18 +337,18 @@ export class UsersService {
       const attendance = await this.attendanceModel.findOne({
         chapterId: ObjectId(createUserDto.idChapter),
         userId: ObjectId(newUser._id),
-        attendanceDate: dateAttendance,
+        attendanceDate: currentDate,
       });
 
       if (!attendance?._id) {
         await this.attendanceModel.create({
           userId: ObjectId(newUser._id),
           chapterId: ObjectId(createUserDto.idChapter),
-          attendanceDate: dateAttendance,
+          attendanceDate: currentDate,
           attendanceType: AttendanceType.OnSite,
           chapterSessionId: ObjectId(findChapterSession._id),
           attended: true,
-          updatedAt: leaveTime,
+          updatedAt: currentDate,
         });
       }
 

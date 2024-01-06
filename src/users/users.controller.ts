@@ -68,13 +68,14 @@ export class UsersController {
 
   @ApiBearerAuth()
   // @Role('Admin')
-  @UseGuards(AuthGuard(), JwtGuard)
+  @UseGuards(AuthGuard(), JwtGuard),
   @Post('/createVistor')
   async createVisotors(
     @Body() createUserDto: CreateUserDto,
     @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload
   ) {
-    return await this.usersService.createVisitor(createUserDto, res);
+    return await this.usersService.createVisitor(createUserDto, res,jwtPayload);
   }
 
   @ApiBearerAuth()
