@@ -332,8 +332,8 @@ export class UsersService {
         ...createUserDto,
         idChapter: ObjectId(createUserDto.idChapter),
         resetPassword: false,
+        createdAt: currentDate,
       };
-
       //S le pasa asistencia al usuario nuevo
       //const dateAttendance = moment().format('YYYY-MM-DD');
       //const leaveTime = moment(dateAttendance).toISOString();
