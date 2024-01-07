@@ -276,14 +276,13 @@ export class AttendanceService {
         0,
         jwtPayload.timeZone,
       );
-
       const userData = await this.attendanceModel.aggregate(pipeline);
       // También puedes almacenar la IP en la base de datos si es necesario
-      await this.logModel.create({
-        message: `pipeline extraído: ${JSON.stringify(pipeline)}`,
-        stackTrace: 'NetworkersList',
-        createdAt: new Date().toISOString(),
-      });
+      // await this.logModel.create({
+      //   message: `pipeline extraído: ${JSON.stringify(pipeline)}`,
+      //   stackTrace: 'NetworkersList',
+      //   createdAt: new Date().toISOString(),
+      // });
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -302,7 +301,7 @@ export class AttendanceService {
   }
 
   //PIPELINE PARA REGRESAR LOS DATOS DEL USUARIO (NETWORKER) CUANDO SE REGISTRA
-  private async AttendanceResult(
+  private async   AttendanceResult(
     chapterId: string,
     attendaceDate: string,
     userId: string,
@@ -336,7 +335,7 @@ export class AttendanceService {
         },
         {
           $match: {
-            role: {
+            "userData.role": {
               $ne: 'Visitante',
             },
           },
