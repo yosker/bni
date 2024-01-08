@@ -307,6 +307,12 @@ export class UsersService {
     const currentDateZone = moment().tz(jwtPayload.timeZone);
     const currentDate = currentDateZone.format('YYYY-MM-DD');
 
+    const leaveTime = moment
+    .utc(currentDateZone)
+    .tz(jwtPayload.timeZone)
+    .toISOString();
+
+
     await this.logModel.create({
       message: `pipeline extraído: ${JSON.stringify(currentDate)}`,
       stackTrace: 'users.createVisitor',
@@ -315,10 +321,10 @@ export class UsersService {
 
     if (!findRole)
       throw new HttpErrorByCode[404]('NOT_FOUND_ROLE', this.servicesResponse);
-
+    
     const findChapterSession = await this.chapterSessionModel.findOne({
       chapterId: ObjectId(createUserDto.idChapter),
-      sessionDate: currentDate,//moment().format('YYYY-MM-DD'),
+      sessionDate: currentDate,
     });
 
     if (!findChapterSession)
@@ -357,7 +363,7 @@ export class UsersService {
           attendanceType: AttendanceType.OnSite,
           chapterSessionId: ObjectId(findChapterSession._id),
           attended: true,
-          updatedAt: currentDate,
+          updatedAt: leaveTime, //currentDate,
         });
       }
 

@@ -13,6 +13,7 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { AttendanceType } from 'src/shared/enums/attendance.enum';
 import { ChapterSession } from 'src/chapter-sessions/interfaces/chapterSessions.interface';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { EstatusRegister } from 'src/shared/enums/register.enum';
 
 const moment = require('moment-timezone');
 const ObjectId = require('mongodb').ObjectId;
@@ -45,7 +46,7 @@ export class ZoomService {
     try {
       
       //OBTENEMOS EL OBJETO DEL CAPITULO
-      const objChapter = await this.chapterModel.findById({_id: ObjectId(jwtPayload.idChapter)});
+      const objChapter = await this.chapterModel.findById({_id: ObjectId(jwtPayload.idChapter), status: EstatusRegister.Active,});
 
       //OBTENEMOS EL ACCES-TOKEN 
       const accessToken: any = await this.generateAccessToken(objChapter).catch(
@@ -69,9 +70,20 @@ export class ZoomService {
           result: {},
         });
       }
-      //REGISTRAMOS LA ASISTENCIA DE LOS NETS Y DE LOS INVITADOS (OBSERVADORES, INVITADOS Y )
-      const obj = await this.setAttendanceUsers(meeting,ObjectId(jwtPayload.idChapter),jwtPayload);
-
+      
+      const dateAttendance = moment().format('YYYY-MM-DD');
+      //SE VALIDA QUE EXISTA LA SESION (SE FILTRA POR CHAPTERID Y FECHA)
+      const findChapterSession = await this.chapterSessionModel.findOne({
+        chapterId: ObjectId(jwtPayload.idChapter),
+        sessionDate: dateAttendance,
+        status: EstatusRegister.Active,
+      });
+    
+      if (findChapterSession !== null){
+        //REGISTRAMOS LA ASISTENCIA DE LOS NETS Y DE LOS INVITADOS (OBSERVADORES, INVITADOS )
+        const obj = await this.setAttendanceUsers(meeting,ObjectId(jwtPayload.idChapter),jwtPayload,dateAttendance,findChapterSession._id);
+      }
+       
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,
@@ -139,22 +151,12 @@ export class ZoomService {
   async setAttendanceUsers(
     meeting: any,
     chapterId: any,
-    jwtPayload: JWTPayload
+    jwtPayload: JWTPayload,
+    dateAttendance: string,
+    chapterSessionId: any
   ) {
     try {
 
-      const dateAttendance = moment().format('YYYY-MM-DD');
-      //SE VALIDA QUE EXISTA LA SESION (SE FILTRA POR CHAPTERID Y FECHA)
-      const findChapterSession = await this.chapterSessionModel.findOne({
-        chapterId: ObjectId(chapterId),
-        sessionDate: dateAttendance,
-      });
-
-      if (!findChapterSession?._id)
-        throw new HttpErrorByCode[404](
-          'NOT_FOUND_CHAPTERSESSION',
-          this.servicesResponse,
-        );
 
       for (const element of meeting.registrants) {
         const registrant = element;
@@ -168,6 +170,7 @@ export class ZoomService {
         const user = await this.usersModel.findOne({
           email: registrant.email,
           idChapter: ObjectId(chapterId),
+          status: EstatusRegister.Active,
         });
 
         if (!user) {
@@ -193,7 +196,7 @@ export class ZoomService {
               chapterId: ObjectId(chapterId),
               attendanceDate: dateAttendance,
               attendanceType: AttendanceType.OnZoom,
-              chapterSessionId: ObjectId(findChapterSession._id),
+              chapterSessionId: ObjectId(chapterSessionId),
             },
             {
               attended: true,
@@ -209,6 +212,7 @@ export class ZoomService {
                 userId: ObjectId(user._id),
                 chapterId: ObjectId(chapterId),
                 attendanceDate: dateAttendance,
+                status: EstatusRegister.Active
               },
               {
                 attended: true,
@@ -222,7 +226,8 @@ export class ZoomService {
             const attendanceRegister = await this.attendanceModel.findOne({  
               chapterId: ObjectId(chapterId),
               sessionDate: dateAttendance, 
-              userId: user._id
+              userId: user._id,
+              status: EstatusRegister.Active
              })
 
             if (attendanceRegister === null) //SE CREA SU ATTENDANCE 
@@ -231,7 +236,7 @@ export class ZoomService {
                 chapterId: ObjectId(chapterId),
                 attendanceDate: dateAttendance,
                 attendanceType: AttendanceType.OnZoom,
-                chapterSessionId: ObjectId(findChapterSession._id),
+                chapterSessionId: ObjectId(chapterSessionId),
                 attended: true,
                 updatedAt: leaveTime,
               });
@@ -242,8 +247,6 @@ export class ZoomService {
       console.log(error);
     }
   }
-
-
 
   async updateAttendaceNet(
     obj: any,

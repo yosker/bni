@@ -46,7 +46,22 @@ export class AttendanceController {
     @Res() res: Response,
     @Auth() jwtPayload: JWTPayload,
   ) {
-    return await this.attendanceService.VisitorsList(
+    return await this.attendanceService.VisitorsListApp(
+      chapterId,
+      sessionDate,
+      res,
+      jwtPayload,
+    );
+  }
+  
+  @Get('/visitorsBackOffice/:chapterId/:sessionDate')
+  async getVisitorsBackOffice(
+    @Param('chapterId') chapterId: string,
+    @Param('sessionDate') sessionDate: string,
+    @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
+  ) {
+    return await this.attendanceService.VisitorsListBackOffice(
       chapterId,
       sessionDate,
       res,
