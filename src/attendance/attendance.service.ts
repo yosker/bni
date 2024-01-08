@@ -439,9 +439,8 @@ export class AttendanceService {
       const filter = {
         chapterId: ObjectId(chapterId),
         attendanceDate: attendaceDate,
-        attended: true,
-        role: { $nin: { roles}}
-      };
+        attended: true
+       };
       if (queryType == 1) {
         filter['userId'] = ObjectId(userId);
       }
@@ -464,7 +463,7 @@ export class AttendanceService {
         {
           $match: {
             "userData.role": {
-              $ne: 'Visitante',
+              $nin: roles
             },
           },
         },
