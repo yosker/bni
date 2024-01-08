@@ -434,10 +434,13 @@ export class AttendanceService {
     timeZone: string,
   ) {
     try {
+
+      const roles = ['Visitante','Sustituto'];
       const filter = {
         chapterId: ObjectId(chapterId),
         attendanceDate: attendaceDate,
         attended: true,
+        role: { $nin: { roles}}
       };
       if (queryType == 1) {
         filter['userId'] = ObjectId(userId);
