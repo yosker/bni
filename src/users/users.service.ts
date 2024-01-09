@@ -319,6 +319,7 @@ export class UsersService {
       createdAt: new Date().toISOString(),
     });
 
+   
     if (!findRole)
       throw new HttpErrorByCode[404]('NOT_FOUND_ROLE', this.servicesResponse);
     
@@ -329,7 +330,7 @@ export class UsersService {
 
     if (!findChapterSession)
       throw new HttpErrorByCode[404](
-        'NOT_FOUND_CHAPTERSESSION',
+        'No encontramos una sesión programada para el dia de hoy.',
         this.servicesResponse,
       );
 
@@ -363,7 +364,7 @@ export class UsersService {
           attendanceType: AttendanceType.OnSite,
           chapterSessionId: ObjectId(findChapterSession._id),
           attended: true,
-          updatedAt: leaveTime, //currentDate,
+          updatedAt: currentDate,
         });
       }
 
