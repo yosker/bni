@@ -307,8 +307,8 @@ export class UsersService {
     const currentDateZone = moment().tz(jwtPayload.timeZone);
     const currentDate = currentDateZone.format('YYYY-MM-DD');
 
-    const leaveTime = moment
-    .utc(currentDateZone)
+    const curentDataTime = moment
+    .utc(currentDate)
     .tz(jwtPayload.timeZone)
     .toISOString();
 
@@ -364,7 +364,7 @@ export class UsersService {
           attendanceType: AttendanceType.OnSite,
           chapterSessionId: ObjectId(findChapterSession._id),
           attended: true,
-          updatedAt: currentDate,
+          updatedAt: curentDataTime,// currentDate,
         });
       }
 

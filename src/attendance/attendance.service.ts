@@ -383,9 +383,6 @@ export class AttendanceService {
     ]
 }
 
-
-
-
   //ENDPOINT QUE REGRESA EL LISTADO DE USUARIOS QUE REGISTRARON ASISNTENCIA
   async NetworkersList(
     chapterId: string,
