@@ -83,9 +83,11 @@ export class AttendanceService {
         });
 
         if (userSession) {
-          return res
-            .status(HttpStatus.BAD_REQUEST)
-            .json(new HttpException('RECORD_DUPLICATED.', HttpStatus.CONFLICT));
+          return res.status(HttpStatus.CONFLICT).json({
+            statusCode: HttpStatus.CONFLICT,
+            message: 'Este usuario ya ha sido registrado.',
+            result: {}
+          });
         }
 
         attendanceDTO = {
@@ -119,14 +121,11 @@ export class AttendanceService {
           result: userData[0],
         });
       } else {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json(
-            new HttpException(
-              'ATTENDANCE_NOT_AUTHORIZED.',
-              HttpStatus.UNAUTHORIZED,
-            ),
-          );
+        return res.status(HttpStatus.NOT_FOUND).json({
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'No encontramos una sesión programada para el dia de hoy.',
+          result: {}
+        });
       }
     } catch (err) {
       throw res
@@ -227,6 +226,7 @@ export class AttendanceService {
                 companyName: "$companyName",
                 profession: "$profession",
                 invitedBy: "$invitedBy",
+                completedInterview: "$completedInterview",
                 createdAt: {
                     $reduce: {
                         input: "$userData.updatedAt",
@@ -399,12 +399,7 @@ export class AttendanceService {
         jwtPayload.timeZone,
       );
       const userData = await this.attendanceModel.aggregate(pipeline);
-      // También puedes almacenar la IP en la base de datos si es necesario
-      // await this.logModel.create({
-      //   message: `pipeline extraído: ${JSON.stringify(pipeline)}`,
-      //   stackTrace: 'NetworkersList',
-      //   createdAt: new Date().toISOString(),
-      // });
+ 
       return res.status(HttpStatus.OK).json({
         statusCode: this.servicesResponse.statusCode,
         message: this.servicesResponse.message,

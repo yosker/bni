@@ -31,11 +31,11 @@ export class AttendanceController {
   constructor(private attendanceService: AttendanceService) {}
 
   @Post('/update')
-  async update(
-    @Body() attendanceDTO: AttendanceDTO,
+  async updateNetAttendance(
+    @Body() attendanceDTO: any,
     @Res() res: Response,
     @Auth() jwtPayload: JWTPayload,
-  ) {
+  ): Promise<Response> {
     return await this.attendanceService.update(attendanceDTO, res, jwtPayload);
   }
 

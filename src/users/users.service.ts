@@ -300,10 +300,7 @@ export class UsersService {
     res: Response,
     jwtPayload: JWTPayload
   ): Promise<Response> {
-    const findRole = this.rolesModel.findOne({
-      name: createUserDto.role,
-    });
-
+   
     const currentDateZone = moment().tz(jwtPayload.timeZone);
     const currentDate = currentDateZone.format('YYYY-MM-DD');
 
@@ -311,21 +308,11 @@ export class UsersService {
     .utc(currentDate)
     .tz(jwtPayload.timeZone)
     .toISOString();
-
-
-    await this.logModel.create({
-      message: `pipeline extraído: ${JSON.stringify(currentDate)}`,
-      stackTrace: 'users.createVisitor',
-      createdAt: new Date().toISOString(),
-    });
-
-   
-    if (!findRole)
-      throw new HttpErrorByCode[404]('NOT_FOUND_ROLE', this.servicesResponse);
     
     const findChapterSession = await this.chapterSessionModel.findOne({
       chapterId: ObjectId(createUserDto.idChapter),
       sessionDate: currentDate,
+      status:  EstatusRegister.Active
     });
 
     if (!findChapterSession)
@@ -341,11 +328,9 @@ export class UsersService {
         resetPassword: false,
         createdAt: currentDate,
       };
-      //S le pasa asistencia al usuario nuevo
-      //const dateAttendance = moment().format('YYYY-MM-DD');
-      //const leaveTime = moment(dateAttendance).toISOString();
       let newUser = await this.usersModel.findOne({
         email: createUserDto.email,
+        status: EstatusRegister.Active
       });
 
       if (!newUser) newUser = await this.usersModel.create(createUserDto);
@@ -364,7 +349,8 @@ export class UsersService {
           attendanceType: AttendanceType.OnSite,
           chapterSessionId: ObjectId(findChapterSession._id),
           attended: true,
-          updatedAt: curentDataTime,// currentDate,
+          createdAt: curentDataTime,
+          updatedAt: curentDataTime,
         });
       }
 

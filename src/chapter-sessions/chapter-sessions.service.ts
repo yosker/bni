@@ -168,12 +168,16 @@ export class ChapterSessionsService {
     const { result } = this.servicesResponse;
 
     try {
+
       const session = await this.chapterSessionModel.findOne({
         chapterId: ObjectId(jwtPayload.idChapter),
         sessionDate: sessionDate.toString(),
+        status:EstatusRegister.Active
       });
+      
       await this.chapterSessionModel.updateOne(
         {
+          _id: ObjectId(session._id),
           chapterId: ObjectId(jwtPayload.idChapter),
           sessionDate: sessionDate.toString(),
         },
