@@ -16,6 +16,7 @@ import { PresentationcalendarService } from './presentationcalendar.service';
 import { Response } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 
 @ApiBearerAuth()
@@ -24,17 +25,18 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 @Controller('presentationcalendar')
 export class PresentationcalendarController {
 
-    constructor(private presentationcalendarService: PresentationcalendarService) {}
-
-    @Post('/create')
-    async create(
-      @Body() presentationCalendarDTO: PresentationCalendarDTO,
-      @Res() res: Response,
-      @Auth() jwtPayload: JWTPayload,
-    ): Promise<Response> {
-      return await this.presentationcalendarService.create(presentationCalendarDTO, res, jwtPayload);
-    }
-
+  constructor(private presentationcalendarService: PresentationcalendarService) {}
+  @Role('Presidente','Vicepresidente','Tesorería')
+  @Post('/create')
+  async create(
+    @Body() presentationCalendarDTO: PresentationCalendarDTO,
+    @Res() res: Response,
+    @Auth() jwtPayload: JWTPayload,
+  ): Promise<Response> {
+    return await this.presentationcalendarService.create(presentationCalendarDTO, res, jwtPayload);
+  }
+  
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/findAll')
   async findAll(
     @Auth() jwtPayload: JWTPayload,
@@ -42,7 +44,8 @@ export class PresentationcalendarController {
   ): Promise<Response> {
     return await this.presentationcalendarService.findAll(jwtPayload, res);
   }
-
+  
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('delete/:id')
   async deleteRecord(
     @Param('id') id: string,
@@ -51,7 +54,7 @@ export class PresentationcalendarController {
     return this.presentationcalendarService.delete(id, res);
   }
   
-
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/findUsersAndPresentationsCalendar')
   async findUsersAndPresentations(
     @Auth() jwtPayload: JWTPayload,

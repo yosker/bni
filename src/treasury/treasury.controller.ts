@@ -15,6 +15,7 @@ import { TreasuryService } from './treasury.service';
 import { Response } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -23,6 +24,7 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 export class TreasuryController {
   constructor(private treasusyService: TreasuryService) {}
 
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Post('/create')
   async create(
     @Body() treasuryDTO: TreasuryDTO,
@@ -31,7 +33,8 @@ export class TreasuryController {
   ): Promise<Response> {
     return await this.treasusyService.create(treasuryDTO, res, jwtPayload);
   }
-
+ 
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/userPayments/:userId')
   async getVisitors(
     @Param('userId') userId: string,
@@ -40,6 +43,7 @@ export class TreasuryController {
     return await this.treasusyService.userPaymentList(userId, res);
   }
 
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/findAll')
   async findAll(
     @Auth() jwtPayload: JWTPayload,
@@ -48,6 +52,7 @@ export class TreasuryController {
     return await this.treasusyService.findAll(jwtPayload, res);
   }
 
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/deleteContribution/:id')
   async delete(
     @Param('id') id: string,

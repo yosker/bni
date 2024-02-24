@@ -32,7 +32,7 @@ export class RolesController {
   ): Promise<Response> {
     return await this.rolesService.create(createRoleDto, res);
   }
-
+  @Role('Presidente','Vicepresidente','Tesorería','Membresías')
   @Get('rolesList')
   findAll(@Res() res: Response) {
     return this.rolesService.findAll(res);

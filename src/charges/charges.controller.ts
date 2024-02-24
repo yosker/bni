@@ -19,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Response } from 'express';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @ApiTags('charges')
 @Controller('charges')
@@ -27,6 +28,7 @@ export class ChargesController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), JwtGuard)
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Post('/create')
   @UseInterceptors(FileInterceptor('file'))
   async create(
@@ -46,6 +48,7 @@ export class ChargesController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), JwtGuard)
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/findAll')
   async findAll(
     @Auth() jwtPayload: JWTPayload,
@@ -56,6 +59,7 @@ export class ChargesController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), JwtGuard)
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Patch('/delete/:id')
   async Delete(
     @Param('id') id: string,
@@ -66,6 +70,7 @@ export class ChargesController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), JwtGuard)
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/findOne/:id')
   async findone(
     @Param('id') id: string,

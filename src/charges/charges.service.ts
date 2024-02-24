@@ -73,12 +73,16 @@ export class ChargesService {
         ).result.toString();
       }
 
+      const currentDateZone = moment().tz(jwtPayload.timeZone);
+      const currentDate = currentDateZone.format('YYYY-MM-DD');
+
       let createChargeDto = req;
       createChargeDto = {
         ...createChargeDto,
         chapterId: ObjectId(jwtPayload.idChapter),
         userId: ObjectId(jwtPayload.id),
         urlFile: s3Response,
+        createdAt: currentDate
       };
       if (createChargeDto.idCharge != '') {
         await this.chargesModel.findByIdAndUpdate(

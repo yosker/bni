@@ -6,6 +6,7 @@ import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { TreasuryReportService } from './treasury-report.service';
 import { Response } from 'express';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -13,6 +14,7 @@ import { Response } from 'express';
 export class TreasuryReportController {
   constructor(private treasuryReportService: TreasuryReportService) {}
 
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/getData')
   async getData(@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
     return await this.treasuryReportService.getFullData(jwtPayload, res);

@@ -16,6 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -23,7 +24,8 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 @Controller('evaluation-period')
 export class EvaluationPeriodController {
   constructor(private evaluationPeriodService: EvaluationPeriodService) {}
-
+ 
+  @Role('Presidente','Vicepresidente','Tesorería','Membresías')
   @Post('/create')
   async create(
     @Body() evaluationPeriodDTO: EvaluationPeriodDTO,
@@ -37,6 +39,7 @@ export class EvaluationPeriodController {
     );
   }
 
+  @Role('Presidente','Vicepresidente','Tesorería','Membresías')
   @Get('/list/:networkerId')
   @UseGuards(AuthGuard('jwt'))
   findAll(
@@ -51,6 +54,7 @@ export class EvaluationPeriodController {
     );
   }
 
+  @Role('Presidente','Vicepresidente','Tesorería','Membresías')
   @Get('/detail/:id')
   @UseGuards(AuthGuard('jwt'))
   finDetail(
@@ -61,6 +65,7 @@ export class EvaluationPeriodController {
     return this.evaluationPeriodService.evaluationDetail(id, jwtPayload, res);
   }
 
+  @Role('Presidente','Vicepresidente','Tesorería','Membresías')
   @Patch('/update/:id')
   async update(
     @Param('id') id: string,
@@ -76,6 +81,7 @@ export class EvaluationPeriodController {
     );
   }
 
+  @Role('Presidente','Vicepresidente','Tesorería','Membresías')
   @Patch('/delete/:id')
   async delete(@Param('id') id: string, @Res() res: Response) {
     return await this.evaluationPeriodService.delete(id, res);

@@ -17,7 +17,6 @@ import { PaginateResult } from 'src/shared/pagination/pagination-result';
 import { join } from 'path';
 import { Logs } from 'src/logs/schemas/logs.schema';
 import { Log } from 'src/logs/interfaces/logs.interface';
-import { stringify } from 'querystring';
 
 const ObjectId = require('mongodb').ObjectId;
 const PDFDocument = require('pdfkit-table');
@@ -227,6 +226,7 @@ export class AttendanceService {
                 profession: "$profession",
                 invitedBy: "$invitedBy",
                 completedInterview: "$completedInterview",
+                applicationUrl:"$completedApplication",
                 createdAt: {
                     $reduce: {
                         input: "$userData.updatedAt",

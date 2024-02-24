@@ -22,6 +22,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -29,7 +30,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiBearerAuth()
-  // @Role('Admin')
+ 
   @UseGuards(AuthGuard(), JwtGuard)
   @Post('/create')
   @UseInterceptors(FileInterceptor('file'))
@@ -79,7 +80,7 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  // @Role('Admin')
+  @Role('Presidente','Vicepresidente','Tesorería','Anfitriones','Membresías')
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('/networkersList/:chapterId/:role')
   @ApiBearerAuth()
@@ -132,7 +133,7 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
-  // @Role('Admin')
+  @Role('Presidente','Vicepresidente','Tesorería','Membresías')
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('/findAllMembership')
   findAllMembership(@Auth() jwtPayload: JWTPayload, @Res() res: Response) {
@@ -195,6 +196,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), JwtGuard)
+  @Role('Presidente','Vicepresidente','Tesorería')
   @Get('/acceptedUsersList/:chapterId')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

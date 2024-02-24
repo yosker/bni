@@ -18,6 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard(), JwtGuard)
@@ -27,6 +28,7 @@ export class EmailAccountsController {
   constructor(private readonly emailAccountsService: EmailAccountsService) {}
 
   @Post()
+  @Role('Presidente','Vicepresidente','Tesorería')
   create(
     @Body() createCommentDto: CreateEmailAccountsDTO,
     @Res() res: Response,
@@ -36,19 +38,21 @@ export class EmailAccountsController {
   }
 
   @Get()
-  
+  @Role('Presidente','Vicepresidente','Tesorería')
   findAll(@Res() res: Response,
          @Headers('page') page: string, 
          @Auth() jwtPayload: JWTPayload) {
     return this.emailAccountsService.findAll(res,page, jwtPayload);
   }
-
+  
   @Get(':id')
+  @Role('Presidente','Vicepresidente','Tesorería')
   findOne(@Param('id') id: string, @Res() res: Response) {
     return this.emailAccountsService.findOne(id, res);
   }
 
   @Patch('edit/:id')
+  @Role('Presidente','Vicepresidente','Tesorería')
   update(
     @Param('id') id: string,
     @Body() updateCommentDto: UpdateEmailAccountsDTO,
@@ -64,6 +68,7 @@ export class EmailAccountsController {
   }
 
   @Patch(':id')
+  @Role('Presidente','Vicepresidente','Tesorería')
   delete(@Param('id') id: string, @Res() res: Response) {
     return this.emailAccountsService.delete(id, res);
   }

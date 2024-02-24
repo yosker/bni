@@ -15,6 +15,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @ApiTags('Chapters')
 @Controller('chapters')
@@ -31,6 +32,7 @@ export class ChaptersController {
   }
 
   @ApiBearerAuth()
+  @Role('Presidente','Vicepresidente','Tesorería')
   @UseGuards(AuthGuard(), JwtGuard)
   @Get('/getChapterData')
   findChapterData(
@@ -41,6 +43,7 @@ export class ChaptersController {
   }
 
   @ApiBearerAuth()
+  @Role('Presidente','Vicepresidente','Tesorería')
   @UseGuards(AuthGuard(), JwtGuard)
   @Patch('/editConfigChapter')
   async updateChapter(

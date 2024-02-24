@@ -20,6 +20,7 @@ import { JWTPayload } from 'src/auth/jwt.payload';
 import { PaginationParams } from 'src/shared/pagination/paginationParams';
 import { LocalTimeInterceptor } from 'src/shared/utils/local-time-stamp/local-time.interceptor';
 import { LocalTime } from 'src/shared/utils/local-time-stamp/local-time.decorator';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @LocalTime()
 @UseInterceptors(LocalTimeInterceptor)
@@ -83,7 +84,7 @@ export class AttendanceController {
       jwtPayload,
     );
   }
-
+  @Role('Presidente','Vicepresidente','Tesorería','Tesorería','Membresías')
   @Get('/noAttendances/')
   async getNoAttendances(
     @Res() res: Response,
@@ -113,7 +114,7 @@ export class AttendanceController {
     );
   }
 
-  
+  @Role('Presidente','Vicepresidente','Tesorería','Anfitriones','Membresías')
   @Get('/getUsersAttendancesList')
   async UsersAttendancesList(
     @Auth() jwtPayload: JWTPayload,

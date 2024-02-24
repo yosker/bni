@@ -18,6 +18,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { JWTPayload } from 'src/auth/jwt.payload';
 import { LocalTime } from 'src/shared/utils/local-time-stamp/local-time.decorator';
 import { LocalTimeInterceptor } from 'src/shared/utils/local-time-stamp/local-time.interceptor';
+import { Role } from 'src/auth/decorators/Role.decorator';
 
 @LocalTime()
 @UseInterceptors(LocalTimeInterceptor)
@@ -59,14 +60,16 @@ export class ZoomController {
   getMeetings(@Body() filters: any, @Res() res: Response) {
     return this.zoomService.getMeetings(res, filters);
   }
-
+  
+  @Role('Presidente','Vicepresidente','Tesorería','Anfitriones')
   @Get('getZoomData')
   getData( 
     @Auth() jwtPayload: JWTPayload,
     @Res() res: Response) {
     return this.zoomService.handleAttendanceProcess(jwtPayload, res);
   }
-    
+  
+  @Role('Presidente','Vicepresidente','Tesorería','Anfitriones')
   @Post('updateAttendaceNetworker')
   async updateNetworkerAttendance(
     @Body() obj: any,
